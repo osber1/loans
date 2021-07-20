@@ -1,0 +1,4 @@
+rootProject.name = 'interest'
+include 'interest-app'
+include 'interest-api'
+include 'interest-db'
