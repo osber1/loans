@@ -1,4 +1,4 @@
-package com.finance.task.interest.service;
+package com.finance.interest.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -43,7 +43,7 @@ import com.finance.interest.service.ClientService;
 import com.finance.interest.util.TimeUtils;
 
 @ExtendWith(MockitoExtension.class)
-class ClientServiceTest {
+class ClientServiceTestOld {
 
     public static final String TIME_ZONE = "Europe/Vilnius";
 

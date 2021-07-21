@@ -2,40 +2,42 @@ plugins {
     id 'org.springframework.boot' version '2.5.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'groovy'
+    id 'application'
 }
 
-bootJar {
-    enabled = false
-}
+mainClassName = "com.finance.interest.InterestApplication"
 
-jar {
-    enabled = true
-}
+ext { springBootVersion = '2.5.2' }
 
-repositories {
-    mavenCentral()
-}
-
-test {
-    useJUnitPlatform()
-}
-
-subprojects {
+allprojects {
     group = 'com.4finance'
     version = '1.0-SNAPSHOT'
-
-    apply plugin: 'java'
-    apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'java-library'
 
     repositories {
         mavenCentral()
     }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'application'
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:2.5.2")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
         }
     }
 
+    ext {
+        groovy = '3.0.8'
+        lombok = '1.18.20'
+        springfox = '3.0.0'
+        mockito_inline = '3.8.0'
+        mapstruct = '1.4.2.Final'
+        spock = '2.0-M5-groovy-3.0'
+        lombok_mapstruct_bindings = '0.2.0'
+    }
 }

@@ -1,4 +1,4 @@
-package com.finance.task.interest.controller;
+package com.finance.interest.controller;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,7 +45,7 @@ import com.finance.interest.util.TimeUtils;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application.yaml")
-class ClientControllerTest {
+class ClientControllerTestOld {
 
     public static final String TIME_ZONE = "Europe/Vilnius";
 

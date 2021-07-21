@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:/home/osvaldas/Java_projects/4finance-task/build/h2db/db/interest;AUTO_SERVER=TRUE
     username: username
     password: password
     driverClassName: org.h2.Driver

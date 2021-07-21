@@ -1,4 +1,4 @@
-package com.finance.task.interest.repository;
+package com.finance.interest.repository;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -14,7 +14,7 @@ import com.finance.interest.model.IpLogs;
 import com.finance.interest.repository.IpLogsRepository;
 
 @DataJpaTest
-class IpLogsRepositoryTest {
+class IpLogsRepositoryTestOld {
 
     @Autowired
     private IpLogsRepository underTest;
