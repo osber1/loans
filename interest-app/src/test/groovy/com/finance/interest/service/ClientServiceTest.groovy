@@ -1,7 +1,6 @@
 package com.finance.interest.service
 
 import com.finance.interest.configuration.PropertiesConfig
-import com.finance.interest.model.ClientDAO
 import com.finance.interest.repository.ClientRepository
 import com.finance.interest.repository.LoanRepository
 import com.finance.interest.util.ValidationUtils
@@ -10,29 +9,14 @@ import spock.lang.Specification
 
 class ClientServiceTest extends Specification {
 
-    def clientRepository = Mock(ClientRepository)
+    ClientRepository clientRepository = Mock()
 
-    def loanRepository = Mock(LoanRepository)
+    LoanRepository loanRepository = Mock()
 
-    def config = Mock(PropertiesConfig)
+    PropertiesConfig config = Mock()
 
-    def validationUtils = Mock(ValidationUtils)
+    ValidationUtils validationUtils = Mock()
 
-    def clientService = new ClientService(clientRepository, loanRepository, config, validationUtils)
+    ClientService clientService = new ClientService(clientRepository, loanRepository, config, validationUtils)
 
-    def client = createClient()
-
-    void 'test'() {
-        when:
-            clientRepository.findById(_ as String) >> client
-
-        then:
-            clientService.returnName("Tomas") == "Tomas"
-    }
-
-    static Optional<ClientDAO> createClient() {
-        ClientDAO client = new ClientDAO()
-        client.setFirstName("Tomas")
-        return Optional.of(client)
-    }
 }

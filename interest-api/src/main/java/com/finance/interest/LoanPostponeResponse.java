@@ -1,5 +1,6 @@
 package com.finance.interest;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 import lombok.Data;
@@ -11,5 +12,5 @@ public class LoanPostponeResponse {
 
     private ZonedDateTime newReturnDate;
 
-    private double newInterestRate;
+    private BigDecimal newInterestRate;
 }

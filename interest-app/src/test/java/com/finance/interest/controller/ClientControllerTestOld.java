@@ -105,7 +105,7 @@ class ClientControllerTestOld {
         loanPostpone = new LoanPostpone();
         loanPostpone.setId(1);
         loanPostpone.setNewReturnDate(DATE_TIME_OF_JAN_8_2021);
-        loanPostpone.setNewInterestRate(15.0);
+        loanPostpone.setNewInterestRate(BigDecimal.valueOf(15.0));
     }
 
     private void createClientDao() {
@@ -120,7 +120,7 @@ class ClientControllerTestOld {
     private void createLoan() {
         loan = new Loan();
         loan.setAmount(BigDecimal.valueOf(100.00).setScale(2, RoundingMode.HALF_EVEN));
-        loan.setInterestRate(10.0);
+        loan.setInterestRate(BigDecimal.valueOf(10.0));
         loan.setTermInMonths(12);
         loan.setReturnDate(DATE_TIME_OF_JAN_1_2021);
     }
@@ -128,7 +128,7 @@ class ClientControllerTestOld {
     private void createClientDto() {
         LoanResponse loan = new LoanResponse();
         loan.setAmount(BigDecimal.valueOf(100));
-        loan.setInterestRate(10);
+        loan.setInterestRate(BigDecimal.valueOf(10));
         loan.setTermInMonths(12);
         loan.setReturnDate(DATE_TIME_OF_JAN_1_2021);
         clientDto = new ClientResponse();

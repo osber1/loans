@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 
 public class TimeUtils {
 
-    public static final String TIME_ZONE = "Europe/Vilnius";
+    private static final String TIME_ZONE = "Europe/Vilnius";
 
     public static ZonedDateTime getDayOfMonth() {
         return getCurrentDateTime().truncatedTo(ChronoUnit.DAYS);

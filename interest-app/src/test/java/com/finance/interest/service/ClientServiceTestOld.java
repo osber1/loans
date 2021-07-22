@@ -120,7 +120,7 @@ class ClientServiceTestOld {
     private static LoanPostpone createLoanPostpone(ZonedDateTime date, double interestRate) {
         LoanPostpone loanPostpone = new LoanPostpone();
         loanPostpone.setNewReturnDate(date);
-        loanPostpone.setNewInterestRate(interestRate);
+        loanPostpone.setNewInterestRate(BigDecimal.valueOf(interestRate));
         return loanPostpone;
     }
 
@@ -160,7 +160,7 @@ class ClientServiceTestOld {
     private static Loan createLoan(ZonedDateTime date, BigDecimal amount) {
         Loan successLoan = new Loan();
         successLoan.setId(1);
-        successLoan.setInterestRate(10.0);
+        successLoan.setInterestRate(BigDecimal.valueOf(10.0));
         successLoan.setTermInMonths(12);
         successLoan.setAmount(amount);
         successLoan.setReturnDate(date);
@@ -183,7 +183,7 @@ class ClientServiceTestOld {
     void takeLoan_whenNewUser() {
         // given
         when(config.getMaxAmount()).thenReturn(BigDecimal.valueOf(100));
-        when(config.getInterestRate()).thenReturn(10.0);
+        when(config.getInterestRate()).thenReturn(BigDecimal.valueOf(10.0));
         when(config.getRequestsFromSameIpLimit()).thenReturn(3);
         when(clientsIpsRepository.findByIp(anyString())).thenReturn(Optional.of(ipLog));
         when(clientRepository.save(any(ClientDAO.class))).thenReturn(clientFromRepo);
@@ -205,7 +205,7 @@ class ClientServiceTestOld {
     void takeLoan_whenExistingUser() {
         // given
         when(config.getMaxAmount()).thenReturn(BigDecimal.valueOf(100));
-        when(config.getInterestRate()).thenReturn(10.0);
+        when(config.getInterestRate()).thenReturn(BigDecimal.valueOf(10.0));
         when(config.getRequestsFromSameIpLimit()).thenReturn(3);
         when(clientsIpsRepository.findByIp(anyString())).thenReturn(Optional.of(ipLog));
         when(clientRepository.save(any(ClientDAO.class))).thenReturn(clientFromRepo);
@@ -260,7 +260,7 @@ class ClientServiceTestOld {
     @Test
     void takeLoan_whenIpLimitObjectIsNull() {
         when(config.getMaxAmount()).thenReturn(BigDecimal.valueOf(100));
-        when(config.getInterestRate()).thenReturn(10.0);
+        when(config.getInterestRate()).thenReturn(BigDecimal.valueOf(10.0));
         when(clientsIpsRepository.findByIp(anyString())).thenReturn(Optional.empty());
         when(clientRepository.save(any(ClientDAO.class))).thenReturn(clientFromRepo);
 
@@ -280,7 +280,7 @@ class ClientServiceTestOld {
     @Test
     void takeLoan_whenIpLimitExceededButItIsNextDay() {
         when(config.getMaxAmount()).thenReturn(BigDecimal.valueOf(100));
-        when(config.getInterestRate()).thenReturn(10.0);
+        when(config.getInterestRate()).thenReturn(BigDecimal.valueOf(10.0));
         when(config.getRequestsFromSameIpLimit()).thenReturn(1);
         when(clientsIpsRepository.findByIp(anyString())).thenReturn(Optional.of(ipLogAfter));
         when(clientRepository.save(any(ClientDAO.class))).thenReturn(clientFromRepo);
@@ -313,7 +313,7 @@ class ClientServiceTestOld {
     void postponeLoan_whenLoanExistAndFirstPostpone() {
         // given
         when(config.getPostponeDays()).thenReturn(7);
-        when(config.getInterestIncrementFactor()).thenReturn(1.5);
+        when(config.getInterestIncrementFactor()).thenReturn(BigDecimal.valueOf(1.5));
         when(loanRepository.findById(anyInt())).thenReturn(Optional.of(successfulLoan));
         when(loanRepository.save(any(Loan.class))).thenReturn(loanWithPostpone);
 
@@ -328,7 +328,7 @@ class ClientServiceTestOld {
     void postponeLoan_whenLoanExistAndNotFirstPostpone() {
         // given
         when(config.getPostponeDays()).thenReturn(7);
-        when(config.getInterestIncrementFactor()).thenReturn(1.5);
+        when(config.getInterestIncrementFactor()).thenReturn(BigDecimal.valueOf(1.5));
         when(loanRepository.findById(anyInt())).thenReturn(Optional.of(loanWithPostpone));
         when(loanRepository.save(any(Loan.class))).thenReturn(loanWithTwoPostpones);
 

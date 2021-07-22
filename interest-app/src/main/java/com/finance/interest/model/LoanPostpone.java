@@ -1,5 +1,6 @@
 package com.finance.interest.model;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 import javax.persistence.Entity;
@@ -23,6 +24,6 @@ public class LoanPostpone {
 
     private ZonedDateTime newReturnDate;
 
-    private double newInterestRate;
+    private BigDecimal newInterestRate;
 }
 

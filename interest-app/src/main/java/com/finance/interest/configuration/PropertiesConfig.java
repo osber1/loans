@@ -21,7 +21,7 @@ public class PropertiesConfig {
 
     private BigDecimal maxAmount;
 
-    private Double interestRate;
+    private BigDecimal interestRate;
 
     private int postponeDays;
 
@@ -35,5 +35,5 @@ public class PropertiesConfig {
     @Max(value = 24)
     private int forbiddenHourTo;
 
-    private double interestIncrementFactor;
+    private BigDecimal interestIncrementFactor;
 }

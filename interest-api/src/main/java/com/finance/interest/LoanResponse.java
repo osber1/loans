@@ -13,7 +13,7 @@ public class LoanResponse {
 
     private BigDecimal amount;
 
-    private double interestRate;
+    private BigDecimal interestRate;
 
     private Integer termInMonths;
 

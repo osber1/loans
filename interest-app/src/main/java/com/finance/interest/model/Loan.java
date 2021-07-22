@@ -29,7 +29,7 @@ public class Loan {
     @NotNull
     private BigDecimal amount;
 
-    private Double interestRate;
+    private BigDecimal interestRate;
 
     @NotNull
     private Integer termInMonths;

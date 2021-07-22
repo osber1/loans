@@ -73,7 +73,7 @@ public class ClientService {
     @Transactional
     public LoanPostpone postponeLoan(int id) {
         ZonedDateTime newReturnDate;
-        double newInterestRate;
+        BigDecimal newInterestRate;
         LoanPostpone loanPostpone = new LoanPostpone();
         Loan loanRequest = getLoan(id);
 
@@ -83,13 +83,13 @@ public class ClientService {
         if (loanPostpones == null || loanPostpones.isEmpty()) {
             loanPostpones = new HashSet<>();
             newReturnDate = loanRequest.getReturnDate().plusDays(config.getPostponeDays());
-            newInterestRate = loanRequest.getInterestRate() * config.getInterestIncrementFactor();
+            newInterestRate = loanRequest.getInterestRate().multiply(config.getInterestIncrementFactor());
         } else {
             LoanPostpone firstPostpone = loanPostpones.stream().max(latestLoanPostpone).get();
             newReturnDate = firstPostpone.getNewReturnDate().plusDays(config.getPostponeDays());
-            newInterestRate = firstPostpone.getNewInterestRate() * config.getInterestIncrementFactor();
+            newInterestRate = firstPostpone.getNewInterestRate().multiply(config.getInterestIncrementFactor());
         }
-        loanPostpone.setNewInterestRate(roundNewInterestRate(newInterestRate));
+        loanPostpone.setNewInterestRate(newInterestRate.setScale(NUMBERS_AFTER_COMMA, RoundingMode.HALF_UP));
         loanPostpone.setNewReturnDate(newReturnDate);
         loanPostpones.add(loanPostpone);
         loanRequest.setLoanPostpones(loanPostpones);
@@ -106,10 +106,6 @@ public class ClientService {
         return clientRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(String.format(CLIENT_NOT_EXIST, id)))
             .getLoans();
-    }
-
-    private double roundNewInterestRate(double newInterestRate) {
-        return BigDecimal.valueOf(newInterestRate).setScale(NUMBERS_AFTER_COMMA, RoundingMode.HALF_UP).doubleValue();
     }
 
     private Client buildClientResponse(ClientDAO savedClient) {
