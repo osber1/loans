@@ -19,8 +19,10 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "application")
 public class PropertiesConfig {
 
+    @Min(value = 0)
     private BigDecimal maxAmount;
 
+    @Min(value = 0)
     private BigDecimal interestRate;
 
     private int postponeDays;

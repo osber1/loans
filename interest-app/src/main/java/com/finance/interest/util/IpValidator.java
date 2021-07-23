@@ -31,21 +31,14 @@ public class IpValidator implements ValidationRule {
     private final TimeUtils timeUtils;
 
     @Override
+    @Transactional
     public void validate(String ip, BigDecimal clientAmount) {
         checkIpAddress(ip, config.getRequestsFromSameIpLimit());
     }
 
-    @Transactional
-    public void checkIpAddress(String ipAddress, int requestsFromSameIpLimit) {
-        Optional<IpLogs> ipFromDatabase = ipLogsRepository.findByIp(ipAddress);
-        if (ipFromDatabase.isEmpty()) {
-            IpLogs newIpToSave = IpLogs.builder()
-                .ip(ipAddress)
-                .firstRequestDate(timeUtils.getCurrentDateTime())
-                .timesUsed(1).build();
-            ipLogsRepository.save(newIpToSave);
-        } else {
-            IpLogs ipLog = ipFromDatabase.get();
+    private void checkIpAddress(String ipAddress, int requestsFromSameIpLimit) {
+        IpLogs ipLog = ipLogsRepository.findByIp(ipAddress).orElseGet(() -> createIpLogs(ipAddress));
+        if (ipLog.getTimesUsed() >= 1) {
             if (ipLog.getTimesUsed() >= requestsFromSameIpLimit && !checkIfItsTheNextDay(ipLog)) {
                 throw new BadRequestException(TOO_MANY_REQUESTS);
             } else {
@@ -55,15 +48,23 @@ public class IpValidator implements ValidationRule {
         }
     }
 
-    public boolean checkIfItsTheNextDay(IpLogs ipFromDatabase) {
+    private boolean checkIfItsTheNextDay(IpLogs ipFromDatabase) {
         ZonedDateTime currentDay = timeUtils.getDayOfMonth();
         ZonedDateTime lastRequestDay = ipFromDatabase.getFirstRequestDate().truncatedTo(ChronoUnit.DAYS);
-        if (currentDay.isAfter(lastRequestDay)) {
+        if (currentDay.isAfter(lastRequestDay.plusDays(1))) {
             ipFromDatabase.setTimesUsed(0);
             ipLogsRepository.save(ipFromDatabase);
             return true;
         } else {
             return false;
         }
+    }
+
+    private IpLogs createIpLogs(String ipAddress) {
+        IpLogs newIpToSave = IpLogs.builder()
+            .ip(ipAddress)
+            .firstRequestDate(timeUtils.getCurrentDateTime())
+            .timesUsed(1).build();
+        return ipLogsRepository.save(newIpToSave);
     }
 }

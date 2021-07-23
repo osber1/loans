@@ -1,5 +1,8 @@
 package com.finance.interest.service;
 
+import static com.finance.interest.model.Client.buildClientResponse;
+import static com.finance.interest.model.ClientDAO.buildNewClientDAO;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZonedDateTime;
@@ -7,7 +10,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -102,25 +104,5 @@ public class ClientService {
         return clientRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(String.format(CLIENT_NOT_EXIST, id)))
             .getLoans();
-    }
-
-    private Client buildClientResponse(ClientDAO savedClient) {
-        return Client.builder()
-            .id(savedClient.getId())
-            .firstName(savedClient.getFirstName())
-            .lastName(savedClient.getLastName())
-            .personalCode(savedClient.getPersonalCode())
-            .loan(savedClient.getLoans().stream().max(Comparator.comparing(Loan::getId)).get())
-            .createdAt(savedClient.getCreatedAt())
-            .updatedAt(savedClient.getUpdatedAt()).build();
-    }
-
-    private ClientDAO buildNewClientDAO(Client client) {
-        return ClientDAO.builder()
-            .id(UUID.randomUUID().toString())
-            .firstName(client.getFirstName())
-            .lastName(client.getLastName())
-            .personalCode(client.getPersonalCode())
-            .build();
     }
 }

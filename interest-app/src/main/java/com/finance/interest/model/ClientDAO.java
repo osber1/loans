@@ -3,6 +3,7 @@ package com.finance.interest.model;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -51,4 +52,13 @@ public class ClientDAO {
 
     @UpdateTimestamp
     private ZonedDateTime updatedAt;
+
+    public static ClientDAO buildNewClientDAO(Client client) {
+        return ClientDAO.builder()
+            .id(UUID.randomUUID().toString())
+            .firstName(client.getFirstName())
+            .lastName(client.getLastName())
+            .personalCode(client.getPersonalCode())
+            .build();
+    }
 }

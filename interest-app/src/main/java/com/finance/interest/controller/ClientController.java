@@ -37,18 +37,18 @@ public class ClientController {
 
     private final LoanPostponeMapper postponeMapper;
 
-    @PostMapping("loans")
+    @PostMapping("client/loans")
     public ClientResponse takeLoan(@Valid @RequestBody ClientRequest clientDto, HttpServletRequest request) {
         Client client = clientMapper.clientToEntity(clientDto);
         return clientMapper.clientToDTO(service.takeLoan(client, request.getRemoteAddr()));
     }
 
-    @PostMapping("loans/{id}/postpone")
+    @PostMapping("client/loans/{id}/extensions")
     public LoanPostponeResponse postponeLoan(@PathVariable int id) {
         return postponeMapper.loanPostponeToDTO(service.postponeLoan(id));
     }
 
-    @GetMapping("clients/{id}/loans")
+    @GetMapping("client/{id}/loans")
     public Collection<LoanResponse> getClientHistory(@PathVariable String id) {
         return loanMapper.loanToDTOs(service.getClientHistory(id));
     }

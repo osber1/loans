@@ -29,14 +29,14 @@ public class TimeAndAmountValidator implements ValidationRule {
         checkIfAmountIsNotToHigh(clientAmount, config.getMaxAmount());
     }
 
-    public void checkTimeAndAmount(BigDecimal amount, BigDecimal maxAmount, int forbiddenHourFrom, int forbiddenHourTo) {
+    private void checkTimeAndAmount(BigDecimal amount, BigDecimal maxAmount, int forbiddenHourFrom, int forbiddenHourTo) {
         int currentHour = timeUtils.getHourOfDay();
         if (forbiddenHourFrom <= currentHour && currentHour <= forbiddenHourTo && amount.compareTo(maxAmount) == 0) {
             throw new BadRequestException(RISK_MESSAGE);
         }
     }
 
-    public void checkIfAmountIsNotToHigh(BigDecimal clientAmount, BigDecimal maxAmount) {
+    private void checkIfAmountIsNotToHigh(BigDecimal clientAmount, BigDecimal maxAmount) {
         if (clientAmount.compareTo(maxAmount) > 0) {
             throw new BadRequestException(AMOUNT_EXCEEDS);
         }

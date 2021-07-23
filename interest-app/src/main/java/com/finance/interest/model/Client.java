@@ -1,6 +1,7 @@
 package com.finance.interest.model;
 
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,4 +29,15 @@ public class Client {
     private ZonedDateTime createdAt;
 
     private ZonedDateTime updatedAt;
+
+    public static Client buildClientResponse(ClientDAO savedClient) {
+        return Client.builder()
+            .id(savedClient.getId())
+            .firstName(savedClient.getFirstName())
+            .lastName(savedClient.getLastName())
+            .personalCode(savedClient.getPersonalCode())
+            .loan(savedClient.getLoans().stream().max(Comparator.comparing(Loan::getId)).get())
+            .createdAt(savedClient.getCreatedAt())
+            .updatedAt(savedClient.getUpdatedAt()).build();
+    }
 }
