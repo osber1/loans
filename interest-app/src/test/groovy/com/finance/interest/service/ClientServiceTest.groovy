@@ -3,7 +3,6 @@ package com.finance.interest.service
 import com.finance.interest.configuration.PropertiesConfig
 import com.finance.interest.repository.ClientRepository
 import com.finance.interest.repository.LoanRepository
-import com.finance.interest.util.ValidationUtils
 
 import spock.lang.Specification
 
@@ -15,7 +14,7 @@ class ClientServiceTest extends Specification {
 
     PropertiesConfig config = Mock()
 
-    ValidationUtils validationUtils = Mock()
+//    ValidationUtils validationUtils = Mock()
 
     ClientService clientService = new ClientService(clientRepository, loanRepository, config, validationUtils)
 

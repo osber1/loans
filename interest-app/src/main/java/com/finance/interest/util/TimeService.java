@@ -4,19 +4,27 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-public class TimeUtils {
+import org.springframework.stereotype.Component;
+
+import com.finance.interest.interfaces.TimeUtils;
+
+@Component
+public class TimeService implements TimeUtils {
 
     private static final String TIME_ZONE = "Europe/Vilnius";
 
-    public static ZonedDateTime getDayOfMonth() {
+    @Override
+    public ZonedDateTime getDayOfMonth() {
         return getCurrentDateTime().truncatedTo(ChronoUnit.DAYS);
     }
 
-    public static int getHourOfDay() {
+    @Override
+    public int getHourOfDay() {
         return getCurrentDateTime().getHour();
     }
 
-    public static ZonedDateTime getCurrentDateTime() {
+    @Override
+    public ZonedDateTime getCurrentDateTime() {
         return ZonedDateTime.now(ZoneId.of(TIME_ZONE));
     }
 }

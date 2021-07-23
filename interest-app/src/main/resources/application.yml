@@ -32,6 +32,6 @@ application:
   interestRate: 10
   interestIncrementFactor: 1.5
   postponeDays: 7
-  requestsFromSameIpLimit: 3
+  requestsFromSameIpLimit: 38
   forbiddenHourFrom: 0
   forbiddenHourTo: 6

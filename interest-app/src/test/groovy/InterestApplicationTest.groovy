@@ -23,12 +23,18 @@ class InterestApplicationTest extends Specification {
         and:
             context.containsBean("loanRepository")
         and:
-            context.containsBean("validationUtils")
+            context.containsBean("ipValidator")
+        and:
+            context.containsBean("riskValidator")
+        and:
+            context.containsBean("timeAndAmountValidator")
+        and:
+            context.containsBean("timeService")
         and:
             context.containsBean("ipLogsRepository")
-        and :
+        and:
             context.containsBean("swaggerConfig")
-        and :
+        and:
             context.containsBean("propertiesConfig")
 
     }

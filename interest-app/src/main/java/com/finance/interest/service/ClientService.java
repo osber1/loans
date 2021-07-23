@@ -1,32 +1,28 @@
 package com.finance.interest.service;
 
-import static com.finance.interest.util.TimeUtils.getCurrentDateTime;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
 import com.finance.interest.configuration.PropertiesConfig;
 import com.finance.interest.exception.NotFoundException;
+import com.finance.interest.interfaces.TimeUtils;
+import com.finance.interest.interfaces.Validator;
 import com.finance.interest.model.Client;
 import com.finance.interest.model.ClientDAO;
 import com.finance.interest.model.Loan;
 import com.finance.interest.model.LoanPostpone;
 import com.finance.interest.repository.ClientRepository;
 import com.finance.interest.repository.LoanRepository;
-import com.finance.interest.util.ValidationUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,24 +44,24 @@ public class ClientService {
 
     private final PropertiesConfig config;
 
-    private final ValidationUtils validationUtils;
+    private final Validator validator;
+
+    private final TimeUtils timeUtils;
 
     @Transactional
-    public Client takeLoan(Client client, HttpServletRequest request) {
-        validationUtils.checkIfAmountIsNotToHigh(client, config.getMaxAmount());
-        validationUtils.checkTimeAndAmount(client, config.getMaxAmount(), config.getForbiddenHourFrom(), config.getForbiddenHourTo());
-        validationUtils.checkIpAddress(request, config.getRequestsFromSameIpLimit());
+    public Client takeLoan(Client client, String ip) {
+        validator.validate(ip, client.getLoan().getAmount());
 
-        ClientDAO loanClient;
-        Optional<ClientDAO> existingClient = clientRepository.findByPersonalCode(client.getPersonalCode());
-        if (existingClient.isPresent()) {
-            loanClient = existingClient.get();
-            loanClient.getLoans().add(client.getLoan());
-        } else {
-            loanClient = buildNewClientDAO(client);
+        ClientDAO loanClient = clientRepository.findByPersonalCode(client.getPersonalCode())
+            .orElse(buildNewClientDAO(client));
+
+        if (loanClient.getLoans() == null) {
+            loanClient.setLoans(new HashSet<>());
         }
+        loanClient.getLoans().add(client.getLoan());
+
         client.getLoan().setInterestRate(config.getInterestRate());
-        client.getLoan().setReturnDate(getCurrentDateTime().plusMonths(client.getLoan().getTermInMonths()));
+        client.getLoan().setReturnDate(timeUtils.getCurrentDateTime().plusMonths(client.getLoan().getTermInMonths()));
         ClientDAO savedClient = clientRepository.save(loanClient);
         return buildClientResponse(savedClient);
     }
@@ -125,6 +121,6 @@ public class ClientService {
             .firstName(client.getFirstName())
             .lastName(client.getLastName())
             .personalCode(client.getPersonalCode())
-            .loans(Collections.singleton(client.getLoan())).build();
+            .build();
     }
 }

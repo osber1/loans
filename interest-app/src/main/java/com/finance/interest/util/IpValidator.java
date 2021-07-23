@@ -1,61 +1,47 @@
 package com.finance.interest.util;
 
-import static com.finance.interest.util.TimeUtils.getCurrentDateTime;
-import static com.finance.interest.util.TimeUtils.getDayOfMonth;
-import static com.finance.interest.util.TimeUtils.getHourOfDay;
-
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
+import com.finance.interest.configuration.PropertiesConfig;
 import com.finance.interest.exception.BadRequestException;
-import com.finance.interest.model.Client;
+import com.finance.interest.interfaces.TimeUtils;
+import com.finance.interest.interfaces.ValidationRule;
 import com.finance.interest.model.IpLogs;
 import com.finance.interest.repository.IpLogsRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class ValidationUtils {
-
-    private static final String RISK_MESSAGE = "Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!";
-
-    private static final String AMOUNT_EXCEEDS = "The amount you are trying to borrow exceeds the max amount!";
+public class IpValidator implements ValidationRule {
 
     private static final String TOO_MANY_REQUESTS = "Too many requests from the same ip per day.";
 
     private final IpLogsRepository ipLogsRepository;
 
-    public void checkTimeAndAmount(Client client, BigDecimal maxAmount, int forbiddenHourFrom, int forbiddenHourTo) {
-        int currentHour = getHourOfDay();
-        BigDecimal amount = client.getLoan().getAmount();
-        if (forbiddenHourFrom <= currentHour && currentHour <= forbiddenHourTo && amount.compareTo(maxAmount) == 0) {
-            throw new BadRequestException(RISK_MESSAGE);
-        }
-    }
+    private final PropertiesConfig config;
 
-    public void checkIfAmountIsNotToHigh(Client client, BigDecimal maxAmount) {
-        int i = client.getLoan().getAmount().compareTo(maxAmount);
-        if (i > 0) {
-            throw new BadRequestException(AMOUNT_EXCEEDS);
-        }
+    private final TimeUtils timeUtils;
+
+    @Override
+    public void validate(String ip, BigDecimal clientAmount) {
+        checkIpAddress(ip, config.getRequestsFromSameIpLimit());
     }
 
     @Transactional
-    public void checkIpAddress(HttpServletRequest request, int requestsFromSameIpLimit) {
-        String ipAddress = request.getRemoteAddr();
+    public void checkIpAddress(String ipAddress, int requestsFromSameIpLimit) {
         Optional<IpLogs> ipFromDatabase = ipLogsRepository.findByIp(ipAddress);
         if (ipFromDatabase.isEmpty()) {
             IpLogs newIpToSave = IpLogs.builder()
                 .ip(ipAddress)
-                .firstRequestDate(getCurrentDateTime())
+                .firstRequestDate(timeUtils.getCurrentDateTime())
                 .timesUsed(1).build();
             ipLogsRepository.save(newIpToSave);
         } else {
@@ -70,7 +56,7 @@ public class ValidationUtils {
     }
 
     public boolean checkIfItsTheNextDay(IpLogs ipFromDatabase) {
-        ZonedDateTime currentDay = getDayOfMonth();
+        ZonedDateTime currentDay = timeUtils.getDayOfMonth();
         ZonedDateTime lastRequestDay = ipFromDatabase.getFirstRequestDate().truncatedTo(ChronoUnit.DAYS);
         if (currentDay.isAfter(lastRequestDay)) {
             ipFromDatabase.setTimesUsed(0);

@@ -40,7 +40,7 @@ public class ClientController {
     @PostMapping("loans")
     public ClientResponse takeLoan(@Valid @RequestBody ClientRequest clientDto, HttpServletRequest request) {
         Client client = clientMapper.clientToEntity(clientDto);
-        return clientMapper.clientToDTO(service.takeLoan(client, request));
+        return clientMapper.clientToDTO(service.takeLoan(client, request.getRemoteAddr()));
     }
 
     @PostMapping("loans/{id}/postpone")
