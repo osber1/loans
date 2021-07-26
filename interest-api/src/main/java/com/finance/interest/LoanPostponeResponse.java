@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class LoanPostponeResponse {
 
-    private int id;
+    private long id;
 
     private ZonedDateTime newReturnDate;
 

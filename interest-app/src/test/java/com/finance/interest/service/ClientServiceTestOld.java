@@ -36,24 +36,6 @@
 
 //    private static MockHttpServletRequest httpServletRequest;
 
-//    @Mock
-//    private ClientRepository clientRepository;
-
-//    @Mock
-//    private IpLogsRepository clientsIpsRepository;
-
-//    @Mock
-//    private LoanRepository loanRepository;
-
-//    @Mock
-//    private TimeUtilsImpl timeUtils;
-
-//    @Mock
-//    private PropertiesConfig config;
-
-//    @InjectMocks
-//    private ClientService underTest;
-
 //    @BeforeAll
 //    static void init() {
 //        successfulLoan = createLoan(DATE_TIME_OF_JAN_1_2022, BigDecimal.valueOf(100));

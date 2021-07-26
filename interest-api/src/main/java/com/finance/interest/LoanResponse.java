@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class LoanResponse {
 
-    private int id;
+    private long id;
 
     private BigDecimal amount;
 

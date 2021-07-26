@@ -7,19 +7,21 @@ import com.finance.interest.util.RiskValidator
 import com.finance.interest.util.TimeService
 
 import spock.lang.Specification
+import spock.lang.Subject
 
 class ClientServiceTest extends Specification {
 
-    ClientRepository clientRepository = Mock()
+    ClientRepository clientRepository = Stub()
 
-    LoanRepository loanRepository = Mock()
+    LoanRepository loanRepository = Stub()
 
-    PropertiesConfig config = Mock()
+    PropertiesConfig config = Stub()
 
-    RiskValidator validator = Mock()
+    RiskValidator validator = Stub()
 
-    TimeService timeService = Mock()
+    TimeService timeService = Stub()
 
+    @Subject
     ClientService clientService = new ClientService(clientRepository, loanRepository, config, validator, timeService)
 
     void 'should work when run'() {
@@ -29,5 +31,4 @@ class ClientServiceTest extends Specification {
 //            clientService.takeLoan()
 //        then:
     }
-
 }

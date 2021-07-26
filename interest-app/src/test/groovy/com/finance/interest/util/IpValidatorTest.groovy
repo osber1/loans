@@ -6,10 +6,12 @@ import java.time.ZonedDateTime
 import com.finance.interest.configuration.PropertiesConfig
 import com.finance.interest.exception.BadRequestException
 import com.finance.interest.interfaces.TimeUtils
-import com.finance.interest.model.IpLogs
+import com.finance.interest.model.IpLog
 import com.finance.interest.repository.IpLogsRepository
+import com.finance.interest.util.IpValidator.IpException
 
 import spock.lang.Specification
+import spock.lang.Subject
 
 class IpValidatorTest extends Specification {
 
@@ -17,15 +19,15 @@ class IpValidatorTest extends Specification {
 
     private static final String IP_ADDRESS_TO_CHECK = '0.0.0.0.0.0.1'
 
-    private TimeUtils timeUtils = Mock()
+    private TimeUtils timeUtils = Stub()
 
-    private PropertiesConfig config = Mock()
+    private PropertiesConfig config = Stub()
 
     private IpLogsRepository ipLogsRepository = Mock()
 
-    private IpLogs successfulIpLog = buildIpLog(1)
+    private IpLog successfulIpLog = buildIpLog(1)
 
-    private IpLogs unsuccessfulIpLog = buildIpLog(10)
+    private IpLog unsuccessfulIpLog = buildIpLog(10)
 
     private static final ZonedDateTime date = generateDate(1)
 
@@ -33,7 +35,8 @@ class IpValidatorTest extends Specification {
 
     private static final ZonedDateTime dateWithTime = generateDate(1)
 
-    private IpValidator underTest = new IpValidator(ipLogsRepository, config, timeUtils)
+    @Subject
+    private IpValidator ipValidator = new IpValidator(ipLogsRepository, config, timeUtils)
 
     void 'should validate when ip limit is not exceeded'() {
         given:
@@ -41,16 +44,13 @@ class IpValidatorTest extends Specification {
 
             config.getRequestsFromSameIpLimit() >> 5
 
-            ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
-
         when:
-            underTest.validate(IP_ADDRESS_TO_CHECK, 1.00)
+            ipValidator.validate(IP_ADDRESS_TO_CHECK)
 
         then:
             notThrown(BadRequestException)
-        // TODO why this is not working
-//            1 * _
-//            1 * ipLogsRepository.findByIp(_ as String)
+            1 * ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
+
     }
 
     void 'should throw exception when ip limit is exceeded'() {
@@ -64,10 +64,10 @@ class IpValidatorTest extends Specification {
             ipLogsRepository.findByIp(_ as String) >> Optional.of(unsuccessfulIpLog)
 
         when:
-            underTest.validate(IP_ADDRESS_TO_CHECK, 1.00)
+            ipValidator.validate(IP_ADDRESS_TO_CHECK)
 
         then:
-            BadRequestException e = thrown()
+            IpException e = thrown()
             e.message == 'Too many requests from the same ip per day.'
     }
 
@@ -82,20 +82,20 @@ class IpValidatorTest extends Specification {
             ipLogsRepository.findByIp(_ as String) >> Optional.of(unsuccessfulIpLog)
 
         when:
-            underTest.validate(IP_ADDRESS_TO_CHECK, 1.00)
+            ipValidator.validate(IP_ADDRESS_TO_CHECK)
 
         then:
             notThrown(BadRequestException)
     }
 
-    static IpLogs buildIpLog(int ipTimesUsed) {
-        return new IpLogs().with {
+    static IpLog buildIpLog(int ipTimesUsed) {
+        return new IpLog().with {
             id = 1
             ip = IP_ADDRESS_TO_CHECK
             timesUsed = ipTimesUsed
             firstRequestDate = dateWithTime
             return it
-        } as IpLogs
+        } as IpLog
     }
 
     private static ZonedDateTime generateDate(int dayOfMonth) {

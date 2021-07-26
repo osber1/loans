@@ -5,8 +5,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.finance.interest.interfaces.ValidationRule;
+import com.finance.interest.interfaces.IpValidationRule;
 import com.finance.interest.interfaces.Validator;
+import com.finance.interest.interfaces.TimeAndAmountValidationRule;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,10 +15,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RiskValidator implements Validator {
 
-    private final List<ValidationRule> validationRule;
+    private final List<IpValidationRule> ipValidationRule;
+
+    private final List<TimeAndAmountValidationRule> timeAndAmountValidationRule;
 
     @Override
-    public void validate(String ip, BigDecimal clientAmount) {
-        validationRule.forEach(v -> v.validate(ip, clientAmount));
+    public void validate(String ip) {
+        ipValidationRule.forEach(v -> v.validate(ip));
+    }
+
+    @Override
+    public void validate(BigDecimal clientAmount) {
+        timeAndAmountValidationRule.forEach(v -> v.validate(clientAmount));
     }
 }

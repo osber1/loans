@@ -20,7 +20,7 @@ public class LoanPostpone {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     private ZonedDateTime newReturnDate;
 

@@ -14,13 +14,13 @@ spring:
     hibernate.ddl-auto: none
     show-sql: true
     properties:
-      #      javax:
-      #        persistence:
-      #          schema-generation:
-      #            create-source: metadata
-      #            scripts:
-      #              action: create
-      #              create-target: create.sql
+#      javax:
+#        persistence:
+#          schema-generation:
+#            create-source: metadata
+#            scripts:
+#              action: create
+#              create-target: create.sql
       hibernate:
         format_sql: true
   h2:
@@ -32,6 +32,6 @@ application:
   interestRate: 10
   interestIncrementFactor: 1.5
   postponeDays: 7
-  requestsFromSameIpLimit: 38
+  requestsFromSameIpLimit: 3
   forbiddenHourFrom: 0
   forbiddenHourTo: 6

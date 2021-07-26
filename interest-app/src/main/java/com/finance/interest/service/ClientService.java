@@ -52,7 +52,8 @@ public class ClientService {
 
     @Transactional
     public Client takeLoan(Client client, String ip) {
-        validator.validate(ip, client.getLoan().getAmount());
+        validator.validate(ip);
+        validator.validate(client.getLoan().getAmount());
 
         ClientDAO loanClient = clientRepository.findByPersonalCode(client.getPersonalCode())
             .orElse(buildNewClientDAO(client));
