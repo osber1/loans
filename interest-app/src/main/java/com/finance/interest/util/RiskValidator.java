@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.finance.interest.interfaces.IpValidationRule;
-import com.finance.interest.interfaces.Validator;
 import com.finance.interest.interfaces.TimeAndAmountValidationRule;
+import com.finance.interest.interfaces.Validator;
 
 import lombok.RequiredArgsConstructor;
 

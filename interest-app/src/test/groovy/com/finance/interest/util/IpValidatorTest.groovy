@@ -40,26 +40,26 @@ class IpValidatorTest extends Specification {
 
     void 'should validate when ip limit is not exceeded'() {
         given:
-            timeUtils.getCurrentDateTime() >> dateWithTime
+            timeUtils.currentDateTime >> dateWithTime
 
-            config.getRequestsFromSameIpLimit() >> 5
+            config.requestsFromSameIpLimit >> 5
 
         when:
             ipValidator.validate(IP_ADDRESS_TO_CHECK)
 
         then:
-            notThrown(BadRequestException)
+            notThrown(IpException)
             1 * ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
 
     }
 
     void 'should throw exception when ip limit is exceeded'() {
         given:
-            timeUtils.getCurrentDateTime() >> dateWithTime
+            timeUtils.currentDateTime >> dateWithTime
 
-            timeUtils.getDayOfMonth() >> date
+            timeUtils.dayOfMonth >> date
 
-            config.getRequestsFromSameIpLimit() >> 5
+            config.requestsFromSameIpLimit >> 5
 
             ipLogsRepository.findByIp(_ as String) >> Optional.of(unsuccessfulIpLog)
 
@@ -73,11 +73,11 @@ class IpValidatorTest extends Specification {
 
     void 'should validate when ip limit is exceeded, but it is next day'() {
         given:
-            timeUtils.getCurrentDateTime() >> dateWithTime
+            timeUtils.currentDateTime >> dateWithTime
 
-            timeUtils.getDayOfMonth() >> dateNextDay
+            timeUtils.dayOfMonth >> dateNextDay
 
-            config.getRequestsFromSameIpLimit() >> 5
+            config.requestsFromSameIpLimit >> 5
 
             ipLogsRepository.findByIp(_ as String) >> Optional.of(unsuccessfulIpLog)
 
@@ -85,7 +85,7 @@ class IpValidatorTest extends Specification {
             ipValidator.validate(IP_ADDRESS_TO_CHECK)
 
         then:
-            notThrown(BadRequestException)
+            notThrown(IpException)
     }
 
     static IpLog buildIpLog(int ipTimesUsed) {

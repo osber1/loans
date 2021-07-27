@@ -41,14 +41,14 @@ public class TimeAndAmountValidator implements TimeAndAmountValidationRule {
         }
     }
 
-    static class AmountException extends ValidationRuleException {
+    public static class AmountException extends ValidationRuleException {
 
         public AmountException(String message) {
             super(message);
         }
     }
 
-    static class TimeException extends ValidationRuleException {
+    public static class TimeException extends ValidationRuleException {
 
         public TimeException(String message) {
             super(message);

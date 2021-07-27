@@ -20,10 +20,10 @@ class TimeAndAmountValidatorTest extends Specification {
 
     void 'should validate when amount is not to high and correct time'() {
         given:
-            timeUtils.getHourOfDay() >> 10
-            config.getMaxAmount() >> 100.00
-            config.getForbiddenHourFrom() >> 0
-            config.getForbiddenHourTo() >> 6
+            timeUtils.hourOfDay >> 10
+            config.maxAmount >> 100.00
+            config.forbiddenHourFrom >> 0
+            config.forbiddenHourTo >> 6
         when:
             timeAndAmountValidator.validate(100.00)
 
@@ -33,10 +33,10 @@ class TimeAndAmountValidatorTest extends Specification {
 
     void 'should throw exception when max amount and forbidden time'() {
         given:
-            timeUtils.getHourOfDay() >> 3
-            config.getMaxAmount() >> 100.00
-            config.getForbiddenHourFrom() >> 1
-            config.getForbiddenHourTo() >> 6
+            timeUtils.hourOfDay >> 3
+            config.maxAmount >> 100.00
+            config.forbiddenHourFrom >> 1
+            config.forbiddenHourTo >> 6
         when:
             timeAndAmountValidator.validate(100.00)
 
@@ -47,10 +47,10 @@ class TimeAndAmountValidatorTest extends Specification {
 
     void 'should throw exception when amount exceeds max amount'() {
         given:
-            timeUtils.getHourOfDay() >> 10
-            config.getMaxAmount() >> 100.00
-            config.getForbiddenHourFrom() >> 1
-            config.getForbiddenHourTo() >> 6
+            timeUtils.hourOfDay >> 10
+            config.maxAmount >> 100.00
+            config.forbiddenHourFrom >> 1
+            config.forbiddenHourTo >> 6
         when:
             timeAndAmountValidator.validate(1000.00)
 

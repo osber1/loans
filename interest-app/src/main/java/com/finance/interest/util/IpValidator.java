@@ -62,7 +62,7 @@ public class IpValidator implements IpValidationRule {
         return ipLogsRepository.save(newIpToSave);
     }
 
-    static class IpException extends ValidationRuleException {
+    public static class IpException extends ValidationRuleException {
 
         public IpException(String message) {
             super(message);
