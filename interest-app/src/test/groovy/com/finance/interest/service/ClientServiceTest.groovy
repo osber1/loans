@@ -204,7 +204,7 @@ class ClientServiceTest extends Specification {
         given:
             loanRepository.findById(_ as Integer) >> Optional.of(successfulLoan)
             loanRepository.save(_ as Loan) >> loanWithPostpone
-        
+
         when:
             LoanPostpone loanPostponeResponse = clientService.postponeLoan(1)
 

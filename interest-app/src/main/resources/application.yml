@@ -14,13 +14,13 @@ spring:
     hibernate.ddl-auto: none
     show-sql: true
     properties:
-#      javax:
-#        persistence:
-#          schema-generation:
-#            create-source: metadata
-#            scripts:
-#              action: create
-#              create-target: create.sql
+      #      javax:
+      #        persistence:
+      #          schema-generation:
+      #            create-source: metadata
+      #            scripts:
+      #              action: create
+      #              create-target: create.sql
       hibernate:
         format_sql: true
   h2:

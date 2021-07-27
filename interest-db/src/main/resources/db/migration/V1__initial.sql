@@ -12,7 +12,7 @@ create table client
 create table client_loans
 (
     clientdao_id varchar(255) not null,
-    loans_id     bigint      not null,
+    loans_id     bigint       not null,
     primary key (clientdao_id, loans_id)
 );
 

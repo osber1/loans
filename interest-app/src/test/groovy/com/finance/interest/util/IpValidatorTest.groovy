@@ -4,7 +4,6 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 import com.finance.interest.configuration.PropertiesConfig
-import com.finance.interest.exception.BadRequestException
 import com.finance.interest.interfaces.TimeUtils
 import com.finance.interest.model.IpLog
 import com.finance.interest.repository.IpLogsRepository
