@@ -2,6 +2,7 @@ package com.finance.interest.model;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -37,5 +38,5 @@ public class Loan {
     private ZonedDateTime returnDate;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private Set<LoanPostpone> loanPostpones;
+    private Set<LoanPostpone> loanPostpones = new HashSet<>();
 }

@@ -8,8 +8,6 @@ import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -65,29 +63,16 @@ public class ClientService {
 
     @Transactional
     public LoanPostpone postponeLoan(long id) {
-        ZonedDateTime newReturnDate;
-        BigDecimal newInterestRate;
-        LoanPostpone loanPostpone = new LoanPostpone();
         Loan loanRequest = getLoan(id);
-
-        Set<LoanPostpone> loanPostpones = loanRequest.getLoanPostpones();
-        Comparator<LoanPostpone> latestLoanPostpone = Comparator.comparing(LoanPostpone::getNewReturnDate);
-
-        if (loanPostpones == null || loanPostpones.isEmpty()) {
-            loanPostpones = new HashSet<>();
-            newReturnDate = loanRequest.getReturnDate().plusDays(config.getPostponeDays());
-            newInterestRate = loanRequest.getInterestRate().multiply(config.getInterestIncrementFactor());
-        } else {
-            LoanPostpone firstPostpone = loanPostpones.stream().max(latestLoanPostpone).get();
-            newReturnDate = firstPostpone.getNewReturnDate().plusDays(config.getPostponeDays());
-            newInterestRate = firstPostpone.getNewInterestRate().multiply(config.getInterestIncrementFactor());
-        }
-        loanPostpone.setNewInterestRate(newInterestRate.setScale(NUMBERS_AFTER_COMMA, RoundingMode.HALF_UP));
-        loanPostpone.setNewReturnDate(newReturnDate);
-        loanPostpones.add(loanPostpone);
-        loanRequest.setLoanPostpones(loanPostpones);
+        loanRequest.getLoanPostpones().add(buildLoanPostpone(loanRequest));
         Loan savedLoanRequest = loanRepository.save(loanRequest);
-        return savedLoanRequest.getLoanPostpones().stream().max(latestLoanPostpone).get();
+        return savedLoanRequest.getLoanPostpones().stream().max(Comparator.comparing(LoanPostpone::getNewReturnDate)).get();
+    }
+
+    public Collection<Loan> getClientHistory(String id) {
+        return clientRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(String.format(CLIENT_NOT_EXIST, id)))
+            .getLoans();
     }
 
     private Loan getLoan(long id) {
@@ -95,10 +80,29 @@ public class ClientService {
             .orElseThrow(() -> new NotFoundException(String.format(LOAN_NOT_EXIST, id)));
     }
 
-    public Collection<Loan> getClientHistory(String id) {
-        return clientRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(String.format(CLIENT_NOT_EXIST, id)))
-            .getLoans();
+    private LoanPostpone buildLoanPostpone(Loan loanRequest) {
+        LoanPostpone loanPostpone = new LoanPostpone();
+        ZonedDateTime newReturnDate;
+        BigDecimal newInterestRate;
+        if (loanRequest.getLoanPostpones().isEmpty()) {
+            newReturnDate = loanRequest.getReturnDate();
+            newInterestRate = loanRequest.getInterestRate();
+        } else {
+            LoanPostpone latestPostpone = loanRequest.getLoanPostpones().stream().max(Comparator.comparing(LoanPostpone::getNewReturnDate)).get();
+            newReturnDate = latestPostpone.getNewReturnDate();
+            newInterestRate = latestPostpone.getNewInterestRate();
+        }
+        loanPostpone.setNewInterestRate(calculateNewInterestRate(newInterestRate).setScale(NUMBERS_AFTER_COMMA, RoundingMode.HALF_UP));
+        loanPostpone.setNewReturnDate(calculateNewReturnDate(newReturnDate));
+        return loanPostpone;
+    }
+
+    private BigDecimal calculateNewInterestRate(BigDecimal newInterestRate) {
+        return newInterestRate.multiply(config.getInterestIncrementFactor());
+    }
+
+    private ZonedDateTime calculateNewReturnDate(ZonedDateTime newReturnDate) {
+        return newReturnDate.plusDays(config.getPostponeDays());
     }
 
     private void validateClient(Client client, String ip) {
