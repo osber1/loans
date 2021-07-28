@@ -44,7 +44,7 @@ public class ClientController {
     }
 
     @PostMapping("client/loans/{id}/extensions")
-    public LoanPostponeResponse postponeLoan(@PathVariable int id) {
+    public LoanPostponeResponse postponeLoan(@PathVariable long id) {
         return postponeMapper.loanPostponeToDTO(service.postponeLoan(id));
     }
 

@@ -1,6 +1,7 @@
 package com.finance.interest.model;
 
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,8 +16,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,8 +23,6 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "client")
 public class ClientDAO {
@@ -44,7 +41,7 @@ public class ClientDAO {
     private Long personalCode;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private Set<Loan> loans;
+    private Set<Loan> loans = new HashSet<>();
 
     @CreationTimestamp
     private ZonedDateTime createdAt;
@@ -53,11 +50,15 @@ public class ClientDAO {
     private ZonedDateTime updatedAt;
 
     public static ClientDAO buildNewClientDAO(Client client) {
-        return ClientDAO.builder()
-            .id(UUID.randomUUID().toString())
-            .firstName(client.getFirstName())
-            .lastName(client.getLastName())
-            .personalCode(client.getPersonalCode())
-            .build();
+        ClientDAO clientDao = new ClientDAO();
+        clientDao.setId(UUID.randomUUID().toString());
+        clientDao.setFirstName(client.getFirstName());
+        clientDao.setLastName(client.getLastName());
+        clientDao.setPersonalCode(client.getPersonalCode());
+        return clientDao;
+    }
+
+    public void addLoan(Loan loan) {
+        loans.add(loan);
     }
 }

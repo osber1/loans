@@ -2,7 +2,6 @@ package com.finance.interest.model;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,18 +25,4 @@ public class LoanPostpone {
     private ZonedDateTime newReturnDate;
 
     private BigDecimal newInterestRate;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LoanPostpone that = (LoanPostpone) o;
-        return id == that.id && Objects.equals(newReturnDate, that.newReturnDate) && Objects.equals(newInterestRate, that.newInterestRate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, newReturnDate, newInterestRate);
-    }
 }
-

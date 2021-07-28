@@ -13,7 +13,7 @@ class InterestApplicationTest extends Specification {
     @Autowired
     ApplicationContext context
 
-    def "test context loads"() {
+    def "should load context when everything is correct"() {
         expect:
             context != null
         and:
@@ -36,6 +36,5 @@ class InterestApplicationTest extends Specification {
             context.containsBean("swaggerConfig")
         and:
             context.containsBean("propertiesConfig")
-
     }
 }

@@ -37,61 +37,72 @@ class IpValidatorTest extends Specification {
     @Subject
     private IpValidator ipValidator = new IpValidator(ipLogsRepository, config, timeUtils)
 
-    void 'should validate when ip limit is not exceeded'() {
+    void 'should validate when ip limit is not exceeded and log is new'() {
         given:
             timeUtils.currentDateTime >> dateWithTime
-
             config.requestsFromSameIpLimit >> 5
-
         when:
             ipValidator.validate(IP_ADDRESS_TO_CHECK)
-
         then:
             notThrown(IpException)
-            1 * ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
+        and:
+            1 * ipLogsRepository.findByIp(_ as String) >> Optional.empty()
+        and:
+            2 * ipLogsRepository.save(_ as IpLog) >> buildSmallIpLog()
+    }
 
+    void 'should validate when ip limit is not exceeded and log is not new'() {
+        given:
+            timeUtils.currentDateTime >> dateWithTime
+            config.requestsFromSameIpLimit >> 5
+        when:
+            ipValidator.validate(IP_ADDRESS_TO_CHECK)
+        then:
+            notThrown(IpException)
+        and:
+            1 * ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
     }
 
     void 'should throw exception when ip limit is exceeded'() {
         given:
             timeUtils.currentDateTime >> dateWithTime
-
             timeUtils.dayOfMonth >> date
-
             config.requestsFromSameIpLimit >> 5
-
             ipLogsRepository.findByIp(_ as String) >> Optional.of(unsuccessfulIpLog)
-
         when:
             ipValidator.validate(IP_ADDRESS_TO_CHECK)
-
         then:
             IpException e = thrown()
+        and:
             e.message == 'Too many requests from the same ip per day.'
     }
 
     void 'should validate when ip limit is exceeded, but it is next day'() {
         given:
             timeUtils.currentDateTime >> dateWithTime
-
             timeUtils.dayOfMonth >> dateNextDay
-
             config.requestsFromSameIpLimit >> 5
-
             ipLogsRepository.findByIp(_ as String) >> Optional.of(unsuccessfulIpLog)
-
         when:
             ipValidator.validate(IP_ADDRESS_TO_CHECK)
-
         then:
             notThrown(IpException)
     }
 
-    static IpLog buildIpLog(int ipTimesUsed) {
+    private static IpLog buildIpLog(int ipTimesUsed) {
         return new IpLog().with {
             id = 1
             ip = IP_ADDRESS_TO_CHECK
             timesUsed = ipTimesUsed
+            firstRequestDate = dateWithTime
+            return it
+        } as IpLog
+    }
+
+    private static IpLog buildSmallIpLog() {
+        return new IpLog().with {
+            id = 1
+            ip = IP_ADDRESS_TO_CHECK
             firstRequestDate = dateWithTime
             return it
         } as IpLog

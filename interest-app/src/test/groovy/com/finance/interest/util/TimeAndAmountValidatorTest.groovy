@@ -26,7 +26,6 @@ class TimeAndAmountValidatorTest extends Specification {
             config.forbiddenHourTo >> 6
         when:
             timeAndAmountValidator.validate(100.00)
-
         then:
             notThrown(BadRequestException)
     }
@@ -39,9 +38,9 @@ class TimeAndAmountValidatorTest extends Specification {
             config.forbiddenHourTo >> 6
         when:
             timeAndAmountValidator.validate(100.00)
-
         then:
             TimeException e = thrown()
+        and:
             e.message == 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
     }
 
@@ -53,9 +52,9 @@ class TimeAndAmountValidatorTest extends Specification {
             config.forbiddenHourTo >> 6
         when:
             timeAndAmountValidator.validate(1000.00)
-
         then:
             AmountException e = thrown()
+        and:
             e.message == 'The amount you are trying to borrow exceeds the max amount!'
     }
 }

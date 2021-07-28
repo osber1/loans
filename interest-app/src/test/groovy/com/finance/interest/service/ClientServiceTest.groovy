@@ -31,7 +31,7 @@ class ClientServiceTest extends Specification {
 
     public static final String IP = '0.0.0.0.0.1'
 
-    private static final ZonedDateTime date = generateDate(1)
+    private static final ZonedDateTime date = generateDate()
 
     public static final String CORRECT_USER_ID = 'TEST-CORRECT-ID'
 
@@ -81,10 +81,8 @@ class ClientServiceTest extends Specification {
             config.requestsFromSameIpLimit >> 3
             timeUtils.dayOfMonth >> date.truncatedTo(ChronoUnit.DAYS)
             ipLogsRepository.findByIp(_ as String) >> Optional.of(unsuccessfulIpLog)
-
         when:
             clientService.takeLoan(new Client(), IP)
-
         then:
             IpException exception = thrown()
             exception.message == 'Too many requests from the same ip per day.'
@@ -99,10 +97,8 @@ class ClientServiceTest extends Specification {
             timeUtils.dayOfMonth >> date.truncatedTo(ChronoUnit.DAYS).plusDays(1)
             timeUtils.hourOfDay >> 10
             ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
-
         when:
             clientService.takeLoan(unsuccessfulClient, IP)
-
         then:
             AmountException exception = thrown()
             exception.message == 'The amount you are trying to borrow exceeds the max amount!'
@@ -117,10 +113,8 @@ class ClientServiceTest extends Specification {
             timeUtils.dayOfMonth >> date.truncatedTo(ChronoUnit.DAYS).plusDays(1)
             timeUtils.hourOfDay >> 4
             ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
-
         when:
             clientService.takeLoan(successfulClient, IP)
-
         then:
             TimeException exception = thrown()
             exception.message == 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
@@ -137,12 +131,11 @@ class ClientServiceTest extends Specification {
             timeUtils.hourOfDay >> 10
             ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
             clientRepository.save(_ as ClientDAO) >> clientFromDatabase
-
+            clientRepository.findByPersonalCode(_ as Long) >> Optional.empty()
         when:
             Client clientResponse = clientService.takeLoan(successfulClient, IP)
-
         then:
-            clientResponse == successfulClient
+            successfulClient == clientResponse
     }
 
     void 'should be successful when user is not new'() {
@@ -157,10 +150,8 @@ class ClientServiceTest extends Specification {
             ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
             clientRepository.save(_ as ClientDAO) >> clientFromDatabase
             clientRepository.findByPersonalCode(_ as Long) >> Optional.of(clientFromDatabase)
-
         when:
             Client clientResponse = clientService.takeLoan(successfulClient, IP)
-
         then:
             clientResponse == successfulClient
     }
@@ -168,10 +159,8 @@ class ClientServiceTest extends Specification {
     void 'should throw exception when getting history and client not exist'() {
         given:
             clientRepository.findById(_ as String) >> Optional.empty()
-
         when:
             clientService.getClientHistory(CORRECT_USER_ID)
-
         then:
             NotFoundException e = thrown()
             e.message == 'Client with id TEST-CORRECT-ID does not exist.'
@@ -180,21 +169,17 @@ class ClientServiceTest extends Specification {
     void 'should return history when client exists'() {
         given:
             clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
-
         when:
             Set<Loan> clientHistory = clientService.getClientHistory(CORRECT_USER_ID)
-
         then:
-            clientHistory == clientFromDatabase.loans
+            clientFromDatabase.loans == clientHistory
     }
 
     void 'should fail loan postpone when loan not exist'() {
         given:
             loanRepository.findById(_ as Integer) >> Optional.empty()
-
         when:
             clientService.postponeLoan(1)
-
         then:
             NotFoundException e = thrown()
             e.message == 'Loan with id 1 does not exist.'
@@ -202,26 +187,22 @@ class ClientServiceTest extends Specification {
 
     void 'should postpone loan when it is first postpone'() {
         given:
-            loanRepository.findById(_ as Integer) >> Optional.of(successfulLoan)
+            loanRepository.findById(_ as Long) >> Optional.of(successfulLoan)
             loanRepository.save(_ as Loan) >> loanWithPostpone
-
         when:
             LoanPostpone loanPostponeResponse = clientService.postponeLoan(1)
-
         then:
-            loanPostponeResponse == firstPostpone
+            firstPostpone == loanPostponeResponse
     }
 
     void 'should postpone loan when it is not first postpone'() {
         given:
-            loanRepository.findById(_ as Integer) >> Optional.of(loanWithPostpone)
+            loanRepository.findById(_ as Long) >> Optional.of(loanWithPostpone)
             loanRepository.save(_ as Loan) >> loanWithTwoPostpones
-
         when:
             LoanPostpone loanPostponeResponse = clientService.postponeLoan(1)
-
         then:
-            loanPostponeResponse == secondPostpone
+            secondPostpone == loanPostponeResponse
     }
 
     private static Loan buildLoan(BigDecimal loanAmount) {
@@ -232,7 +213,7 @@ class ClientServiceTest extends Specification {
             interestRate = 10
             returnDate = date.plusYears(1)
             return it
-        }
+        } as Loan
     }
 
     private static LoanPostpone buildLoanPostpone(BigDecimal newRate, ZonedDateTime newDate) {
@@ -241,7 +222,7 @@ class ClientServiceTest extends Specification {
             newInterestRate = newRate
             newReturnDate = newDate
             return it
-        }
+        } as LoanPostpone
     }
 
     private static IpLog buildIpLog(int usedTimes) {
@@ -251,7 +232,7 @@ class ClientServiceTest extends Specification {
             timesUsed = usedTimes
             firstRequestDate = date
             return it
-        }
+        } as IpLog
     }
 
     private static Client buildClient(Loan loanObj) {
@@ -262,14 +243,14 @@ class ClientServiceTest extends Specification {
             personalCode = 12345678910
             loan = loanObj
             return it
-        }
+        } as Client
     }
 
-    private static ZonedDateTime generateDate(int dayOfMonth) {
+    private static ZonedDateTime generateDate() {
         return ZonedDateTime.of(
             2020,
             1,
-            dayOfMonth,
+            1,
             1,
             1,
             1,
@@ -279,14 +260,15 @@ class ClientServiceTest extends Specification {
 
     private static Loan buildLoanWithPostpone(Loan loanRequest, LoanPostpone postpone1) {
         List<LoanPostpone> list = Collections.singletonList(postpone1)
-        loanRequest.setLoanPostpones(new HashSet<>(list))
+        loanRequest.with { loanPostpones = new HashSet<>(list) }
         return loanRequest
     }
 
     private static Loan buildLoanWithPostpones(Loan loanRequest, LoanPostpone postpone1, LoanPostpone postpone2) {
         List<LoanPostpone> list = Arrays.asList(postpone1, postpone2)
-        loanRequest.setLoanPostpones(new HashSet<>(list))
+        loanRequest.with { loanPostpones = new HashSet<>(list) }
         return loanRequest
+
     }
 
     private static ClientDAO buildClientResponse(Loan loanObj) {
@@ -297,6 +279,6 @@ class ClientServiceTest extends Specification {
             personalCode = 12345678910
             loans = new HashSet<>(Collections.singletonList(loanObj))
             return it
-        }
+        } as ClientDAO
     }
 }

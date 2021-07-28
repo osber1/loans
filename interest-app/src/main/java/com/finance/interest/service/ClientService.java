@@ -52,25 +52,19 @@ public class ClientService {
 
     @Transactional
     public Client takeLoan(Client client, String ip) {
-        validator.validate(ip);
-        validator.validate(client.getLoan().getAmount());
+        validateClient(client, ip);
 
         ClientDAO loanClient = clientRepository.findByPersonalCode(client.getPersonalCode())
-            .orElse(buildNewClientDAO(client));
+            .orElseGet(() -> buildNewClientDAO(client));
 
-        if (loanClient.getLoans() == null) {
-            loanClient.setLoans(new HashSet<>());
-        }
-        loanClient.getLoans().add(client.getLoan());
-
-        client.getLoan().setInterestRate(config.getInterestRate());
-        client.getLoan().setReturnDate(timeUtils.getCurrentDateTime().plusMonths(client.getLoan().getTermInMonths()));
+        loanClient.addLoan(client.getLoan());
+        setNewInterestAndReturnDate(client);
         ClientDAO savedClient = clientRepository.save(loanClient);
         return buildClientResponse(savedClient);
     }
 
     @Transactional
-    public LoanPostpone postponeLoan(int id) {
+    public LoanPostpone postponeLoan(long id) {
         ZonedDateTime newReturnDate;
         BigDecimal newInterestRate;
         LoanPostpone loanPostpone = new LoanPostpone();
@@ -96,7 +90,7 @@ public class ClientService {
         return savedLoanRequest.getLoanPostpones().stream().max(latestLoanPostpone).get();
     }
 
-    private Loan getLoan(int id) {
+    private Loan getLoan(long id) {
         return loanRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(String.format(LOAN_NOT_EXIST, id)));
     }
@@ -105,5 +99,15 @@ public class ClientService {
         return clientRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(String.format(CLIENT_NOT_EXIST, id)))
             .getLoans();
+    }
+
+    private void validateClient(Client client, String ip) {
+        validator.validate(ip);
+        validator.validate(client.getLoan().getAmount());
+    }
+
+    private void setNewInterestAndReturnDate(Client client) {
+        client.getLoan().setInterestRate(config.getInterestRate());
+        client.getLoan().setReturnDate(timeUtils.getCurrentDateTime().plusMonths(client.getLoan().getTermInMonths()));
     }
 }

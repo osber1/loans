@@ -11,5 +11,4 @@ public class InterestApplication {
     public static void main(String[] args) {
         SpringApplication.run(InterestApplication.class, args);
     }
-
 }
