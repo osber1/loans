@@ -7,18 +7,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+//@RedisHash("IpLog")
 public class IpLog {
 
     @Id
@@ -30,4 +25,11 @@ public class IpLog {
     private int timesUsed;
 
     private ZonedDateTime firstRequestDate;
+
+    public static IpLog buildNewIpLog(String ipAddress, ZonedDateTime currentDateTime) {
+        IpLog ipLog = new IpLog();
+        ipLog.setIp(ipAddress);
+        ipLog.setFirstRequestDate(currentDateTime);
+        return ipLog;
+    }
 }

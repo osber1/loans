@@ -35,9 +35,8 @@ subprojects {
         groovy = '3.0.8'
         lombok = '1.18.20'
         springfox = '3.0.0'
-        mockito_inline = '3.8.0'
         mapstruct = '1.4.2.Final'
-        spock = '2.0-M5-groovy-3.0'
+        spock = '2.0-groovy-3.0'
         lombok_mapstruct_bindings = '0.2.0'
     }
 }

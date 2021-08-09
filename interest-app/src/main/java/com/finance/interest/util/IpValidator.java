@@ -56,9 +56,7 @@ public class IpValidator implements IpValidationRule {
     }
 
     private IpLog createIpLog(String ipAddress) {
-        IpLog newIpToSave = IpLog.builder()
-            .ip(ipAddress)
-            .firstRequestDate(timeUtils.getCurrentDateTime()).build();
+        IpLog newIpToSave = IpLog.buildNewIpLog(ipAddress, timeUtils.getCurrentDateTime());
         return ipLogsRepository.save(newIpToSave);
     }
 

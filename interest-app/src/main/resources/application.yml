@@ -5,12 +5,11 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:/home/osvaldas/Java_projects/4finance-task/build/h2db/db/interest;AUTO_SERVER=TRUE
-    username: username
-    password: password
-    driverClassName: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/loans
+    username: root
+    password: root
+    driverClassName: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate.ddl-auto: none
     show-sql: true
     properties:
@@ -23,9 +22,7 @@ spring:
       #              create-target: create.sql
       hibernate:
         format_sql: true
-  h2:
-    console:
-      enabled: true
+      dialect: org.hibernate.dialect.PostgreSQL81Dialect
 
 application:
   maxAmount: 100
