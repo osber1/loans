@@ -23,6 +23,11 @@ spring:
       hibernate:
         format_sql: true
       dialect: org.hibernate.dialect.PostgreSQL81Dialect
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    timeout: 60000
 
 application:
   maxAmount: 100

@@ -92,7 +92,8 @@ public class ClientService {
             newReturnDate = latestPostpone.getNewReturnDate();
             newInterestRate = latestPostpone.getNewInterestRate();
         }
-        loanPostpone.setNewInterestRate(calculateNewInterestRate(newInterestRate).setScale(NUMBERS_AFTER_COMMA, RoundingMode.HALF_UP));
+        loanPostpone.setNewInterestRate(calculateNewInterestRate(newInterestRate)
+            .setScale(NUMBERS_AFTER_COMMA, RoundingMode.HALF_UP));
         loanPostpone.setNewReturnDate(calculateNewReturnDate(newReturnDate));
         return loanPostpone;
     }
@@ -112,6 +113,7 @@ public class ClientService {
 
     private void setNewInterestAndReturnDate(Client client) {
         client.getLoan().setInterestRate(config.getInterestRate());
-        client.getLoan().setReturnDate(timeUtils.getCurrentDateTime().plusMonths(client.getLoan().getTermInMonths()));
+        client.getLoan().setReturnDate(
+            timeUtils.getCurrentDateTime().plusMonths(client.getLoan().getTermInMonths()));
     }
 }

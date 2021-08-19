@@ -7,6 +7,4 @@ public interface TimeUtils {
     ZonedDateTime getCurrentDateTime();
 
     int getHourOfDay();
-
-    ZonedDateTime getDayOfMonth();
 }

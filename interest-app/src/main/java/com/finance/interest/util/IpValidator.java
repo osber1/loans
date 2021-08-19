@@ -1,17 +1,12 @@
 package com.finance.interest.util;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-
 import javax.transaction.Transactional;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.finance.interest.configuration.PropertiesConfig;
 import com.finance.interest.interfaces.IpValidationRule;
-import com.finance.interest.interfaces.TimeUtils;
-import com.finance.interest.model.IpLog;
-import com.finance.interest.repository.IpLogsRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,11 +16,9 @@ public class IpValidator implements IpValidationRule {
 
     private static final String TOO_MANY_REQUESTS = "Too many requests from the same ip per day.";
 
-    private final IpLogsRepository ipLogsRepository;
-
     private final PropertiesConfig config;
 
-    private final TimeUtils timeUtils;
+    private final RedisTemplate<String, Integer> redisTemplate;
 
     @Override
     @Transactional
@@ -34,30 +27,16 @@ public class IpValidator implements IpValidationRule {
     }
 
     private void checkIpAddress(String ipAddress, int requestsFromSameIpLimit) {
-        IpLog ipLog = ipLogsRepository.findByIp(ipAddress).orElseGet(() -> createIpLog(ipAddress));
-        if (ipLog.getTimesUsed() >= requestsFromSameIpLimit && !checkIfItsTheNextDay(ipLog)) {
-            throw new IpException(TOO_MANY_REQUESTS);
+        Integer ipTimesUsed = redisTemplate.opsForValue().get(ipAddress);
+        if (ipTimesUsed != null) {
+            if (ipTimesUsed >= requestsFromSameIpLimit) {
+                throw new IpException(TOO_MANY_REQUESTS);
+            } else {
+                redisTemplate.opsForValue().set(ipAddress, ipTimesUsed + 1);
+            }
         } else {
-            ipLog.setTimesUsed(ipLog.getTimesUsed() + 1);
-            ipLogsRepository.save(ipLog);
+            redisTemplate.opsForValue().set(ipAddress, 1);
         }
-    }
-
-    private boolean checkIfItsTheNextDay(IpLog ipFromDatabase) {
-        ZonedDateTime currentDay = timeUtils.getDayOfMonth();
-        ZonedDateTime lastRequestDay = ipFromDatabase.getFirstRequestDate().truncatedTo(ChronoUnit.DAYS);
-        if (currentDay.isAfter(lastRequestDay.plusDays(1))) {
-            ipFromDatabase.setTimesUsed(0);
-            ipLogsRepository.save(ipFromDatabase);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private IpLog createIpLog(String ipAddress) {
-        IpLog newIpToSave = IpLog.buildNewIpLog(ipAddress, timeUtils.getCurrentDateTime());
-        return ipLogsRepository.save(newIpToSave);
     }
 
     public static class IpException extends ValidationRuleException {

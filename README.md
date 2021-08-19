@@ -1,20 +1,16 @@
 # Task for 4finance
 
 ## What could be done next:
+
 - Spring Security added. Users could register using personal information
-  (maybe receive a verification email) and then log in and access only that user information and details. Under the hood, the JWT token will be generated on login and used for every request so security filters can manage user access to different endpoints.
+  (maybe receive a verification email) and then log in and access only that user information and details. Under the hood, the JWT token will be generated on login and used for
+  every request so security filters can manage user access to different endpoints.
 - Additional validation added for personal code, depending on which country the app is running.
 - Full CRUD for client and loans created.
 
 ## Swagger
+
 http://localhost:8080/swagger-ui/
-
-## H2 Console
-http://localhost:8080/h2-console
-
-### Creds:
-- Username: username
-- Password: password
 
 # Feedback
 
@@ -50,7 +46,8 @@ http://localhost:8080/h2-console
 
 ### IRRELEVANT (Just me being a douche)
 
-- [x] DTO class naming... DTO in class name is just a noise, would argue that using Request/Response would provide a more concrete context and scope where those objects could be used.
+- [x] DTO class naming... DTO in class name is just a noise, would argue that using Request/Response would provide a more concrete context and scope where those objects could be
+  used.
 
 - [x] Naming with noise. e.g. existingClientOptional. No need to define that its optional (this can be read from type).
 
@@ -68,9 +65,11 @@ http://localhost:8080/h2-console
 
 - [x] Inconsistent use of primitives vs primitive wrappers. (e.g., Integer, int).
 
-- [x] Double is used for currency amount (which might become THE UGLY in some cases as more precises operations may lead to inconsistencies). Would suggest using either BigDecimal, or long and int to represent e.g Eur and cents...
+- [x] Double is used for currency amount (which might become THE UGLY in some cases as more precises operations may lead to inconsistencies). Would suggest using either BigDecimal,
+  or long and int to represent e.g Eur and cents...
 
-- [x] Configuration object props are not validated (e.g., incorrect configuration of maxAmount, interest rate). ForbiddenHourTo, forbiddenHourFrom, could lead to funky business, eg. forbiddenHourTo < forbiddenHourTo , since it is not defined if configuration accepts value 0 < n < 24. (?) How to check max amount and interest rate?
+- [x] Configuration object props are not validated (e.g., incorrect configuration of maxAmount, interest rate). ForbiddenHourTo, forbiddenHourFrom, could lead to funky business,
+  eg. forbiddenHourTo < forbiddenHourTo , since it is not defined if configuration accepts value 0 < n < 24. (?) How to check max amount and interest rate?
 
 - [x] No validations on persistence model.
 
@@ -88,11 +87,13 @@ http://localhost:8080/h2-console
 
 - [x] Tests may break if ran after working hours.
 
-- [x] Use separate classes for client request and client response. Using one class already introduced confusion like @ApiModelProperty(hidden = true) private String id. In future those classes tend to grow and become more and more complex.
+- [x] Use separate classes for client request and client response. Using one class already introduced confusion like @ApiModelProperty(hidden = true) private String id. In future
+  those classes tend to grow and become more and more complex.
 
 - [x] Not sure what to expect after calling "clients/{id}/history". Sounds like it could be client events, client personal data updates, loans etc.
 
-- [x] Test methods like com.finance.task.interest.controller.ClientControllerTest#testTakeLoan_whenPersonalCodeContainsLetters looks too big. You don't want to flood reader with data, which is not important for test. Please consider moving request building logic to separate method. (Clean code)
+- [x] Test methods like com.finance.task.interest.controller.ClientControllerTest#testTakeLoan_whenPersonalCodeContainsLetters looks too big. You don't want to flood reader with
+  data, which is not important for test. Please consider moving request building logic to separate method. (Clean code)
 
 - [ ] Packaging could be by functional zone like 'crm', 'risk' instead of layered structure. (?) Where to split classes
 
@@ -109,5 +110,6 @@ http://localhost:8080/h2-console
 - [x] (int) client.getLoan().getAmount() > config.getMaxAmount() there is an error somewhere in here related to casting double to int.
 
 TODO:
- - [ ] Migrate from FlyWay to Liquid Base.
- - [ ] Start using Redis for ip.
+
+- [ ] Migrate from FlyWay to Liquid Base.
+- [ ] Start using Redis for ip.
