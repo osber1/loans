@@ -2,18 +2,18 @@ package com.finance.interest.service
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
+
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.core.ValueOperations
 
 import com.finance.interest.configuration.PropertiesConfig
 import com.finance.interest.exception.NotFoundException
 import com.finance.interest.interfaces.TimeUtils
 import com.finance.interest.model.Client
 import com.finance.interest.model.ClientDAO
-import com.finance.interest.model.IpLog
 import com.finance.interest.model.Loan
 import com.finance.interest.model.LoanPostpone
 import com.finance.interest.repository.ClientRepository
-import com.finance.interest.repository.IpLogsRepository
 import com.finance.interest.repository.LoanRepository
 import com.finance.interest.util.IpValidator
 import com.finance.interest.util.IpValidator.IpException
@@ -41,19 +41,17 @@ class ClientServiceTest extends Specification {
 
     private LoanRepository loanRepository = Stub()
 
-    private IpLogsRepository ipLogsRepository = Stub()
-
     private ClientRepository clientRepository = Stub()
 
-    private IpValidator ipValidator = new IpValidator(ipLogsRepository, config, timeUtils)
+    private RedisTemplate<String, Integer> redisTemplate = Stub()
+
+    private ValueOperations valueOperations = Stub()
+
+    private IpValidator ipValidator = new IpValidator(config, redisTemplate)
 
     private TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
 
     private RiskValidator validator = new RiskValidator(Collections.singletonList(ipValidator), Collections.singletonList(timeAndAmountValidator))
-
-    private IpLog successfulIpLog = buildIpLog(2)
-
-    private IpLog unsuccessfulIpLog = buildIpLog(3)
 
     private LoanPostpone firstPostpone = buildLoanPostpone(15.00, date.plusWeeks(1))
 
@@ -78,9 +76,9 @@ class ClientServiceTest extends Specification {
 
     void 'should fail when ip limit is exceeded'() {
         given:
+            redisTemplate.opsForValue() >> valueOperations
+            valueOperations.get(_ as String) >> 3
             config.requestsFromSameIpLimit >> 3
-            timeUtils.dayOfMonth >> date.truncatedTo(ChronoUnit.DAYS)
-            ipLogsRepository.findByIp(_ as String) >> Optional.of(unsuccessfulIpLog)
         when:
             clientService.takeLoan(new Client(), IP)
         then:
@@ -90,13 +88,13 @@ class ClientServiceTest extends Specification {
 
     void 'should fail when amount limit is exceeded'() {
         given:
+            redisTemplate.opsForValue() >> valueOperations
+            valueOperations.get(_ as String) >> 2
             config.requestsFromSameIpLimit >> 3
             config.maxAmount >> 100.00
             config.forbiddenHourFrom >> 0
             config.forbiddenHourTo >> 6
-            timeUtils.dayOfMonth >> date.truncatedTo(ChronoUnit.DAYS).plusDays(1)
             timeUtils.hourOfDay >> 10
-            ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
         when:
             clientService.takeLoan(unsuccessfulClient, IP)
         then:
@@ -106,13 +104,13 @@ class ClientServiceTest extends Specification {
 
     void 'should fail when max amount and forbidden time'() {
         given:
+            redisTemplate.opsForValue() >> valueOperations
+            valueOperations.get(_ as String) >> 2
             config.requestsFromSameIpLimit >> 3
             config.maxAmount >> 100.00
             config.forbiddenHourFrom >> 0
             config.forbiddenHourTo >> 6
-            timeUtils.dayOfMonth >> date.truncatedTo(ChronoUnit.DAYS).plusDays(1)
             timeUtils.hourOfDay >> 4
-            ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
         when:
             clientService.takeLoan(successfulClient, IP)
         then:
@@ -122,14 +120,14 @@ class ClientServiceTest extends Specification {
 
     void 'should be successful when the user is new'() {
         given:
+            redisTemplate.opsForValue() >> valueOperations
+            valueOperations.get(_ as String) >> 2
             config.requestsFromSameIpLimit >> 10
             config.maxAmount >> 100.00
             config.forbiddenHourFrom >> 0
             config.forbiddenHourTo >> 6
             timeUtils.currentDateTime >> date
-            timeUtils.dayOfMonth >> date.truncatedTo(ChronoUnit.DAYS)
             timeUtils.hourOfDay >> 10
-            ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
             clientRepository.save(_ as ClientDAO) >> clientFromDatabase
             clientRepository.findByPersonalCode(_ as Long) >> Optional.empty()
         when:
@@ -140,14 +138,14 @@ class ClientServiceTest extends Specification {
 
     void 'should be successful when user is not new'() {
         given:
+            redisTemplate.opsForValue() >> valueOperations
+            valueOperations.get(_ as String) >> 2
             config.requestsFromSameIpLimit >> 10
             config.maxAmount >> 100.00
             config.forbiddenHourFrom >> 0
             config.forbiddenHourTo >> 6
             timeUtils.currentDateTime >> date
-            timeUtils.dayOfMonth >> date.truncatedTo(ChronoUnit.DAYS)
             timeUtils.hourOfDay >> 10
-            ipLogsRepository.findByIp(_ as String) >> Optional.of(successfulIpLog)
             clientRepository.save(_ as ClientDAO) >> clientFromDatabase
             clientRepository.findByPersonalCode(_ as Long) >> Optional.of(clientFromDatabase)
         when:
@@ -223,16 +221,6 @@ class ClientServiceTest extends Specification {
             newReturnDate = newDate
             return it
         } as LoanPostpone
-    }
-
-    private static IpLog buildIpLog(int usedTimes) {
-        new IpLog().with {
-            id = 1
-            ip = IP
-            timesUsed = usedTimes
-            firstRequestDate = date
-            return it
-        } as IpLog
     }
 
     private static Client buildClient(Loan loanObj) {

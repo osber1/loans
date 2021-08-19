@@ -6,12 +6,14 @@ import org.springframework.data.redis.core.ValueOperations
 import com.finance.interest.configuration.PropertiesConfig
 import com.finance.interest.util.IpValidator.IpException
 
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
 
 class IpValidatorTest extends Specification {
 
-    private static final String IP_ADDRESS_TO_CHECK = '0.0.0.0.0.0.1'
+    @Shared
+    String IP_ADDRESS_TO_CHECK = '0.0.0.0.0.0.1'
 
     private PropertiesConfig config = Stub()
 

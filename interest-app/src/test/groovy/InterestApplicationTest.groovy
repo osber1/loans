@@ -31,8 +31,6 @@ class InterestApplicationTest extends Specification {
         and:
             context.containsBean("timeService")
         and:
-            context.containsBean("ipLogsRepository")
-        and:
             context.containsBean("swaggerConfig")
         and:
             context.containsBean("propertiesConfig")

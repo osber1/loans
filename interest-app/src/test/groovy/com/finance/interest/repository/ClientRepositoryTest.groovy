@@ -6,14 +6,17 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import com.finance.interest.model.ClientDAO
 import com.finance.interest.model.Loan
 
+import spock.lang.Shared
 import spock.lang.Specification
 
 @DataJpaTest
 class ClientRepositoryTest extends Specification {
 
-    public static final String NON_EXISTING_PERSON_ID = 'NON-EXISTING-ID'
+    @Shared
+    String NON_EXISTING_PERSON_ID = 'NON-EXISTING-ID'
 
-    private static final long NON_EXISTING_PERSONAL_CODE = 11111111110L
+    @Shared
+    long NON_EXISTING_PERSONAL_CODE = 11111111110L
 
     private ClientDAO client = createClient()
 

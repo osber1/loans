@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletResponse
@@ -24,7 +25,6 @@ import com.finance.interest.model.ClientDAO
 import com.finance.interest.model.Loan
 import com.finance.interest.model.LoanPostpone
 import com.finance.interest.repository.ClientRepository
-import com.finance.interest.repository.IpLogsRepository
 import com.finance.interest.repository.LoanRepository
 
 import groovy.json.JsonBuilder
@@ -37,15 +37,15 @@ class ClientControllerTest extends Specification {
 
     private static final ZonedDateTime date = generateDate()
 
-    public static final String TIME_ZONE = "Europe/Vilnius"
+    private static final String TIME_ZONE = "Europe/Vilnius"
 
-    public static final String NAME = "Name"
+    private static final String NAME = "Name"
 
-    public static final String SURNAME = "Surname"
+    private static final String SURNAME = "Surname"
 
-    public static final String PERSONAL_CODE = "12345678910"
+    private static final String PERSONAL_CODE = "12345678910"
 
-    public static final String ID = "CORRECT-TEST-ID"
+    private static final String ID = "CORRECT-TEST-ID"
 
     @Autowired
     private MockMvc mockMvc
@@ -57,10 +57,10 @@ class ClientControllerTest extends Specification {
     private ClientRepository clientRepository
 
     @Autowired
-    private IpLogsRepository ipLogsRepository
+    private LoanRepository loanRepository
 
     @Autowired
-    private LoanRepository loanRepository
+    private RedisTemplate<String, Integer> redisTemplate
 
     private ClientDAO clientDao = buildClientDao()
 
@@ -68,8 +68,10 @@ class ClientControllerTest extends Specification {
 
     void cleanup() {
         clientRepository.deleteAll()
-        ipLogsRepository.deleteAll()
         loanRepository.deleteAll()
+        for (String key : redisTemplate.keys("*")) {
+            redisTemplate.delete(key);
+        }
     }
 
     void 'should take loan when request is correct'() {

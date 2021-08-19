@@ -112,4 +112,4 @@ http://localhost:8080/swagger-ui/
 TODO:
 
 - [ ] Migrate from FlyWay to Liquid Base.
-- [ ] Start using Redis for ip.
+- [x] Start using Redis for ip validation.
