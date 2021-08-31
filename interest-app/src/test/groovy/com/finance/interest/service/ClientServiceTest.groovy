@@ -22,6 +22,7 @@ import com.finance.interest.util.TimeAndAmountValidator
 import com.finance.interest.util.TimeAndAmountValidator.AmountException
 import com.finance.interest.util.TimeAndAmountValidator.TimeException
 
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -53,23 +54,23 @@ class ClientServiceTest extends Specification {
 
     private RiskValidator validator = new RiskValidator(Collections.singletonList(ipValidator), Collections.singletonList(timeAndAmountValidator))
 
+    @Shared
     private LoanPostpone firstPostpone = buildLoanPostpone(15.00, date.plusWeeks(1))
 
+    @Shared
     private LoanPostpone secondPostpone = buildLoanPostpone(22.50, date.plusWeeks(2))
 
+    @Shared
     private Loan successfulLoan = buildLoan(100.00)
 
-    private Loan unsuccessfulLoan = buildLoan(1000.00)
-
+    @Shared
     private Loan loanWithPostpone = buildLoanWithPostpone(buildLoan(100.00), firstPostpone)
 
-    private Loan loanWithTwoPostpones = buildLoanWithPostpones(buildLoan(100.00), firstPostpone, secondPostpone)
-
+    @Shared
     private ClientDAO clientFromDatabase = buildClientResponse(successfulLoan)
 
+    @Shared
     private Client successfulClient = buildClient(successfulLoan)
-
-    private Client unsuccessfulClient = buildClient(unsuccessfulLoan)
 
     @Subject
     ClientService clientService = new ClientService(clientRepository, loanRepository, config, validator, timeUtils)
@@ -96,7 +97,7 @@ class ClientServiceTest extends Specification {
             config.forbiddenHourTo >> 6
             timeUtils.hourOfDay >> 10
         when:
-            clientService.takeLoan(unsuccessfulClient, IP)
+            clientService.takeLoan(buildClient(buildLoan(1000.00)), IP)
         then:
             AmountException exception = thrown()
             exception.message == 'The amount you are trying to borrow exceeds the max amount!'
@@ -196,7 +197,7 @@ class ClientServiceTest extends Specification {
     void 'should postpone loan when it is not first postpone'() {
         given:
             loanRepository.findById(_ as Long) >> Optional.of(loanWithPostpone)
-            loanRepository.save(_ as Loan) >> loanWithTwoPostpones
+            loanRepository.save(_ as Loan) >> buildLoanWithPostpones(buildLoan(100.00), firstPostpone, secondPostpone)
         when:
             LoanPostpone loanPostponeResponse = clientService.postponeLoan(1)
         then:

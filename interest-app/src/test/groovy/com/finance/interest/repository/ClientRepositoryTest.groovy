@@ -11,6 +11,7 @@ import com.finance.interest.model.Loan
 
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Subject
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
@@ -31,6 +32,7 @@ class ClientRepositoryTest extends Specification {
     @Shared
     private ClientDAO client = createClient()
 
+    @Subject
     @Autowired
     private ClientRepository clientRepository
 

@@ -26,12 +26,14 @@ import com.finance.interest.model.Loan
 import com.finance.interest.model.LoanPostpone
 import com.finance.interest.repository.ClientRepository
 import com.finance.interest.repository.LoanRepository
+import com.jupitertools.springtestredis.RedisTestContainer
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import spock.lang.Specification
 
 @SpringBootTest
+@RedisTestContainer
 @AutoConfigureMockMvc
 class ClientControllerTest extends Specification {
 
@@ -70,7 +72,7 @@ class ClientControllerTest extends Specification {
         clientRepository.deleteAll()
         loanRepository.deleteAll()
         for (String key : redisTemplate.keys("*")) {
-            redisTemplate.delete(key);
+            redisTemplate.delete(key)
         }
     }
 

@@ -113,3 +113,4 @@ TODO:
 
 - [ ] Migrate from FlyWay to Liquid Base.
 - [x] Start using Redis for ip validation.
+- [x] Enable Testcontainers.

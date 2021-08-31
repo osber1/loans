@@ -26,6 +26,7 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testcontainers
     testImplementation group: 'org.testcontainers', name: 'spock', version: testcontainers
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: testcontainers
+    testImplementation group: 'com.jupiter-tools', name: 'spring-test-redis', version: '0.1'
 
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombok
 
