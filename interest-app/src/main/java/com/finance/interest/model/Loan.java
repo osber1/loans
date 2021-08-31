@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
@@ -24,7 +25,8 @@ import lombok.Setter;
 public class Loan {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "LOANS_SEQ", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "LOANS_SEQ", sequenceName = "LOANS_SEQ", allocationSize = 1)
     private long id;
 
     @NotNull

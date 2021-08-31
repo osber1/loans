@@ -23,12 +23,13 @@ dependencies {
     testImplementation group: 'org.spockframework', name: 'spock-core', version: spock
     testImplementation group: 'org.spockframework', name: 'spock-spring', version: spock
     testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: testcontainers
+    testImplementation group: 'org.testcontainers', name: 'spock', version: testcontainers
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: testcontainers
 
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombok
 
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombok
-
-    testRuntimeOnly 'com.h2database:h2'
 }
 
 test {
