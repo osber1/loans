@@ -111,6 +111,7 @@ http://localhost:8080/swagger-ui/
 
 TODO:
 
-- [ ] Migrate from FlyWay to Liquid Base.
 - [x] Start using Redis for ip validation.
 - [x] Enable Testcontainers.
+- [x] Migrate from FlyWay to Liquidbase.
+- [ ] Use ip validation in filter, not in service.

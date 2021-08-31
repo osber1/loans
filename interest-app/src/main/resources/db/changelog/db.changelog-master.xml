@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd" objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1630411958776-1" author="osvaldas">
+        <createSequence incrementBy="1" sequenceName="loans_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1630411958776-2" author="osvaldas">
+        <createSequence incrementBy="1" sequenceName="postpone_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1630411958776-3" author="osvaldas">
+        <createTable tableName="client">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_client"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="personal_code" type="BIGINT"/>
+            <column name="created_at" type="timestamp with time zone"/>
+            <column name="updated_at" type="timestamp with time zone"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1630411958776-4" author="osvaldas">
+        <createTable tableName="client_loans">
+            <column name="clientdao_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="loans_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1630411958776-5" author="osvaldas">
+        <createTable tableName="loan">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_loan"/>
+            </column>
+            <column name="amount" type="DECIMAL"/>
+            <column name="interest_rate" type="DECIMAL"/>
+            <column name="term_in_months" type="INT"/>
+            <column name="return_date" type="timestamp with time zone"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1630411958776-6" author="osvaldas">
+        <createTable tableName="loan_loan_postpones">
+            <column name="loan_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="loan_postpones_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1630411958776-7" author="osvaldas">
+        <createTable tableName="loan_postpone">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_loanpostpone"/>
+            </column>
+            <column name="new_return_date" type="timestamp with time zone"/>
+            <column name="new_interest_rate" type="DECIMAL"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1630411958776-8" author="osvaldas">
+        <addUniqueConstraint columnNames="loans_id" constraintName="uc_client_loans_loans" tableName="client_loans"/>
+    </changeSet>
+    <changeSet id="1630411958776-9" author="osvaldas">
+        <addUniqueConstraint columnNames="loan_postpones_id" constraintName="uc_loan_loan_postpones_loanpostpones" tableName="loan_loan_postpones"/>
+    </changeSet>
+    <changeSet id="1630411958776-10" author="osvaldas">
+        <addForeignKeyConstraint baseColumnNames="clientdao_id" baseTableName="client_loans" constraintName="fk_cliloa_on_client_d_a_o" referencedColumnNames="id"
+                                 referencedTableName="client"/>
+    </changeSet>
+    <changeSet id="1630411958776-11" author="osvaldas">
+        <addForeignKeyConstraint baseColumnNames="loans_id" baseTableName="client_loans" constraintName="fk_cliloa_on_loan" referencedColumnNames="id" referencedTableName="loan"/>
+    </changeSet>
+    <changeSet id="1630411958776-12" author="osvaldas">
+        <addForeignKeyConstraint baseColumnNames="loan_id" baseTableName="loan_loan_postpones" constraintName="fk_loaloa_on_loan" referencedColumnNames="id"
+                                 referencedTableName="loan"/>
+    </changeSet>
+    <changeSet id="1630411958776-13" author="osvaldas">
+        <addForeignKeyConstraint baseColumnNames="loan_postpones_id" baseTableName="loan_loan_postpones" constraintName="fk_loaloa_on_loan_postpone" referencedColumnNames="id"
+                                 referencedTableName="loan_postpone"/>
+    </changeSet>
+</databaseChangeLog>

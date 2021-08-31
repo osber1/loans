@@ -28,6 +28,8 @@ spring:
     host: localhost
     port: 6379
     timeout: 60000
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
 
 application:
   maxAmount: 100
