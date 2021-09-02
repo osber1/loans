@@ -2,7 +2,6 @@ package com.finance.interest.controller;
 
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,9 +37,9 @@ public class ClientController {
     private final LoanPostponeMapper postponeMapper;
 
     @PostMapping("client/loans")
-    public ClientResponse takeLoan(@Valid @RequestBody ClientRequest clientDto, HttpServletRequest request) {
+    public ClientResponse takeLoan(@Valid @RequestBody ClientRequest clientDto) {
         Client client = clientMapper.clientToEntity(clientDto);
-        return clientMapper.clientToDTO(service.takeLoan(client, request.getRemoteAddr()));
+        return clientMapper.clientToDTO(service.takeLoan(client));
     }
 
     @PostMapping("client/loans/{id}/extensions")

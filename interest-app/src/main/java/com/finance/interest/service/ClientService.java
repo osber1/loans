@@ -49,8 +49,8 @@ public class ClientService {
     private final TimeUtils timeUtils;
 
     @Transactional
-    public Client takeLoan(Client client, String ip) {
-        validateClient(client, ip);
+    public Client takeLoan(Client client) {
+        validateClient(client);
 
         ClientDAO loanClient = clientRepository.findByPersonalCode(client.getPersonalCode())
             .orElseGet(() -> buildNewClientDAO(client));
@@ -106,8 +106,7 @@ public class ClientService {
         return newReturnDate.plusDays(config.getPostponeDays());
     }
 
-    private void validateClient(Client client, String ip) {
-        validator.validate(ip);
+    private void validateClient(Client client) {
         validator.validate(client.getLoan().getAmount());
     }
 
