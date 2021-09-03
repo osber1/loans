@@ -1,43 +1,80 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.2'
+    id 'org.springframework.boot' version '2.6.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'groovy'
     id 'application'
+    id 'jacoco'
 }
 
-mainClassName = "com.finance.interest.InterestApplication"
+group = 'io.osvaldas'
+version = '1.0-SNAPSHOT'
+//sourceCompatibility = '17'
 
-ext { springBootVersion = '2.5.2' }
+repositories {
+    mavenCentral()
+}
 
-allprojects {
-    group = 'com.4finance'
-    version = '1.0-SNAPSHOT'
+ext {
+    springBootVersion = '2.6.4'
+    groovyVersion = '3.0.10'
+    lombokVersion = '1.18.22'
+    springfoxVersion = '3.0.0'
+    mapstructVersion = '1.4.2.Final'
+    spockVersion = '2.1-groovy-3.0'
+    lombokMapstructBindingsVersion = '0.2.0'
+    testContainersVersion = '1.16.3'
+}
 
-    repositories {
-        mavenCentral()
+dependencies {
+    implementation(
+        "org.projectlombok:lombok:${lombokVersion}",
+        "org.codehaus.groovy:groovy-all:${groovyVersion}",
+        'org.springframework.boot:spring-boot-starter-data-jpa',
+        'org.springframework.boot:spring-boot-starter-web',
+        'org.springframework.boot:spring-boot-starter-validation',
+        'org.springframework.boot:spring-boot-starter-data-redis',
+        'redis.clients:jedis',
+        'org.liquibase:liquibase-core',
+        "io.springfox:springfox-boot-starter:${springfoxVersion}",
+        "org.mapstruct:mapstruct:${mapstructVersion}",
+        'org.postgresql:postgresql'
+    )
+
+    compileOnly(
+        "org.projectlombok:lombok:${lombokVersion}",
+        "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingsVersion}"
+
+    )
+
+    annotationProcessor(
+        "org.projectlombok:lombok:${lombokVersion}",
+        'org.springframework.boot:spring-boot-configuration-processor',
+        "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    )
+
+    testImplementation(
+        "org.spockframework:spock-core:${spockVersion}",
+        "org.spockframework:spock-spring:${spockVersion}",
+        'org.springframework.boot:spring-boot-starter-test',
+        "org.testcontainers:testcontainers:${testContainersVersion}",
+        "org.testcontainers:spock:${testContainersVersion}",
+        "org.testcontainers:postgresql:${testContainersVersion}",
+        "com.jupiter-tools:spring-test-redis:0.1"
+    )
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.enabled true
+        html.enabled false
+        csv.enabled false
+        xml.destination file("${buildDir}/reports/jacoco.xml")
     }
 }
 
-subprojects {
-    apply plugin: 'java'
-    apply plugin: 'groovy'
-    apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'application'
-
-    dependencyManagement {
-        imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
-        }
-    }
-
-    ext {
-        groovy = '3.0.8'
-        lombok = '1.18.20'
-        springfox = '3.0.0'
-        mapstruct = '1.4.2.Final'
-        spock = '2.0-groovy-3.0'
-        lombok_mapstruct_bindings = '0.2.0'
-        testcontainers = '1.16.0'
-    }
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport // report is always generated after tests run
 }
