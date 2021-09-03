@@ -1,13 +1,5 @@
 # Task for 4finance
 
-## What could be done next:
-
-- Spring Security added. Users could register using personal information
-  (maybe receive a verification email) and then log in and access only that user information and details. Under the hood, the JWT token will be generated on login and used for
-  every request so security filters can manage user access to different endpoints.
-- Additional validation added for personal code, depending on which country the app is running.
-- Full CRUD for client and loans created.
-
 ## Swagger
 
 http://localhost:8080/swagger-ui/
@@ -57,7 +49,7 @@ http://localhost:8080/swagger-ui/
 
 - [x] Use of List for collections which seem to be holding unique objects. Would use Set in this case.
 
-- [ ] Top lvl package naming is based on architectural layering of application. (?) How it should be named?
+- [x] Top lvl package naming is based on architectural layering of application. (?) How it should be named?
 
 - [x] Not sure if it's a good idea to use same object for request and response (ClientDTO), thinking about possible evolution of api.
 
@@ -95,7 +87,7 @@ http://localhost:8080/swagger-ui/
 - [x] Test methods like com.finance.task.interest.controller.ClientControllerTest#testTakeLoan_whenPersonalCodeContainsLetters looks too big. You don't want to flood reader with
   data, which is not important for test. Please consider moving request building logic to separate method. (Clean code)
 
-- [ ] Packaging could be by functional zone like 'crm', 'risk' instead of layered structure. (?) Where to split classes
+- [x] Packaging could be by functional zone like 'crm', 'risk' instead of layered structure. (?) Where to split classes
 
 - [x] Anemic domain model. Client, Loan are only DTO's and don't have any logic. (Domain driven design).
 
@@ -112,6 +104,17 @@ http://localhost:8080/swagger-ui/
 TODO:
 
 - [x] Start using Redis for ip validation.
+
 - [x] Enable Testcontainers.
+
 - [x] Migrate from FlyWay to Liquidbase.
-- [ ] Use ip validation in filter, not in service.
+
+- [x] Use ip validation in filter, not in service.
+
+- [ ] Add full CRUD for client and loans.
+
+- [ ] Add Spring Security with JWT tokens on every request (okta or keycloak).
+
+- [ ] Users receive email on registration and have to confirm email.
+
+- [ ] FE with Angular.
