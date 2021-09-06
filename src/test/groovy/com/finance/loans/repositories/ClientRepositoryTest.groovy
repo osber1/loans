@@ -27,7 +27,7 @@ class ClientRepositoryTest extends Specification {
     long NON_EXISTING_PERSONAL_CODE = 11111111110L
 
     @Shared
-    private ClientDAO client = createClient()
+    private Client client = createClient()
 
     @Subject
     @Autowired
@@ -35,32 +35,32 @@ class ClientRepositoryTest extends Specification {
 
     void 'should return user when id is correct'() {
         given:
-            ClientDAO databaseResponse = clientRepository.save(client)
+            Client databaseResponse = clientRepository.save(client)
         when:
-            Optional<ClientDAO> expected = clientRepository.findById(client.id)
+            Optional<Client> expected = clientRepository.findById(client.id)
         then:
             expected.filter(databaseResponse::equals)
     }
 
     void 'should be empty when id is incorrect'() {
         when:
-            Optional<ClientDAO> expected = clientRepository.findById(NON_EXISTING_PERSON_ID)
+            Optional<Client> expected = clientRepository.findById(NON_EXISTING_PERSON_ID)
         then:
             expected.isEmpty()
     }
 
     void 'should return user when personal code is correct'() {
         given:
-            ClientDAO databaseResponse = clientRepository.save(client)
+            Client databaseResponse = clientRepository.save(client)
         when:
-            Optional<ClientDAO> expected = clientRepository.findByPersonalCode(client.personalCode)
+            Optional<Client> expected = clientRepository.findByPersonalCode(client.personalCode)
         then:
             expected.filter(databaseResponse::equals)
     }
 
     void 'should be empty when personal code is incorrect'() {
         when:
-            Optional<ClientDAO> expected = clientRepository.findByPersonalCode(NON_EXISTING_PERSONAL_CODE)
+            Optional<Client> expected = clientRepository.findByPersonalCode(NON_EXISTING_PERSONAL_CODE)
         then:
             expected.isEmpty()
     }
@@ -75,11 +75,13 @@ class ClientRepositoryTest extends Specification {
         } as Loan
     }
 
-    static ClientDAO createClient() {
-        return new ClientDAO().with {
+    static Client createClient() {
+        return new Client().with {
             id = 'ID-TO-TEST'
             firstName = 'Test'
-            lastName = 'Uset'
+            lastName = 'User'
+            email = 'user@mail.com'
+            phoneNumber = '+37062541365'
             personalCode = 11111111111L
             loans = Collections.singleton(createLoan())
             return it

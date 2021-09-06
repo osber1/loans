@@ -14,7 +14,6 @@ import com.finance.loans.domain.loans.validators.TimeAndAmountValidator.TimeExce
 import com.finance.loans.domain.util.TimeUtils
 import com.finance.loans.infra.configuration.PropertiesConfig
 import com.finance.loans.repositories.Client
-import com.finance.loans.repositories.ClientDAO
 import com.finance.loans.repositories.ClientRepository
 import com.finance.loans.repositories.Loan
 import com.finance.loans.repositories.LoanPostpone
@@ -61,16 +60,15 @@ class ClientServiceTest extends Specification {
     private Loan loanWithPostpone = buildLoanWithPostpone(buildLoan(100.00), firstPostpone)
 
     @Shared
-    private ClientDAO clientFromDatabase = buildClientResponse(successfulLoan)
-
-    @Shared
-    private Client successfulClient = buildClient(successfulLoan)
+    private Client clientFromDatabase = buildClientResponse(successfulLoan)
 
     @Subject
     ClientService clientService = new ClientService(clientRepository, loanRepository, config, validator, timeUtils)
 
     void 'should fail when amount limit is exceeded'() {
         given:
+            clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
+            clientRepository.save(_ as Client) >> clientFromDatabase
             redisTemplate.opsForValue() >> valueOperations
             valueOperations.get(_ as String) >> 2
             config.requestsFromSameIpLimit >> 3
@@ -79,7 +77,7 @@ class ClientServiceTest extends Specification {
             config.forbiddenHourTo >> 6
             timeUtils.hourOfDay >> 10
         when:
-            clientService.takeLoan(buildClient(buildLoan(1000.00)))
+            clientService.takeLoan(buildLoan(1000.00), CORRECT_USER_ID)
         then:
             AmountException exception = thrown()
             exception.message == 'The amount you are trying to borrow exceeds the max amount!'
@@ -95,7 +93,7 @@ class ClientServiceTest extends Specification {
             config.forbiddenHourTo >> 6
             timeUtils.hourOfDay >> 4
         when:
-            clientService.takeLoan(successfulClient)
+            clientService.takeLoan(successfulLoan, CORRECT_USER_ID)
         then:
             TimeException exception = thrown()
             exception.message == 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
@@ -111,12 +109,13 @@ class ClientServiceTest extends Specification {
             config.forbiddenHourTo >> 6
             timeUtils.currentDateTime >> date
             timeUtils.hourOfDay >> 10
-            clientRepository.save(_ as ClientDAO) >> clientFromDatabase
+            clientRepository.save(_ as Client) >> clientFromDatabase
             clientRepository.findByPersonalCode(_ as Long) >> Optional.empty()
+            clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
         when:
-            Client clientResponse = clientService.takeLoan(successfulClient)
+            Loan loanResponse = clientService.takeLoan(successfulLoan, CORRECT_USER_ID)
         then:
-            successfulClient == clientResponse
+            successfulLoan == loanResponse
     }
 
     void 'should be successful when user is not new'() {
@@ -129,12 +128,13 @@ class ClientServiceTest extends Specification {
             config.forbiddenHourTo >> 6
             timeUtils.currentDateTime >> date
             timeUtils.hourOfDay >> 10
-            clientRepository.save(_ as ClientDAO) >> clientFromDatabase
+            clientRepository.save(_ as Client) >> clientFromDatabase
+            clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
             clientRepository.findByPersonalCode(_ as Long) >> Optional.of(clientFromDatabase)
         when:
-            Client clientResponse = clientService.takeLoan(successfulClient)
+            Loan loanResponse = clientService.takeLoan(successfulLoan, CORRECT_USER_ID)
         then:
-            clientResponse == successfulClient
+            successfulLoan == loanResponse
     }
 
     void 'should throw exception when getting history and client not exist'() {
@@ -206,17 +206,6 @@ class ClientServiceTest extends Specification {
         } as LoanPostpone
     }
 
-    private static Client buildClient(Loan loanObj) {
-        return new Client().with {
-            id = CORRECT_USER_ID
-            firstName = 'Testas'
-            lastName = 'Testaitis'
-            personalCode = 12345678910
-            loan = loanObj
-            return it
-        } as Client
-    }
-
     private static ZonedDateTime generateDate() {
         return ZonedDateTime.of(
             2020,
@@ -229,27 +218,27 @@ class ClientServiceTest extends Specification {
             ZoneId.of(TIME_ZONE))
     }
 
-    private static Loan buildLoanWithPostpone(Loan loanRequest, LoanPostpone postpone1) {
-        List<LoanPostpone> list = Collections.singletonList(postpone1)
+    private static Loan buildLoanWithPostpone(Loan loanRequest, LoanPostpone postpone) {
+        List<LoanPostpone> list = Collections.singletonList(postpone)
         loanRequest.with { loanPostpones = new HashSet<>(list) }
         return loanRequest
     }
 
-    private static Loan buildLoanWithPostpones(Loan loanRequest, LoanPostpone postpone1, LoanPostpone postpone2) {
-        List<LoanPostpone> list = Arrays.asList(postpone1, postpone2)
+    private static Loan buildLoanWithPostpones(Loan loanRequest, LoanPostpone postpone, LoanPostpone secondPostpone) {
+        List<LoanPostpone> list = Arrays.asList(postpone, secondPostpone)
         loanRequest.with { loanPostpones = new HashSet<>(list) }
         return loanRequest
 
     }
 
-    private static ClientDAO buildClientResponse(Loan loanObj) {
-        return new ClientDAO().with {
+    private static Client buildClientResponse(Loan loanObj) {
+        return new Client().with {
             id = CORRECT_USER_ID
             firstName = 'Testas'
             lastName = 'Testaitis'
             personalCode = 12345678910
             loans = new HashSet<>(Collections.singletonList(loanObj))
             return it
-        } as ClientDAO
+        } as Client
     }
 }

@@ -15,7 +15,9 @@ public class ClientResponse {
 
     private String personalCode;
 
-    private LoanResponse loan;
+    private String email;
+
+    private String phoneNumber;
 
     private ZonedDateTime createdAt;
 

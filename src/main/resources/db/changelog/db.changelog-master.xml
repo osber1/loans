@@ -17,6 +17,8 @@
             </column>
             <column name="first_name" type="VARCHAR(255)"/>
             <column name="last_name" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="phone_number" type="VARCHAR(255)"/>
             <column name="personal_code" type="BIGINT"/>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="updated_at" type="timestamp with time zone"/>
@@ -24,7 +26,7 @@
     </changeSet>
     <changeSet id="1630411958776-4" author="osvaldas">
         <createTable tableName="client_loans">
-            <column name="clientdao_id" type="VARCHAR(255)">
+            <column name="client_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="loans_id" type="BIGINT">
@@ -69,7 +71,7 @@
         <addUniqueConstraint columnNames="loan_postpones_id" constraintName="uc_loan_loan_postpones_loanpostpones" tableName="loan_loan_postpones"/>
     </changeSet>
     <changeSet id="1630411958776-10" author="osvaldas">
-        <addForeignKeyConstraint baseColumnNames="clientdao_id" baseTableName="client_loans" constraintName="fk_cliloa_on_client_d_a_o" referencedColumnNames="id"
+        <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="client_loans" constraintName="fk_cliloa_on_client_d_a_o" referencedColumnNames="id"
                                  referencedTableName="client"/>
     </changeSet>
     <changeSet id="1630411958776-11" author="osvaldas">

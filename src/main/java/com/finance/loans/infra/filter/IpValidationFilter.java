@@ -23,7 +23,7 @@ public class IpValidationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (getCurrentUrlFromRequest((HttpServletRequest) request).equals("/api/client/loans")) {
+        if (getCurrentUrlFromRequest((HttpServletRequest) request).contains("/api/client") && getCurrentUrlFromRequest((HttpServletRequest) request).contains("loan")) {
             ipValidationRule.validate(request.getRemoteAddr());
         }
         chain.doFilter(request, response);

@@ -111,10 +111,10 @@ TODO:
 
 - [x] Use ip validation in filter, not in service.
 
-- [ ] Add full CRUD for client and loans.
+- [x] Add full CRUD for client and loans.
 
 - [ ] Add Spring Security with JWT tokens on every request (okta or keycloak).
 
 - [ ] Users receive email on registration and have to confirm email.
 
-- [ ] FE with Angular.
+- [ ] FE.

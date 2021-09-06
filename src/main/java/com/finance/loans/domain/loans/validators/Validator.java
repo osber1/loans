@@ -1,4 +1,4 @@
-package com.finance.loans.domain.loans.rules;
+package com.finance.loans.domain.loans.validators;
 
 import java.math.BigDecimal;
 

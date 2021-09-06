@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.finance.loans.domain.loans.rules.TimeAndAmountValidationRule;
-import com.finance.loans.domain.loans.rules.Validator;
 
 import lombok.RequiredArgsConstructor;
 

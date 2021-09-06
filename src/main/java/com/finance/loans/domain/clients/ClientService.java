@@ -1,24 +1,19 @@
 package com.finance.loans.domain.clients;
 
-import static com.finance.loans.repositories.Client.buildClientResponse;
-import static com.finance.loans.repositories.ClientDAO.buildNewClientDAO;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.finance.loans.domain.exceptions.NotFoundException;
-import com.finance.loans.domain.loans.rules.Validator;
+import com.finance.loans.domain.loans.validators.Validator;
 import com.finance.loans.domain.util.TimeUtils;
 import com.finance.loans.infra.configuration.PropertiesConfig;
 import com.finance.loans.repositories.Client;
-import com.finance.loans.repositories.ClientDAO;
 import com.finance.loans.repositories.ClientRepository;
 import com.finance.loans.repositories.Loan;
 import com.finance.loans.repositories.LoanPostpone;
@@ -32,9 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ClientService {
 
-    private static final String LOAN_NOT_EXIST = "Loan with id %s does not exist.";
-
     private static final String CLIENT_NOT_EXIST = "Client with id %s does not exist.";
+
+    private static final String LOAN_NOT_EXIST = "Loan with id %s does not exist.";
 
     private static final int NUMBERS_AFTER_COMMA = 2;
 
@@ -49,16 +44,44 @@ public class ClientService {
     private final TimeUtils timeUtils;
 
     @Transactional
-    public Client takeLoan(Client client) {
-        validateClient(client);
+    public Client registerClient(Client client) {
+        return clientRepository.save(client);
+    }
 
-        ClientDAO loanClient = clientRepository.findByPersonalCode(client.getPersonalCode())
-            .orElseGet(() -> buildNewClientDAO(client));
+    @Transactional(readOnly = true)
+    public Collection<Client> getClients() {
+        return clientRepository.findAll();
+    }
 
-        loanClient.addLoan(client.getLoan());
-        setNewInterestAndReturnDate(client);
-        ClientDAO savedClient = clientRepository.save(loanClient);
-        return buildClientResponse(savedClient);
+    @Transactional(readOnly = true)
+    public Client getClient(String id) {
+        return clientRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(String.format(CLIENT_NOT_EXIST, id)));
+    }
+
+    @Transactional
+    public void deleteClient(String id) {
+        if (!clientRepository.existsById(id)) {
+            throw new NotFoundException(String.format(CLIENT_NOT_EXIST, id));
+        }
+        clientRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Client updateClient(Client client) {
+        if (!clientRepository.existsById(client.getId())) {
+            throw new NotFoundException(String.format(CLIENT_NOT_EXIST, client.getId()));
+        }
+        return clientRepository.save(client);
+    }
+
+    @Transactional
+    public Loan takeLoan(Loan loan, String id) {
+        validateLoan(loan);
+        Client client = getClient(id);
+        setNewInterestAndReturnDate(loan);
+        client.addLoan(loan);
+        return clientRepository.save(client).getLoans().stream().max(Comparator.comparing(Loan::getId)).orElse(null);
     }
 
     @Transactional
@@ -66,7 +89,7 @@ public class ClientService {
         Loan loanRequest = getLoan(id);
         loanRequest.getLoanPostpones().add(buildLoanPostpone(loanRequest));
         Loan savedLoanRequest = loanRepository.save(loanRequest);
-        return savedLoanRequest.getLoanPostpones().stream().max(Comparator.comparing(LoanPostpone::getNewReturnDate)).get();
+        return savedLoanRequest.getLoanPostpones().stream().max(Comparator.comparing(LoanPostpone::getNewReturnDate)).orElse(null);
     }
 
     public Collection<Loan> getClientHistory(String id) {
@@ -88,7 +111,7 @@ public class ClientService {
             newReturnDate = loanRequest.getReturnDate();
             newInterestRate = loanRequest.getInterestRate();
         } else {
-            LoanPostpone latestPostpone = loanRequest.getLoanPostpones().stream().max(Comparator.comparing(LoanPostpone::getNewReturnDate)).get();
+            LoanPostpone latestPostpone = loanRequest.getLoanPostpones().stream().max(Comparator.comparing(LoanPostpone::getNewReturnDate)).orElse(null);
             newReturnDate = latestPostpone.getNewReturnDate();
             newInterestRate = latestPostpone.getNewInterestRate();
         }
@@ -106,13 +129,12 @@ public class ClientService {
         return newReturnDate.plusDays(config.getPostponeDays());
     }
 
-    private void validateClient(Client client) {
-        validator.validate(client.getLoan().getAmount());
+    private void validateLoan(Loan loan) {
+        validator.validate(loan.getAmount());
     }
 
-    private void setNewInterestAndReturnDate(Client client) {
-        client.getLoan().setInterestRate(config.getInterestRate());
-        client.getLoan().setReturnDate(
-            timeUtils.getCurrentDateTime().plusMonths(client.getLoan().getTermInMonths()));
+    private void setNewInterestAndReturnDate(Loan loan) {
+        loan.setInterestRate(config.getInterestRate());
+        loan.setReturnDate(timeUtils.getCurrentDateTime().plusMonths(loan.getTermInMonths()));
     }
 }
