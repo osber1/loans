@@ -1,4 +1,4 @@
-package com.finance.loans.repositories;
+package com.finance.loans.repositories.entities;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;

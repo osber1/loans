@@ -13,11 +13,11 @@ import com.finance.loans.domain.loans.validators.TimeAndAmountValidator.AmountEx
 import com.finance.loans.domain.loans.validators.TimeAndAmountValidator.TimeException
 import com.finance.loans.domain.util.TimeUtils
 import com.finance.loans.infra.configuration.PropertiesConfig
-import com.finance.loans.repositories.Client
 import com.finance.loans.repositories.ClientRepository
-import com.finance.loans.repositories.Loan
-import com.finance.loans.repositories.LoanPostpone
 import com.finance.loans.repositories.LoanRepository
+import com.finance.loans.repositories.entities.Client
+import com.finance.loans.repositories.entities.Loan
+import com.finance.loans.repositories.entities.LoanPostpone
 
 import spock.lang.Shared
 import spock.lang.Specification

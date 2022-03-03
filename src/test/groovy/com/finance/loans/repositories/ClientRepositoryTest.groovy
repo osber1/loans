@@ -6,6 +6,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.testcontainers.containers.PostgreSQLContainer
 
+import com.finance.loans.repositories.entities.Client
+import com.finance.loans.repositories.entities.Loan
+
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject

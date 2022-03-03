@@ -21,11 +21,12 @@ import com.finance.loans.domain.loans.validators.IpValidator
 import com.finance.loans.domain.loans.validators.IpValidator.IpException
 import com.finance.loans.infra.rest.dtos.ClientRequest
 import com.finance.loans.infra.rest.dtos.LoanRequest
-import com.finance.loans.repositories.Client
+import com.finance.loans.infra.rest.dtos.LoanResponse
 import com.finance.loans.repositories.ClientRepository
-import com.finance.loans.repositories.Loan
-import com.finance.loans.repositories.LoanPostpone
 import com.finance.loans.repositories.LoanRepository
+import com.finance.loans.repositories.entities.Client
+import com.finance.loans.repositories.entities.Loan
+import com.finance.loans.repositories.entities.LoanPostpone
 import com.jupitertools.springtestredis.RedisTestContainer
 
 import groovy.json.JsonBuilder
@@ -97,23 +98,24 @@ class ClientControllerTest extends Specification {
             exception.message == 'Too many requests from the same ip per day.'
     }
 
-//    void 'should take loan when request is correct'() {
-//        given:
-//            ClientRequest clientRequest = buildClientRequest(NAME, SURNAME, PERSONAL_CODE, buildLoanRequest())
-//        when:
-//            MockHttpServletResponse response = postLoanRequest(clientRequest)
-//        then:
-//            response.status == HttpStatus.OK.value()
-//        and:
-//            ClientResponse clientResponse = objectMapper.readValue(response.contentAsString, ClientResponse.class)
-//            with(clientResponse) {
-//                firstName == clientRequest.firstName
-//                lastName == clientRequest.lastName
-//                personalCode == clientRequest.personalCode
-//                loan.amount == clientRequest.loan.amount
-//                loan.termInMonths == clientRequest.loan.termInMonths
-//            }
-//    }
+    void 'should take loan when request is correct'() {
+        given:
+            clientRepository.save(client)
+            LoanRequest request = new LoanRequest().tap {
+                amount = 50
+                termInMonths = 5
+            }
+        when:
+            MockHttpServletResponse response = postLoanRequest(request, ID)
+        then:
+            response.status == HttpStatus.OK.value()
+        and:
+            LoanResponse loanResponse = objectMapper.readValue(response.contentAsString, LoanResponse)
+            with(loanResponse) {
+                amount == request.amount
+                termInMonths == request.termInMonths
+            }
+    }
 
     void 'should throw exception when client\'s first name is null'() {
         given:
@@ -309,23 +311,6 @@ class ClientControllerTest extends Specification {
             loanPostpones = []
         } as Loan
     }
-
-//    private static ClientResponse buildClientResponse() {
-//        LoanResponse loanResponse = new LoanResponse().with {
-//            amount = 100.00
-//            interestRate = 10.00
-//            termInMonths = 12
-//            returnDate = date.plusYears(1)
-//            return it
-//        }
-//
-//        return new ClientResponse().with {
-//            firstName = NAME
-//            lastName = SURNAME
-//            personalCode = PERSONAL_CODE
-//            return it
-//        } as ClientResponse
-//    }
 
     private static Client buildClient() {
         return new Client().tap {

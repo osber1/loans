@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 
 import com.finance.loans.infra.rest.dtos.LoanRequest;
 import com.finance.loans.infra.rest.dtos.LoanResponse;
-import com.finance.loans.repositories.Loan;
+import com.finance.loans.repositories.entities.Loan;
 
 @Mapper(componentModel = "spring")
 public interface LoanMapper {

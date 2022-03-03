@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 
 import com.finance.loans.infra.rest.dtos.ClientRequest;
 import com.finance.loans.infra.rest.dtos.ClientResponse;
-import com.finance.loans.repositories.Client;
+import com.finance.loans.repositories.entities.Client;
 
 @Mapper(componentModel = "spring")
 public interface ClientMapper {

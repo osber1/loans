@@ -1,4 +1,4 @@
-package com.finance.loans.repositories;
+package com.finance.loans.repositories.entities;
 
 import java.time.ZonedDateTime;
 import java.util.HashSet;

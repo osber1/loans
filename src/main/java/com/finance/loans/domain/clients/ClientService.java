@@ -13,11 +13,11 @@ import com.finance.loans.domain.exceptions.NotFoundException;
 import com.finance.loans.domain.loans.validators.Validator;
 import com.finance.loans.domain.util.TimeUtils;
 import com.finance.loans.infra.configuration.PropertiesConfig;
-import com.finance.loans.repositories.Client;
 import com.finance.loans.repositories.ClientRepository;
-import com.finance.loans.repositories.Loan;
-import com.finance.loans.repositories.LoanPostpone;
 import com.finance.loans.repositories.LoanRepository;
+import com.finance.loans.repositories.entities.Client;
+import com.finance.loans.repositories.entities.Loan;
+import com.finance.loans.repositories.entities.LoanPostpone;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -115,8 +115,7 @@ public class ClientService {
             newReturnDate = latestPostpone.getNewReturnDate();
             newInterestRate = latestPostpone.getNewInterestRate();
         }
-        loanPostpone.setNewInterestRate(calculateNewInterestRate(newInterestRate)
-            .setScale(NUMBERS_AFTER_COMMA, RoundingMode.HALF_UP));
+        loanPostpone.setNewInterestRate(calculateNewInterestRate(newInterestRate).setScale(NUMBERS_AFTER_COMMA, RoundingMode.HALF_UP));
         loanPostpone.setNewReturnDate(calculateNewReturnDate(newReturnDate));
         return loanPostpone;
     }
