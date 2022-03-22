@@ -1,4 +1,4 @@
-package com.finance.loans.infra.rest;
+package com.finance.loans.infra.rest.clients;
 
 import java.util.Collection;
 
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.finance.loans.domain.clients.ClientService;
-import com.finance.loans.infra.rest.dtos.ClientRequest;
-import com.finance.loans.infra.rest.dtos.ClientResponse;
-import com.finance.loans.infra.rest.dtos.LoanPostponeResponse;
-import com.finance.loans.infra.rest.dtos.LoanRequest;
-import com.finance.loans.infra.rest.dtos.LoanResponse;
+import com.finance.loans.infra.rest.clients.dtos.ClientRequest;
+import com.finance.loans.infra.rest.clients.dtos.ClientResponse;
+import com.finance.loans.infra.rest.loans.dtos.LoanPostponeResponse;
+import com.finance.loans.infra.rest.loans.dtos.LoanRequest;
+import com.finance.loans.infra.rest.loans.dtos.LoanResponse;
 import com.finance.loans.repositories.entities.Client;
 import com.finance.loans.repositories.entities.Loan;
 import com.finance.loans.repositories.mapper.ClientMapper;
@@ -62,24 +62,24 @@ public class ClientController {
         return clientMapper.clientToDTO(service.updateClient(client));
     }
 
-    @DeleteMapping("client/{id}")
-    public void deleteClient(@PathVariable String id) {
-        service.deleteClient(id);
+    @DeleteMapping("client/{clientId}")
+    public void deleteClient(@PathVariable String clientId) {
+        service.deleteClient(clientId);
     }
 
-    @GetMapping("client/{id}/loans")
-    public Collection<LoanResponse> getClientHistory(@PathVariable String id) {
-        return loanMapper.loanToDTOs(service.getClient(id).getLoans());
+    @GetMapping("client/{clientId}/loans")
+    public Collection<LoanResponse> getClientHistory(@PathVariable String clientId) {
+        return loanMapper.loanToDTOs(service.getClient(clientId).getLoans());
     }
 
-    @PostMapping("client/{id}/loan")
-    public LoanResponse takeLoan(@PathVariable String id, @Valid @RequestBody LoanRequest request) {
+    @PostMapping("client/{clientId}/loan")
+    public LoanResponse takeLoan(@PathVariable String clientId, @Valid @RequestBody LoanRequest request) {
         Loan loan = loanMapper.loanToEntity(request);
-        return loanMapper.loanToDTO(service.takeLoan(loan, id));
+        return loanMapper.loanToDTO(service.takeLoan(loan, clientId));
     }
 
-    @PostMapping("client/loans/{id}/extensions")
-    public LoanPostponeResponse postponeLoan(@PathVariable long id) {
-        return postponeMapper.loanPostponeToDTO(service.postponeLoan(id));
+    @PostMapping("client/loans/{loanId}/extensions")
+    public LoanPostponeResponse postponeLoan(@PathVariable long loanId) {
+        return postponeMapper.loanPostponeToDTO(service.postponeLoan(loanId));
     }
 }

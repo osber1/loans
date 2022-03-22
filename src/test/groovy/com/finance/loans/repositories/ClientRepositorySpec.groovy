@@ -34,7 +34,7 @@ class ClientRepositorySpec extends Specification {
 
     @Subject
     @Autowired
-    private ClientRepository clientRepository
+    ClientRepository clientRepository
 
     void 'should return user when id is correct'() {
         given:

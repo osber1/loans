@@ -1,17 +1,48 @@
-version: "3.9"
+version: '3.5'
+
 services:
   redis:
-    image: "redis:alpine"
+    container_name: redis
+    image: redis:alpine
+    networks:
+      - postgres
+    restart: unless-stopped
+
   postgres:
+    container_name: postgres
     image: postgres:14.1-alpine
-    restart: always
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-    ports:
-      - '5432:5432'
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: loans
+      PGDATA: /data/postgres
     volumes:
-      - db:/var/lib/postgresql/data
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+#      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
 volumes:
-  db:
-    driver: local
+  postgres:
+  pgadmin:

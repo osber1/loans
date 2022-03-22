@@ -3,7 +3,7 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   datasource:
-    url: jdbc:tc:postgresql:latest:///databasename
+    url: jdbc:tc:postgresql:14.1-alpine:///databasename
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
   jpa:
     show-sql: true

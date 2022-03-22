@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,8 @@ import com.finance.loans.repositories.entities.LoanPostpone;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import static java.lang.String.*;
 
 @Slf4j
 @Service
@@ -45,6 +48,7 @@ public class ClientService {
 
     @Transactional
     public Client registerClient(Client client) {
+        client.setId(UUID.randomUUID().toString());
         return clientRepository.save(client);
     }
 
@@ -56,13 +60,13 @@ public class ClientService {
     @Transactional(readOnly = true)
     public Client getClient(String id) {
         return clientRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(String.format(CLIENT_NOT_EXIST, id)));
+            .orElseThrow(() -> new NotFoundException(format(CLIENT_NOT_EXIST, id)));
     }
 
     @Transactional
     public void deleteClient(String id) {
         if (!clientRepository.existsById(id)) {
-            throw new NotFoundException(String.format(CLIENT_NOT_EXIST, id));
+            throw new NotFoundException(format(CLIENT_NOT_EXIST, id));
         }
         clientRepository.deleteById(id);
     }
@@ -70,7 +74,7 @@ public class ClientService {
     @Transactional
     public Client updateClient(Client client) {
         if (!clientRepository.existsById(client.getId())) {
-            throw new NotFoundException(String.format(CLIENT_NOT_EXIST, client.getId()));
+            throw new NotFoundException(format(CLIENT_NOT_EXIST, client.getId()));
         }
         return clientRepository.save(client);
     }
@@ -94,13 +98,13 @@ public class ClientService {
 
     public Collection<Loan> getClientHistory(String id) {
         return clientRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(String.format(CLIENT_NOT_EXIST, id)))
+            .orElseThrow(() -> new NotFoundException(format(CLIENT_NOT_EXIST, id)))
             .getLoans();
     }
 
     private Loan getLoan(long id) {
         return loanRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(String.format(LOAN_NOT_EXIST, id)));
+            .orElseThrow(() -> new NotFoundException(format(LOAN_NOT_EXIST, id)));
     }
 
     private LoanPostpone buildLoanPostpone(Loan loanRequest) {

@@ -4,8 +4,8 @@ import java.util.Collection;
 
 import org.mapstruct.Mapper;
 
-import com.finance.loans.infra.rest.dtos.ClientRequest;
-import com.finance.loans.infra.rest.dtos.ClientResponse;
+import com.finance.loans.infra.rest.clients.dtos.ClientRequest;
+import com.finance.loans.infra.rest.clients.dtos.ClientResponse;
 import com.finance.loans.repositories.entities.Client;
 
 @Mapper(componentModel = "spring")

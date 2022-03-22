@@ -1,4 +1,4 @@
-package com.finance.loans.infra.rest.dtos;
+package com.finance.loans.infra.rest.clients.dtos;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package com.finance.loans.infra.rest.dtos;
+package com.finance.loans.infra.rest.clients.dtos;
 
 import java.time.ZonedDateTime;
 

@@ -3,9 +3,9 @@ package com.finance.loans.infra.rest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.finance.loans.domain.loans.validators.IpValidator
 import com.finance.loans.domain.loans.validators.IpValidator.IpException
-import com.finance.loans.infra.rest.dtos.ClientRequest
-import com.finance.loans.infra.rest.dtos.LoanRequest
-import com.finance.loans.infra.rest.dtos.LoanResponse
+import com.finance.loans.infra.rest.clients.dtos.ClientRequest
+import com.finance.loans.infra.rest.loans.dtos.LoanRequest
+import com.finance.loans.infra.rest.loans.dtos.LoanResponse
 import com.finance.loans.repositories.ClientRepository
 import com.finance.loans.repositories.LoanRepository
 import com.finance.loans.repositories.entities.Client
