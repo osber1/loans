@@ -10,7 +10,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
 
-class IpValidatorTest extends Specification {
+class IpValidatorSpec extends Specification {
 
     @Shared
     String IP_ADDRESS_TO_CHECK = '0.0.0.0.0.0.1'

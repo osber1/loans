@@ -15,10 +15,10 @@ import spock.lang.Subject
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-class ClientRepositoryTest extends Specification {
+class ClientRepositorySpec extends Specification {
 
     @Shared
-    PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:latest')
+    PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:14.1-alpine')
         .withDatabaseName('loans')
         .withUsername('root')
         .withPassword('root')

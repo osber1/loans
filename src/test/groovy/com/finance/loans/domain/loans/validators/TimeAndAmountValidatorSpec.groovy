@@ -9,7 +9,7 @@ import com.finance.loans.infra.configuration.PropertiesConfig
 import spock.lang.Specification
 import spock.lang.Subject
 
-class TimeAndAmountValidatorTest extends Specification {
+class TimeAndAmountValidatorSpec extends Specification {
 
     private TimeUtils timeUtils = Stub()
 

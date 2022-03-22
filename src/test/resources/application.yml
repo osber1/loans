@@ -1,6 +1,9 @@
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   datasource:
-    url: jdbc:tc:postgresql:9.6.8:///databasename
+    url: jdbc:tc:postgresql:latest:///databasename
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
   jpa:
     show-sql: true

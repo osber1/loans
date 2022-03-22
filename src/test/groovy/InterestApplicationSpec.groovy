@@ -8,12 +8,12 @@ import com.finance.loans.InterestApplication
 import spock.lang.Specification
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = InterestApplication)
-class InterestApplicationTest extends Specification {
+class InterestApplicationSpec extends Specification {
 
     @Autowired
     ApplicationContext context
 
-    def 'should load context when everything is correct'() {
+    void 'should load context when everything is correct'() {
         expect:
             context != null
         and:
