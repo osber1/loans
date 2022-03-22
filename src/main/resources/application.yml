@@ -4,6 +4,9 @@ server:
     include-binding-errors: always
 
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   datasource:
     url: jdbc:postgresql://localhost:5432/loans
     username: root
@@ -11,7 +14,7 @@ spring:
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate.ddl-auto: none
-    show-sql: true
+    #    show-sql: true
     properties:
       #      javax:
       #        persistence:
@@ -21,8 +24,8 @@ spring:
       #              action: create
       #              create-target: create.sql
       hibernate:
-        format_sql: true
-      dialect: org.hibernate.dialect.PostgreSQL94Dialect
+        #        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQL94Dialect
   redis:
     database: 0
     host: localhost
@@ -39,3 +42,10 @@ application:
   requestsFromSameIpLimit: 3
   forbiddenHourFrom: 0
   forbiddenHourTo: 6
+
+exceptionMessages:
+  clientErrorMessage: Client with id %s does not exist.
+  loanErrorMessage: Loan with id %s does not exist.
+  riskMessage: Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!
+  amountExceedsMessage: The amount you are trying to borrow exceeds the max amount!
+  ipExceedsMessage: Too many requests from the same ip per day.
