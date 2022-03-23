@@ -32,159 +32,159 @@ class ClientServiceSpec extends Specification {
     @Shared
     String CORRECT_USER_ID = 'TEST-CORRECT-ID'
 
-     TimeUtils timeUtils = Stub()
+    TimeUtils timeUtils = Stub()
 
-     PropertiesConfig config = Stub()
+    PropertiesConfig config = Stub()
 
-     LoanRepository loanRepository = Stub()
+    LoanRepository loanRepository = Stub()
 
-     ClientRepository clientRepository = Stub()
+    ClientRepository clientRepository = Stub()
 
-     RedisTemplate<String, Integer> redisTemplate = Stub()
+    RedisTemplate<String, Integer> redisTemplate = Stub()
 
-     ValueOperations valueOperations = Stub()
+    ValueOperations valueOperations = Stub()
 
-     TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
+    TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
 
-     RiskValidator validator = new RiskValidator(Collections.singletonList(timeAndAmountValidator))
-
-    @Shared
-     LoanPostpone firstPostpone = buildLoanPostpone(15.00, date.plusWeeks(1))
+    RiskValidator validator = new RiskValidator(Collections.singletonList(timeAndAmountValidator))
 
     @Shared
-     LoanPostpone secondPostpone = buildLoanPostpone(22.50, date.plusWeeks(2))
+    LoanPostpone firstPostpone = buildLoanPostpone(15.00, date.plusWeeks(1))
 
     @Shared
-     Loan successfulLoan = buildLoan(100.00)
+    LoanPostpone secondPostpone = buildLoanPostpone(22.50, date.plusWeeks(2))
 
     @Shared
-     Loan loanWithPostpone = buildLoanWithPostpone(buildLoan(100.00), firstPostpone)
+    Loan successfulLoan = buildLoan(100.00)
 
     @Shared
-     Client clientFromDatabase = buildClientResponse(successfulLoan)
+    Loan loanWithPostpone = buildLoanWithPostpone(buildLoan(100.00), firstPostpone)
+
+    @Shared
+    Client clientFromDatabase = buildClientResponse(successfulLoan)
 
     @Subject
     ClientService clientService = new ClientService(clientRepository, loanRepository, config, validator, timeUtils)
 
     void 'should fail when amount limit is exceeded'() {
         given:
-        clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
-        clientRepository.save(_ as Client) >> clientFromDatabase
-        redisTemplate.opsForValue() >> valueOperations
-        valueOperations.get(_ as String) >> 2
-        config.requestsFromSameIpLimit >> 3
-        config.maxAmount >> 100.00
-        config.forbiddenHourFrom >> 0
-        config.forbiddenHourTo >> 6
-        timeUtils.hourOfDay >> 10
+            clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
+            clientRepository.save(_ as Client) >> clientFromDatabase
+            redisTemplate.opsForValue() >> valueOperations
+            valueOperations.get(_ as String) >> 2
+            config.requestsFromSameIpLimit >> 3
+            config.maxAmount >> 100.00
+            config.forbiddenHourFrom >> 0
+            config.forbiddenHourTo >> 6
+            timeUtils.hourOfDay >> 10
         when:
-        clientService.takeLoan(buildLoan(1000.00), CORRECT_USER_ID)
+            clientService.takeLoan(buildLoan(1000.00), CORRECT_USER_ID)
         then:
-        AmountException exception = thrown()
-        exception.message == 'The amount you are trying to borrow exceeds the max amount!'
+            AmountException exception = thrown()
+            exception.message == 'The amount you are trying to borrow exceeds the max amount!'
     }
 
     void 'should fail when max amount and forbidden time'() {
         given:
-        redisTemplate.opsForValue() >> valueOperations
-        valueOperations.get(_ as String) >> 2
-        config.requestsFromSameIpLimit >> 3
-        config.maxAmount >> 100.00
-        config.forbiddenHourFrom >> 0
-        config.forbiddenHourTo >> 6
-        timeUtils.hourOfDay >> 4
+            redisTemplate.opsForValue() >> valueOperations
+            valueOperations.get(_ as String) >> 2
+            config.requestsFromSameIpLimit >> 3
+            config.maxAmount >> 100.00
+            config.forbiddenHourFrom >> 0
+            config.forbiddenHourTo >> 6
+            timeUtils.hourOfDay >> 4
         when:
-        clientService.takeLoan(successfulLoan, CORRECT_USER_ID)
+            clientService.takeLoan(successfulLoan, CORRECT_USER_ID)
         then:
-        TimeException exception = thrown()
-        exception.message == 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
+            TimeException exception = thrown()
+            exception.message == 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
     }
 
     void 'should be successful when the user is new'() {
         given:
-        redisTemplate.opsForValue() >> valueOperations
-        valueOperations.get(_ as String) >> 2
-        config.requestsFromSameIpLimit >> 10
-        config.maxAmount >> 100.00
-        config.forbiddenHourFrom >> 0
-        config.forbiddenHourTo >> 6
-        timeUtils.currentDateTime >> date
-        timeUtils.hourOfDay >> 10
-        clientRepository.save(_ as Client) >> clientFromDatabase
-        clientRepository.findByPersonalCode(_ as Long) >> Optional.empty()
-        clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
+            redisTemplate.opsForValue() >> valueOperations
+            valueOperations.get(_ as String) >> 2
+            config.requestsFromSameIpLimit >> 10
+            config.maxAmount >> 100.00
+            config.forbiddenHourFrom >> 0
+            config.forbiddenHourTo >> 6
+            timeUtils.currentDateTime >> date
+            timeUtils.hourOfDay >> 10
+            clientRepository.save(_ as Client) >> clientFromDatabase
+            clientRepository.findByPersonalCode(_ as Long) >> Optional.empty()
+            clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
         when:
-        Loan loanResponse = clientService.takeLoan(successfulLoan, CORRECT_USER_ID)
+            Loan loanResponse = clientService.takeLoan(successfulLoan, CORRECT_USER_ID)
         then:
-        successfulLoan == loanResponse
+            successfulLoan == loanResponse
     }
 
     void 'should be successful when user is not new'() {
         given:
-        redisTemplate.opsForValue() >> valueOperations
-        valueOperations.get(_ as String) >> 2
-        config.requestsFromSameIpLimit >> 10
-        config.maxAmount >> 100.00
-        config.forbiddenHourFrom >> 0
-        config.forbiddenHourTo >> 6
-        timeUtils.currentDateTime >> date
-        timeUtils.hourOfDay >> 10
-        clientRepository.save(_ as Client) >> clientFromDatabase
-        clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
-        clientRepository.findByPersonalCode(_ as Long) >> Optional.of(clientFromDatabase)
+            redisTemplate.opsForValue() >> valueOperations
+            valueOperations.get(_ as String) >> 2
+            config.requestsFromSameIpLimit >> 10
+            config.maxAmount >> 100.00
+            config.forbiddenHourFrom >> 0
+            config.forbiddenHourTo >> 6
+            timeUtils.currentDateTime >> date
+            timeUtils.hourOfDay >> 10
+            clientRepository.save(_ as Client) >> clientFromDatabase
+            clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
+            clientRepository.findByPersonalCode(_ as Long) >> Optional.of(clientFromDatabase)
         when:
-        Loan loanResponse = clientService.takeLoan(successfulLoan, CORRECT_USER_ID)
+            Loan loanResponse = clientService.takeLoan(successfulLoan, CORRECT_USER_ID)
         then:
-        successfulLoan == loanResponse
+            successfulLoan == loanResponse
     }
 
     void 'should throw exception when getting history and client not exist'() {
         given:
-        clientRepository.findById(_ as String) >> Optional.empty()
+            clientRepository.findById(_ as String) >> Optional.empty()
         when:
-        clientService.getClientHistory(CORRECT_USER_ID)
+            clientService.getClientHistory(CORRECT_USER_ID)
         then:
-        NotFoundException e = thrown()
-        e.message == 'Client with id TEST-CORRECT-ID does not exist.'
+            NotFoundException e = thrown()
+            e.message == 'Client with id TEST-CORRECT-ID does not exist.'
     }
 
     void 'should return history when client exists'() {
         given:
-        clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
+            clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
         when:
-        Set<Loan> clientHistory = clientService.getClientHistory(CORRECT_USER_ID)
+            Set<Loan> clientHistory = clientService.getClientHistory(CORRECT_USER_ID)
         then:
-        clientFromDatabase.loans == clientHistory
+            clientFromDatabase.loans == clientHistory
     }
 
     void 'should fail loan postpone when loan not exist'() {
         given:
-        loanRepository.findById(_ as Integer) >> Optional.empty()
+            loanRepository.findById(_ as Integer) >> Optional.empty()
         when:
-        clientService.postponeLoan(1)
+            clientService.postponeLoan(1)
         then:
-        NotFoundException e = thrown()
-        e.message == 'Loan with id 1 does not exist.'
+            NotFoundException e = thrown()
+            e.message == 'Loan with id 1 does not exist.'
     }
 
     void 'should postpone loan when it is first postpone'() {
         given:
-        loanRepository.findById(_ as Long) >> Optional.of(successfulLoan)
-        loanRepository.save(_ as Loan) >> loanWithPostpone
+            loanRepository.findById(_ as Long) >> Optional.of(successfulLoan)
+            loanRepository.save(_ as Loan) >> loanWithPostpone
         when:
-        LoanPostpone loanPostponeResponse = clientService.postponeLoan(1)
+            LoanPostpone loanPostponeResponse = clientService.postponeLoan(1)
         then:
-        firstPostpone == loanPostponeResponse
+            firstPostpone == loanPostponeResponse
     }
 
     void 'should postpone loan when it is not first postpone'() {
         given:
-        loanRepository.findById(_ as Long) >> Optional.of(loanWithPostpone)
-        loanRepository.save(_ as Loan) >> buildLoanWithPostpones(buildLoan(100.00), firstPostpone, secondPostpone)
+            loanRepository.findById(_ as Long) >> Optional.of(loanWithPostpone)
+            loanRepository.save(_ as Loan) >> buildLoanWithPostpones(buildLoan(100.00), firstPostpone, secondPostpone)
         when:
-        LoanPostpone loanPostponeResponse = clientService.postponeLoan(1)
+            LoanPostpone loanPostponeResponse = clientService.postponeLoan(1)
         then:
-        secondPostpone == loanPostponeResponse
+            secondPostpone == loanPostponeResponse
     }
 
     private Loan buildLoan(BigDecimal loanAmount) {
@@ -209,14 +209,14 @@ class ClientServiceSpec extends Specification {
 
     private ZonedDateTime generateDate() {
         return ZonedDateTime.of(
-                2020,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                ZoneId.of(TIME_ZONE))
+            2020,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            ZoneId.of(TIME_ZONE))
     }
 
     private Loan buildLoanWithPostpone(Loan loanRequest, LoanPostpone postpone) {

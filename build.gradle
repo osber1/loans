@@ -27,39 +27,39 @@ ext {
 
 dependencies {
     implementation(
-            "org.projectlombok:lombok:${lombokVersion}",
-            "org.codehaus.groovy:groovy-all:${groovyVersion}",
-            'org.springframework.boot:spring-boot-starter-data-jpa',
-            'org.springframework.boot:spring-boot-starter-web',
-            'org.springframework.boot:spring-boot-starter-validation',
-            'org.springframework.boot:spring-boot-starter-data-redis',
-            'redis.clients:jedis',
-            'org.liquibase:liquibase-core',
-            "io.springfox:springfox-boot-starter:${springfoxVersion}",
-            "org.mapstruct:mapstruct:${mapstructVersion}",
-            'org.postgresql:postgresql'
+        "org.projectlombok:lombok:${lombokVersion}",
+        "org.codehaus.groovy:groovy-all:${groovyVersion}",
+        'org.springframework.boot:spring-boot-starter-data-jpa',
+        'org.springframework.boot:spring-boot-starter-web',
+        'org.springframework.boot:spring-boot-starter-validation',
+        'org.springframework.boot:spring-boot-starter-data-redis',
+        'redis.clients:jedis',
+        'org.liquibase:liquibase-core',
+        "io.springfox:springfox-boot-starter:${springfoxVersion}",
+        "org.mapstruct:mapstruct:${mapstructVersion}",
+        'org.postgresql:postgresql'
     )
 
     compileOnly(
-            "org.projectlombok:lombok:${lombokVersion}",
-            "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingsVersion}"
+        "org.projectlombok:lombok:${lombokVersion}",
+        "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingsVersion}"
 
     )
 
     annotationProcessor(
-            "org.projectlombok:lombok:${lombokVersion}",
-            'org.springframework.boot:spring-boot-configuration-processor',
-            "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+        "org.projectlombok:lombok:${lombokVersion}",
+        'org.springframework.boot:spring-boot-configuration-processor',
+        "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     )
 
     testImplementation(
-            "org.spockframework:spock-core:${spockVersion}",
-            "org.spockframework:spock-spring:${spockVersion}",
-            'org.springframework.boot:spring-boot-starter-test',
-            "org.testcontainers:testcontainers:${testContainersVersion}",
-            "org.testcontainers:spock:${testContainersVersion}",
-            "org.testcontainers:postgresql:${testContainersVersion}",
-            "com.jupiter-tools:spring-test-redis:0.1"
+        "org.spockframework:spock-core:${spockVersion}",
+        "org.spockframework:spock-spring:${spockVersion}",
+        'org.springframework.boot:spring-boot-starter-test',
+        "org.testcontainers:testcontainers:${testContainersVersion}",
+        "org.testcontainers:spock:${testContainersVersion}",
+        "org.testcontainers:postgresql:${testContainersVersion}",
+        "com.jupiter-tools:spring-test-redis:0.1"
     )
 
 //    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombok
