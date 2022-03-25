@@ -1,3 +1,6 @@
+![loans workflow](https://github.com/osber1/loans/actions/workflows/gradle.yml/badge.svg)
+[![codecov](https://codecov.io/gh/osber1/loans/branch/improved-application/graph/badge.svg?token=2KOECLUD4M)](https://codecov.io/gh/osber1/loans)
+
 # Loans Application
 
 ## Startup

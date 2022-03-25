@@ -51,34 +51,33 @@ class ClientRepositorySpec extends Specification {
             expected.isEmpty()
     }
 
-    void 'should return user when personal code is correct'() {
+    void 'should return true when user exists by personal code'() {
         given:
-            Client databaseResponse = clientRepository.save(client)
+            clientRepository.save(client)
         when:
-            Optional<Client> expected = clientRepository.findByPersonalCode(client.personalCode)
+            boolean exists = clientRepository.existsByPersonalCode(client.personalCode)
         then:
-            expected.filter(databaseResponse::equals)
+            exists
     }
 
-    void 'should be empty when personal code is incorrect'() {
+    void 'should return false when user exists by personal code'() {
         when:
-            Optional<Client> expected = clientRepository.findByPersonalCode(NON_EXISTING_PERSONAL_CODE)
+            boolean exists = clientRepository.existsByPersonalCode(NON_EXISTING_PERSONAL_CODE)
         then:
-            expected.isEmpty()
+            !exists
     }
 
     static Loan createLoan() {
-        return new Loan().with {
+        return new Loan().tap {
             id = 1
             amount = 10.00
             interestRate = 10.00
             termInMonths = 10
-            return it
-        } as Loan
+        }
     }
 
     static Client createClient() {
-        return new Client().with {
+        return new Client().tap {
             id = 'ID-TO-TEST'
             firstName = 'Test'
             lastName = 'User'
@@ -86,7 +85,6 @@ class ClientRepositorySpec extends Specification {
             phoneNumber = '+37062541365'
             personalCode = 11111111111L
             loans = Collections.singleton(createLoan())
-            return it
         }
     }
 }
