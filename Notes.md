@@ -113,9 +113,9 @@ TODO:
 
 - [x] Add full CRUD for client and loans.
 
-- [ ] Add client validation by personal code.
+- [x] Add client validation by personal code.
 
-- [ ] Separate client and loans logic.
+- [x] Separate client and loans logic.
 
 - [ ] Add enum status to client and when deleting only change status.
 

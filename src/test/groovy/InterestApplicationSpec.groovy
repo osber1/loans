@@ -3,7 +3,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.context.ApplicationContext
 
-import com.finance.loans.InterestApplication
+import io.osvaldas.loans.InterestApplication
 
 import spock.lang.Specification
 
