@@ -1,90 +1,66 @@
 package io.osvaldas.loans.repositories
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.testcontainers.containers.PostgreSQLContainer
 
 import io.osvaldas.loans.repositories.entities.Client
-import io.osvaldas.loans.repositories.entities.Loan
 import spock.lang.Shared
-import spock.lang.Specification
 import spock.lang.Subject
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = Replace.NONE)
-class ClientRepositorySpec extends Specification {
+class ClientRepositorySpec extends AbstractDatabaseSpec {
 
     @Shared
-    PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:14.1-alpine')
-        .withDatabaseName('loans')
-        .withUsername('root')
-        .withPassword('root')
+    String invalidClientId = 'invalidClientId'
 
     @Shared
-    String NON_EXISTING_PERSON_ID = 'NON-EXISTING-ID'
+    String validClientId = 'validClientId'
 
     @Shared
-    long NON_EXISTING_PERSONAL_CODE = 11111111110L
+    long validPersonalCode = 12345678911
 
     @Shared
-    private Client client = createClient()
+    long invalidPersonalCode = 12345678910
+
+    @Shared
+    Client client = createClient()
 
     @Subject
     @Autowired
-    ClientRepository clientRepository
+    ClientRepository repository
 
-    void 'should return user when id is correct'() {
-        given:
-            Client databaseResponse = clientRepository.save(client)
+    void setup() {
+        repository.save(client)
+    }
+
+    void 'should return user if it exists'() {
         when:
-            Optional<Client> expected = clientRepository.findById(client.id)
+            Optional<Client> client = repository.findById(clientId)
         then:
-            expected.filter(databaseResponse::equals)
+            client.isPresent() == result
+        where:
+            clientId        || result
+            validClientId   || true
+            invalidClientId || false
     }
 
-    void 'should be empty when id is incorrect'() {
+    void 'should return #result when personal code is #personalCode'() {
         when:
-            Optional<Client> expected = clientRepository.findById(NON_EXISTING_PERSON_ID)
+            boolean exists = repository.existsByPersonalCode(personalCode)
         then:
-            expected.isEmpty()
+            exists == result
+        where:
+            personalCode        || result
+            validPersonalCode   || true
+            invalidPersonalCode || false
     }
 
-    void 'should return true when user exists by personal code'() {
-        given:
-            clientRepository.save(client)
-        when:
-            boolean exists = clientRepository.existsByPersonalCode(client.personalCode)
-        then:
-            exists
-    }
-
-    void 'should return false when user exists by personal code'() {
-        when:
-            boolean exists = clientRepository.existsByPersonalCode(NON_EXISTING_PERSONAL_CODE)
-        then:
-            !exists
-    }
-
-    static Loan createLoan() {
-        return new Loan().tap {
-            id = 1
-            amount = 10.00
-            interestRate = 10.00
-            termInMonths = 10
-        }
-    }
-
-    static Client createClient() {
+    private Client createClient() {
         return new Client().tap {
-            id = 'ID-TO-TEST'
+            id = validClientId
             firstName = 'Test'
             lastName = 'User'
             email = 'user@mail.com'
             phoneNumber = '+37062541365'
-            personalCode = 11111111111L
-            loans = Collections.singleton(createLoan())
+            personalCode = validPersonalCode
         }
     }
 }
