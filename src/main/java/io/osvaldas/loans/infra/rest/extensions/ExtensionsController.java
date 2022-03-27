@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.osvaldas.loans.domain.extensions.ExtensionService;
 import io.osvaldas.loans.infra.rest.extensions.dtos.LoanExtensionResponse;
 import io.osvaldas.loans.repositories.mapper.LoanExtensionMapper;
-
 import lombok.AllArgsConstructor;
 
 @RestController

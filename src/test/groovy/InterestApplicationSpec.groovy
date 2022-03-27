@@ -4,7 +4,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.context.ApplicationContext
 
 import io.osvaldas.loans.InterestApplication
-
 import spock.lang.Specification
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = InterestApplication)

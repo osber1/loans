@@ -1,6 +1,6 @@
 package io.osvaldas.loans.domain.exceptions;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 import org.springframework.http.HttpStatus;
 

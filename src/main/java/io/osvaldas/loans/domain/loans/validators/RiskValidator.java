@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import io.osvaldas.loans.domain.loans.rules.TimeAndAmountValidationRule;
-
 import lombok.AllArgsConstructor;
 
 @Service

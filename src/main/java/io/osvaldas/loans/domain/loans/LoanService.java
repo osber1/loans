@@ -17,13 +17,10 @@ import io.osvaldas.loans.infra.configuration.PropertiesConfig;
 import io.osvaldas.loans.repositories.LoanRepository;
 import io.osvaldas.loans.repositories.entities.Client;
 import io.osvaldas.loans.repositories.entities.Loan;
-
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class LoanService {
 
     private final ClientService clientService;
@@ -36,8 +33,21 @@ public class LoanService {
 
     private final Validator validator;
 
-    @Value("${exceptionMessages.loanErrorMessage:}")
-    private String loanErrorMessage;
+    private final String loanErrorMessage;
+
+    public LoanService(ClientService clientService,
+                       LoanRepository loanRepository,
+                       PropertiesConfig config,
+                       TimeUtils timeUtils,
+                       Validator validator,
+                       @Value("${exceptionMessages.loanErrorMessage:}") String loanErrorMessage) {
+        this.clientService = clientService;
+        this.loanRepository = loanRepository;
+        this.config = config;
+        this.timeUtils = timeUtils;
+        this.validator = validator;
+        this.loanErrorMessage = loanErrorMessage;
+    }
 
     public Collection<Loan> getLoans(String clientId) {
         return getClient(clientId).getLoans();

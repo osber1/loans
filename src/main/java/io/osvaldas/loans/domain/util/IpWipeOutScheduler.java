@@ -1,6 +1,6 @@
 package io.osvaldas.loans.domain.util;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,7 +16,7 @@ public class IpWipeOutScheduler {
 
     @Scheduled(cron = "0 0 0 * * *")
     private void wipeOutIps() {
-        for (String key : Objects.requireNonNull(redisTemplate.keys("*"))) {
+        for (String key : requireNonNull(redisTemplate.keys("*"))) {
             redisTemplate.delete(key);
         }
     }

@@ -5,7 +5,6 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 
 import io.osvaldas.loans.infra.rest.extensions.dtos.LoanExtensionResponse;
-
 import lombok.Data;
 
 @Data

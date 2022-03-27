@@ -64,7 +64,6 @@ dependencies {
     )
 }
 
-
 jacocoTestReport {
     dependsOn test
     reports {

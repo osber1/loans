@@ -8,21 +8,27 @@ import org.springframework.stereotype.Component;
 import io.osvaldas.loans.domain.loans.rules.TimeAndAmountValidationRule;
 import io.osvaldas.loans.domain.util.TimeUtils;
 import io.osvaldas.loans.infra.configuration.PropertiesConfig;
-import lombok.RequiredArgsConstructor;
 
 @Component
-@RequiredArgsConstructor
 public class TimeAndAmountValidator implements TimeAndAmountValidationRule {
 
-    @Value("${exceptionMessages.riskMessage:}")
-    private String riskMessage;
+    private final String riskMessage;
 
-    @Value("${exceptionMessages.amountExceeds:}")
-    private String amountExceeds;
+    private final String amountExceeds;
 
     private final PropertiesConfig config;
 
     private final TimeUtils timeUtils;
+
+    public TimeAndAmountValidator(@Value("${exceptionMessages.riskMessage:}") String riskMessage,
+                                  @Value("${exceptionMessages.amountExceeds:}") String amountExceeds,
+                                  PropertiesConfig config,
+                                  TimeUtils timeUtils) {
+        this.riskMessage = riskMessage;
+        this.amountExceeds = amountExceeds;
+        this.config = config;
+        this.timeUtils = timeUtils;
+    }
 
     @Override
     public void validate(BigDecimal clientAmount) {

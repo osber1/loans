@@ -1,5 +1,7 @@
 package io.osvaldas.loans.domain.util;
 
+import static java.time.ZonedDateTime.now;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -17,6 +19,6 @@ public class TimeService implements TimeUtils {
 
     @Override
     public ZonedDateTime getCurrentDateTime() {
-        return ZonedDateTime.now(ZoneId.of(TIME_ZONE));
+        return now(ZoneId.of(TIME_ZONE));
     }
 }

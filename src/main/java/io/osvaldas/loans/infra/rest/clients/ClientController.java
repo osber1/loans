@@ -18,7 +18,6 @@ import io.osvaldas.loans.infra.rest.clients.dtos.ClientRequest;
 import io.osvaldas.loans.infra.rest.clients.dtos.ClientResponse;
 import io.osvaldas.loans.repositories.entities.Client;
 import io.osvaldas.loans.repositories.mapper.ClientMapper;
-
 import lombok.AllArgsConstructor;
 
 @RestController

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import io.osvaldas.loans.domain.loans.rules.IpValidationRule;
 import io.osvaldas.loans.infra.configuration.PropertiesConfig;
-
 import lombok.AllArgsConstructor;
 
 @Component

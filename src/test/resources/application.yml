@@ -5,11 +5,11 @@ spring:
   datasource:
     url: jdbc:tc:postgresql:14.1-alpine:///databasename
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
-#  jpa:
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
+  #  jpa:
+  #    show-sql: true
+  #    properties:
+  #      hibernate:
+  #        format_sql: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
 
@@ -21,3 +21,9 @@ application:
   requestsFromSameIpLimit: 1
   forbiddenHourFrom: 0
   forbiddenHourTo: 6
+
+exceptionMessages:
+  clientErrorMessage: Client with id %s does not exist.
+  loanErrorMessage: Loan with id %s does not exist.
+  riskMessage: Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!
+  amountExceeds: The amount you are trying to borrow exceeds the max amount!

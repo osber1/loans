@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import io.osvaldas.loans.domain.loans.rules.IpValidationRule;
-
 import lombok.AllArgsConstructor;
 
 @Component

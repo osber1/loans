@@ -16,7 +16,6 @@ import javax.validation.constraints.NotNull;
 
 import io.osvaldas.loans.domain.util.TimeUtils;
 import io.osvaldas.loans.infra.configuration.PropertiesConfig;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

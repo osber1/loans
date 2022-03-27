@@ -16,7 +16,6 @@ import io.osvaldas.loans.infra.rest.loans.dtos.LoanRequest;
 import io.osvaldas.loans.infra.rest.loans.dtos.LoanResponse;
 import io.osvaldas.loans.repositories.entities.Loan;
 import io.osvaldas.loans.repositories.mapper.LoanMapper;
-
 import lombok.AllArgsConstructor;
 
 @RestController
