@@ -1,7 +1,6 @@
 package io.osvaldas.loans.domain.loans.validators;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -44,7 +43,7 @@ public class TimeAndAmountValidator implements TimeAndAmountValidationRule {
 //            .filter(s -> s <= config.getForbiddenHourFrom());
         if (config.getForbiddenHourFrom() <= currentHour &&
             currentHour <= config.getForbiddenHourTo() &&
-            amount.compareTo(config.getMaxAmount()) >= 0) {
+            amount.compareTo(config.getMaxAmount()) == 0) {
             throw new TimeException(riskMessage);
         }
     }

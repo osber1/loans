@@ -1,6 +1,5 @@
 package io.osvaldas.loans.domain
 
-import static java.util.Collections.emptySet
 import static java.util.Collections.singletonList
 
 import java.time.ZoneId
@@ -30,10 +29,10 @@ class AbstractServiceSpec extends Specification {
     ZonedDateTime date = generateDate()
 
     @Shared
-    String clientErrorMessage = 'Client with id %s does not exist.'
+    String clientErrorMessage = "Client with id ${clientId} does not exist."
 
     @Shared
-    String loanErrorMessage = 'Loan with id %s does not exist.'
+    String loanErrorMessage = "Loan with id ${loanId} does not exist."
 
     @Shared
     String riskMessage = 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
@@ -41,17 +40,34 @@ class AbstractServiceSpec extends Specification {
     @Shared
     String amountExceedsMessage = 'The amount you are trying to borrow exceeds the max amount!'
 
+    //    RedisTemplate<String, Integer> redisTemplate = Stub {
+//        opsForValue() >> valueOperations
+//    }
+//
+//    ValueOperations valueOperations = Stub {
+//        valueOperations.get(_ as String) >> 2
+//    }
+
+//    @Shared
+//    LoanPostpone firstPostpone = buildExtension(15.00, date.plusWeeks(1))
+//
+//    @Shared
+//    LoanPostpone secondPostpone = buildExtension(22.50, date.plusWeeks(2))
+//
+//    @Shared
+//    Loan loanWithPostpone = buildLoanWithPostpone(buildLoan(100.00), firstPostpone)
+
     @Shared
     Loan loan = buildLoan(100.0)
 
     @Shared
-    Client clientWithoutId = buildClient('', emptySet())
+    Client clientWithoutId = buildClient('', new HashSet<Loan>())
 
     @Shared
-    Client clientWithId = buildClient(clientId, emptySet())
+    Client clientWithId = buildClient(clientId, new HashSet<Loan>())
 
     @Shared
-    Client clientWithLoans = buildClient(clientId, Set.of(loan))
+    Client clientWithLoan = buildClient(clientId, Set.of(loan))
 
     LoanPostpone buildExtension(BigDecimal newRate, ZonedDateTime newDate) {
         new LoanPostpone().tap {

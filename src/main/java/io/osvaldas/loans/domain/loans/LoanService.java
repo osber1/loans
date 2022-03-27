@@ -68,7 +68,7 @@ public class LoanService {
     @Transactional
     public Loan takeLoan(Loan loan, String clientId) {
         validate(loan);
-        loan.setNewLoanInterestAndReturnDate(config, timeUtils);
+        loan.setNewLoanInterestAndReturnDate(config.getInterestRate(), timeUtils.getCurrentDateTime());
         return addLoanToClient(clientId, loan);
     }
 

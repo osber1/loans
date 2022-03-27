@@ -14,8 +14,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
 
-import io.osvaldas.loans.domain.util.TimeUtils;
-import io.osvaldas.loans.infra.configuration.PropertiesConfig;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,8 +42,8 @@ public class Loan {
     @OneToMany(cascade = CascadeType.ALL)
     private Set<LoanPostpone> loanPostpones = new HashSet<>();
 
-    public void setNewLoanInterestAndReturnDate(PropertiesConfig config, TimeUtils timeUtils) {
-        this.setInterestRate(config.getInterestRate());
-        this.setReturnDate(timeUtils.getCurrentDateTime().plusMonths(this.getTermInMonths()));
+    public void setNewLoanInterestAndReturnDate(BigDecimal interestRate, ZonedDateTime currentDateTime) {
+        setInterestRate(interestRate);
+        setReturnDate(currentDateTime.plusMonths(getTermInMonths()));
     }
 }

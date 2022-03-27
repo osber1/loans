@@ -1,6 +1,5 @@
 package io.osvaldas.loans.domain.clients
 
-import static java.lang.String.format
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
@@ -72,7 +71,7 @@ class ClientServiceSpec extends AbstractServiceSpec {
             clientService.getClient(clientId)
         then:
             NotFoundException e = thrown()
-            e.message == format(clientErrorMessage, clientId)
+            e.message == clientErrorMessage
         and:
             1 * clientRepository.findById(clientId) >> empty()
     }
@@ -91,7 +90,7 @@ class ClientServiceSpec extends AbstractServiceSpec {
             clientService.deleteClient(clientId)
         then:
             NotFoundException e = thrown()
-            e.message == format(clientErrorMessage, clientId)
+            e.message == clientErrorMessage
         and:
             0 * clientRepository.deleteById(clientId)
         and:
@@ -112,7 +111,7 @@ class ClientServiceSpec extends AbstractServiceSpec {
             clientService.updateClient(clientWithId)
         then:
             NotFoundException e = thrown()
-            e.message == format(clientErrorMessage, clientId)
+            e.message == clientErrorMessage
         and:
             0 * clientRepository.save(clientWithId)
         and:
