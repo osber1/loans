@@ -123,6 +123,8 @@ TODO:
 
 - [ ] Extract validator to separate service (feign).
 
+- [ ] Add linting rules or something to check on build.
+
 - [ ] Add queues with some logic (messaging or notification).
 
 - [ ] Refactor everything and make look nice.

@@ -103,7 +103,7 @@ class LoanServiceSpec extends AbstractServiceSpec {
         when:
             loanService.takeLoan(loan, clientId)
         then:
-            timeUtils.getHourOfDay() >> 4
+            timeUtils.hourOfDay >> 4
         and:
             TimeException exception = thrown()
             exception.message == 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'

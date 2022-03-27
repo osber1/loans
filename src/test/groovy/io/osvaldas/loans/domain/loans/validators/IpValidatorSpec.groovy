@@ -12,49 +12,47 @@ import spock.lang.Subject
 class IpValidatorSpec extends Specification {
 
     @Shared
-    String IP_ADDRESS_TO_CHECK = '0.0.0.0.0.0.1'
+    String ipAddress = '0.0.0.0.0.0.1'
 
-    private PropertiesConfig config = Stub()
+    PropertiesConfig config = Stub {
+        requestsFromSameIpLimit >> 5
+    }
 
-    private RedisTemplate<String, Integer> redisTemplate = Stub()
+    ValueOperations valueOperations = Mock()
 
-    private ValueOperations valueOperations = Stub()
+    RedisTemplate<String, Integer> redisTemplate = Stub {
+        opsForValue() >> valueOperations
+    }
 
     @Subject
     private IpValidator ipValidator = new IpValidator(config, redisTemplate)
 
     void 'should validate when ip limit is not exceeded and log is new'() {
-        given:
-            redisTemplate.opsForValue() >> valueOperations
-            valueOperations.get(_ as String) >> null
-            config.requestsFromSameIpLimit >> 5
         when:
-            ipValidator.validate(IP_ADDRESS_TO_CHECK)
+            ipValidator.validate(ipAddress)
         then:
             notThrown(IpException)
+        and:
+            1 * valueOperations.get(ipAddress) >> null
+
     }
 
     void 'should validate when ip limit is not exceeded and log is not new'() {
-        given:
-            redisTemplate.opsForValue() >> valueOperations
-            valueOperations.get(_ as String) >> 2
-            config.requestsFromSameIpLimit >> 5
         when:
-            ipValidator.validate(IP_ADDRESS_TO_CHECK)
+            ipValidator.validate(ipAddress)
         then:
             notThrown(IpException)
+        and:
+            1 * valueOperations.get(ipAddress) >> 2
     }
 
     void 'should throw exception when ip limit is exceeded'() {
-        given:
-            redisTemplate.opsForValue() >> valueOperations
-            valueOperations.get(_ as String) >> 5
-            config.requestsFromSameIpLimit >> 5
         when:
-            ipValidator.validate(IP_ADDRESS_TO_CHECK)
+            ipValidator.validate(ipAddress)
         then:
             IpException e = thrown()
-        and:
             e.message == 'Too many requests from the same ip per day.'
+        and:
+            1 * valueOperations.get(ipAddress) >> 5
     }
 }

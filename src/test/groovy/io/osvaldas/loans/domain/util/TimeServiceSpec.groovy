@@ -20,7 +20,7 @@ class TimeServiceSpec extends Specification {
 
     void 'should return current time'() {
         when:
-            ZonedDateTime currentDateTime = service.getCurrentDateTime()
+            ZonedDateTime currentDateTime = service.currentDateTime
         then:
             with(currentDateTime) {
                 year == now.year
@@ -33,8 +33,8 @@ class TimeServiceSpec extends Specification {
 
     void 'should return current hour of the day'() {
         when:
-            int currentHour = service.getHourOfDay()
+            int currentHour = service.hourOfDay
         then:
-            currentHour == now.getHour()
+            currentHour == now.hour
     }
 }

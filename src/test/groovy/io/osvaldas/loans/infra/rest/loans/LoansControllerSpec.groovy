@@ -1,6 +1,6 @@
 package io.osvaldas.loans.infra.rest.loans
 
-import spock.lang.Specification
+import io.osvaldas.loans.infra.rest.AbstractControllerSpec
 
-class LoansControllerSpec extends Specification {
+class LoansControllerSpec extends AbstractControllerSpec {
 }

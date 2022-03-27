@@ -1,5 +1,8 @@
 package io.osvaldas.loans.domain.loans.validators;
 
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,20 +25,19 @@ public class IpValidator implements IpValidationRule {
     @Override
     @Transactional
     public void validate(String ip) {
-        checkIpAddress(ip, config.getRequestsFromSameIpLimit());
+        int requestsFromSameIpLimit = config.getRequestsFromSameIpLimit();
+        ofNullable(redisTemplate.opsForValue().get(ip))
+            .ifPresentOrElse(s -> checkIfIpLimitIsNotExceeded(ip, requestsFromSameIpLimit, s),
+            () -> redisTemplate.opsForValue().set(ip, 1));
     }
 
-    private void checkIpAddress(String ipAddress, int requestsFromSameIpLimit) {
-        Integer ipTimesUsed = redisTemplate.opsForValue().get(ipAddress);
-        if (ipTimesUsed != null) {
-            if (ipTimesUsed >= requestsFromSameIpLimit) {
-                throw new IpException(TOO_MANY_REQUESTS);
-            } else {
-                redisTemplate.opsForValue().set(ipAddress, ipTimesUsed + 1);
-            }
-        } else {
-            redisTemplate.opsForValue().set(ipAddress, 1);
-        }
+    private void checkIfIpLimitIsNotExceeded(String ipAddress, int requestsFromSameIpLimit, Integer ipTimesUsed) {
+        of(ipTimesUsed)
+            .filter(timesUsed -> timesUsed < requestsFromSameIpLimit)
+            .ifPresentOrElse(timesUsed -> redisTemplate.opsForValue().set(ipAddress, timesUsed + 1),
+                () -> {
+                    throw new IpException(TOO_MANY_REQUESTS);
+                });
     }
 
     public static class IpException extends ValidationRuleException {

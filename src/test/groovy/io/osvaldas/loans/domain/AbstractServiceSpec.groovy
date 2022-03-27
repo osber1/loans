@@ -29,24 +29,16 @@ abstract class AbstractServiceSpec extends Specification {
     ZonedDateTime date = generateDate()
 
     @Shared
-    String clientErrorMessage = "Client with id ${clientId} does not exist."
+    String clientErrorMessage = 'Client with id ${clientId} does not exist.'
 
     @Shared
-    String loanErrorMessage = "Loan with id ${loanId} does not exist."
+    String loanErrorMessage = 'Loan with id ${loanId} does not exist.'
 
     @Shared
     String riskMessage = 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
 
     @Shared
     String amountExceedsMessage = 'The amount you are trying to borrow exceeds the max amount!'
-
-    //    RedisTemplate<String, Integer> redisTemplate = Stub {
-//        opsForValue() >> valueOperations
-//    }
-//
-//    ValueOperations valueOperations = Stub {
-//        valueOperations.get(_ as String) >> 2
-//    }
 
     @Shared
     LoanPostpone firstPostpone = buildPostpone(15.00, date.plusWeeks(1))

@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/v1")
-public class PostopneController {
+public class PostponeController {
 
     private final PostponeService service;
 
