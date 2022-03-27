@@ -1,43 +1,56 @@
 package io.osvaldas.loans.domain.loans
 
+import static java.lang.String.format
+import static java.util.Collections.emptySet
 import static java.util.Collections.singletonList
+import static java.util.Optional.empty
+import static java.util.Optional.of
 
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.ValueOperations
 
+import io.osvaldas.loans.domain.AbstractServiceSpec
 import io.osvaldas.loans.domain.clients.ClientService
 import io.osvaldas.loans.domain.exceptions.NotFoundException
 import io.osvaldas.loans.domain.loans.validators.RiskValidator
 import io.osvaldas.loans.domain.loans.validators.TimeAndAmountValidator
 import io.osvaldas.loans.domain.loans.validators.TimeAndAmountValidator.AmountException
-import io.osvaldas.loans.domain.loans.validators.TimeAndAmountValidator.TimeException
 import io.osvaldas.loans.domain.util.TimeUtils
 import io.osvaldas.loans.infra.configuration.PropertiesConfig
 import io.osvaldas.loans.repositories.LoanRepository
-import io.osvaldas.loans.repositories.entities.Client
 import io.osvaldas.loans.repositories.entities.Loan
-import io.osvaldas.loans.repositories.entities.LoanPostpone
-import spock.lang.Specification
 
-class LoanServiceSpec extends Specification {
+class LoanServiceSpec extends AbstractServiceSpec {
+
+//    @Shared
+//    LoanPostpone firstPostpone = buildExtension(15.00, date.plusWeeks(1))
+//
+//    @Shared
+//    LoanPostpone secondPostpone = buildExtension(22.50, date.plusWeeks(2))
+//
+//    @Shared
+//    Loan successfulLoan = buildLoan(100.00)
+//
+//    @Shared
+//    Loan loanWithPostpone = buildLoanWithPostpone(buildLoan(100.00), firstPostpone)
 
     ClientService clientService = Stub()
 
     TimeUtils timeUtils = Stub {
-        timeUtils.currentDateTime >> date
-        timeUtils.hourOfDay >> 10
+        currentDateTime >> date
+        hourOfDay >> 10
     }
 
     PropertiesConfig config = Stub {
-        requestsFromSameIpLimit >> 10
+        requestsFromSameIpLimit >> 3
         maxAmount >> 100.00
         forbiddenHourFrom >> 0
         forbiddenHourTo >> 6
     }
 
-    LoanRepository loanRepository = Stub()
+    LoanRepository loanRepository = Mock()
 
-    TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
+    TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(riskMessage, amountExceedsMessage, config, timeUtils)
 
     RiskValidator validator = new RiskValidator(singletonList(timeAndAmountValidator))
 
@@ -49,24 +62,62 @@ class LoanServiceSpec extends Specification {
         valueOperations.get(_ as String) >> 2
     }
 
-    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, validator)
+    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, validator, loanErrorMessage)
 
-//    void 'should fail when amount limit is exceeded'() {
-//        given:
-//            clientRepository.findById(_ as String) >> Optional.of(clientFromDatabase)
-//            clientRepository.save(_ as Client) >> clientFromDatabase
-//            config.requestsFromSameIpLimit >> 3
-//            config.maxAmount >> 100.00
-//            config.forbiddenHourFrom >> 0
-//            config.forbiddenHourTo >> 6
-//            timeUtils.hourOfDay >> 10
-//        when:
-//            clientService.takeLoan(buildLoan(1000.00), validUserId)
-//        then:
-//            AmountException exception = thrown()
-//            exception.message == 'The amount you are trying to borrow exceeds the max amount!'
-//    }
-//
+    void 'should save loan'() {
+        when:
+            loanService.save(loan)
+        then:
+            1 * loanRepository.save(loan) >> loan
+    }
+
+    void 'should return loans list when there are loans'() {
+        when:
+            Collection loans = loanService.getLoans(clientId)
+        then:
+            loans.size() == 1
+        and:
+            loans == Set.of(loan)
+        and:
+            clientService.getClient(clientId) >> clientWithLoans
+    }
+
+    void 'should return empty list when there are no loans'() {
+        when:
+            Collection loans = loanService.getLoans(clientId)
+        then:
+            loans == emptySet()
+        and:
+            clientService.getClient(clientId) >> clientWithId
+    }
+
+    void 'should return loan when it exists'() {
+        when:
+            Loan loan = loanService.getLoan(loanId)
+        then:
+            loan.id == loanId
+        and:
+            1 * loanRepository.findById(loanId) >> of(loan)
+    }
+
+    void 'should throw exception when trying to get non existing loan'() {
+        when:
+            loanService.getLoan(loanId)
+        then:
+            NotFoundException e = thrown()
+            e.message == format(loanErrorMessage, loanId)
+        and:
+            1 * loanRepository.findById(loanId) >> empty()
+    }
+
+    void 'should fail when amount limit is exceeded'() {
+        when:
+            loanService.takeLoan(buildLoan(1000.00), clientId)
+        then:
+            AmountException exception = thrown()
+            exception.message == amountExceedsMessage
+    }
+
 //    void 'should fail when max amount and forbidden time'() {
 //        given:
 //            redisTemplate.opsForValue() >> valueOperations

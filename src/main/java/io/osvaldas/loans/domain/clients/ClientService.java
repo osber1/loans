@@ -65,6 +65,7 @@ public class ClientService {
             .orElseThrow(() -> new NotFoundException(format(clientErrorMessage, id)));
     }
 
+    @Transactional
     public Client save(Client client) {
         return clientRepository.save(client);
     }

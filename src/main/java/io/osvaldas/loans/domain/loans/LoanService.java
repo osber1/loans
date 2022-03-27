@@ -49,6 +49,18 @@ public class LoanService {
         this.loanErrorMessage = loanErrorMessage;
     }
 
+    @Transactional
+    public Loan save(Loan loan) {
+        return loanRepository.save(loan);
+    }
+
+    @Transactional(readOnly = true)
+    public Loan getLoan(long id) {
+        return loanRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(format(loanErrorMessage, id)));
+    }
+
+    @Transactional(readOnly = true)
     public Collection<Loan> getLoans(String clientId) {
         return getClient(clientId).getLoans();
     }
@@ -58,15 +70,6 @@ public class LoanService {
         validate(loan);
         loan.setNewLoanInterestAndReturnDate(config, timeUtils);
         return addLoanToClient(clientId, loan);
-    }
-
-    public Loan get(long id) {
-        return loanRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(format(loanErrorMessage, id)));
-    }
-
-    public Loan save(Loan loan) {
-        return loanRepository.save(loan);
     }
 
     private void validate(Loan loan) {

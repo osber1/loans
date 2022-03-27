@@ -29,7 +29,7 @@ public class ExtensionService {
 
     @Transactional
     public LoanPostpone postponeLoan(long id) {
-        Loan loan = loanService.get(id);
+        Loan loan = loanService.getLoan(id);
         LoanPostpone loanPostpone = buildLoanPostpone(loan);
         loan.getLoanPostpones().add(loanPostpone);
         loan.setReturnDate(loanPostpone.getNewReturnDate());

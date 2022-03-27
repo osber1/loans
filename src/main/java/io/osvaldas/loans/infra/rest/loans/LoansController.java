@@ -29,7 +29,7 @@ public class LoansController {
 
     @GetMapping("client/loans/{loanId}")
     public LoanResponse getClientHistory(@PathVariable long loanId) {
-        return loanMapper.loanToDTO(service.get(loanId));
+        return loanMapper.loanToDTO(service.getLoan(loanId));
     }
 
     @GetMapping("client/{clientId}/loans")

@@ -1,6 +1,7 @@
 package io.osvaldas.loans.domain.loans.validators;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,18 +15,18 @@ public class TimeAndAmountValidator implements TimeAndAmountValidationRule {
 
     private final String riskMessage;
 
-    private final String amountExceeds;
+    private final String amountExceedsMessage;
 
     private final PropertiesConfig config;
 
     private final TimeUtils timeUtils;
 
     public TimeAndAmountValidator(@Value("${exceptionMessages.riskMessage:}") String riskMessage,
-                                  @Value("${exceptionMessages.amountExceeds:}") String amountExceeds,
+                                  @Value("${exceptionMessages.amountExceedsMessage:}") String amountExceedsMessage,
                                   PropertiesConfig config,
                                   TimeUtils timeUtils) {
         this.riskMessage = riskMessage;
-        this.amountExceeds = amountExceeds;
+        this.amountExceedsMessage = amountExceedsMessage;
         this.config = config;
         this.timeUtils = timeUtils;
     }
@@ -38,16 +39,19 @@ public class TimeAndAmountValidator implements TimeAndAmountValidationRule {
 
     private void checkTimeAndAmount(BigDecimal amount) {
         int currentHour = timeUtils.getHourOfDay();
+//        Optional.of(currentHour)
+//            .filter(s -> s <= config.getForbiddenHourTo())
+//            .filter(s -> s <= config.getForbiddenHourFrom());
         if (config.getForbiddenHourFrom() <= currentHour &&
             currentHour <= config.getForbiddenHourTo() &&
-            amount.compareTo(config.getMaxAmount()) == 0) {
+            amount.compareTo(config.getMaxAmount()) >= 0) {
             throw new TimeException(riskMessage);
         }
     }
 
     private void checkIfAmountIsNotToHigh(BigDecimal clientAmount) {
         if (clientAmount.compareTo(config.getMaxAmount()) > 0) {
-            throw new AmountException(amountExceeds);
+            throw new AmountException(amountExceedsMessage);
         }
     }
 
