@@ -14,18 +14,18 @@ spring:
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate.ddl-auto: none
-    #    show-sql: true
+#    show-sql: true
     properties:
-      #      javax:
-      #        persistence:
-      #          schema-generation:
-      #            create-source: metadata
-      #            scripts:
-      #              action: create
-      #              create-target: create.sql
-      #      hibernate:
-      #        format_sql: true
-      dialect: org.hibernate.dialect.PostgreSQL94Dialect
+#      javax:
+#        persistence:
+#          schema-generation:
+#            create-source: metadata
+#            scripts:
+#              action: create
+#              create-target: create.sql
+      hibernate:
+#        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQL94Dialect
   redis:
     database: 0
     host: localhost

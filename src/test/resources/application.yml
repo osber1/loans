@@ -1,3 +1,8 @@
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+
 spring:
   mvc:
     pathmatch:
@@ -5,11 +10,6 @@ spring:
   datasource:
     url: jdbc:tc:postgresql:14.1-alpine:///databasename
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
-  #  jpa:
-  #    show-sql: true
-  #    properties:
-  #      hibernate:
-  #        format_sql: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
 
