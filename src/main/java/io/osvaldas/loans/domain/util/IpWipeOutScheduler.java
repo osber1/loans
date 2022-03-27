@@ -15,7 +15,7 @@ public class IpWipeOutScheduler {
     private final RedisTemplate<String, Integer> redisTemplate;
 
     @Scheduled(cron = "0 0 0 * * *")
-    private void wipeOutIps() {
+    void wipeOutIps() {
         for (String key : requireNonNull(redisTemplate.keys("*"))) {
             redisTemplate.delete(key);
         }

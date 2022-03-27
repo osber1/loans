@@ -16,6 +16,7 @@ import io.osvaldas.loans.domain.util.TimeUtils
 import io.osvaldas.loans.infra.configuration.PropertiesConfig
 import io.osvaldas.loans.repositories.LoanRepository
 import io.osvaldas.loans.repositories.entities.Loan
+import spock.lang.Subject
 
 class LoanServiceSpec extends AbstractServiceSpec {
 
@@ -41,6 +42,7 @@ class LoanServiceSpec extends AbstractServiceSpec {
 
     LoanRepository loanRepository = Mock()
 
+    @Subject
     LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, validator, loanErrorMessage)
 
     void 'should save loan'() {

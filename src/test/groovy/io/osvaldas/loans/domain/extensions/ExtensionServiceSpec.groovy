@@ -1,8 +1,18 @@
 package io.osvaldas.loans.domain.extensions
 
-import spock.lang.Specification
+import io.osvaldas.loans.domain.AbstractServiceSpec
+import io.osvaldas.loans.domain.loans.LoanService
+import io.osvaldas.loans.infra.configuration.PropertiesConfig
+import spock.lang.Subject
 
-class ExtensionServiceSpec extends Specification {
+class ExtensionServiceSpec extends AbstractServiceSpec {
+
+    LoanService loanService = Stub()
+
+    PropertiesConfig config = Stub()
+
+    @Subject
+    ExtensionService extensionService = new ExtensionService(loanService, config)
 
     //    void 'should fail loan postpone when loan not exist'() {
 //        given:

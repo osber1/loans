@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TimeService implements TimeUtils {
 
-    private static final String TIME_ZONE = "Europe/Vilnius";
+    static final String TIME_ZONE = "Europe/Vilnius";
 
     @Override
     public int getHourOfDay() {
