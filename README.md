@@ -9,7 +9,7 @@ To start the application you need to have installed docker in your machine. Cd i
 
 ## pgAdmin
 
-To log in to [pgAdmin](http://localhost:5050) (password is admin) and add new server connection:
+To log in to [pgAdmin](http://localhost:5050) (admin@admin.com:admin) and add new server connection:
 
 - url: postgres,
 - username:root,
