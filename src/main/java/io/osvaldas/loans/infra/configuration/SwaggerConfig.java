@@ -20,7 +20,7 @@ public class SwaggerConfig {
         return new Docket(OAS_30)
             .select()
             .paths(PathSelectors.ant("/api/**"))
-            .apis(basePackage("com.finance.loans"))
+            .apis(basePackage("io.osvaldas.loans"))
             .build()
             .apiInfo(apiDetails());
     }

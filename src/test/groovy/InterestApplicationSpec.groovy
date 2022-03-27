@@ -12,26 +12,8 @@ class InterestApplicationSpec extends Specification {
     @Autowired
     ApplicationContext context
 
-    void 'should load context when everything is correct'() {
+    void 'should load context'() {
         expect:
             context != null
-        and:
-            context.containsBean('clientService')
-        and:
-            context.containsBean('clientRepository')
-        and:
-            context.containsBean('loanRepository')
-        and:
-            context.containsBean('ipValidator')
-        and:
-            context.containsBean('riskValidator')
-        and:
-            context.containsBean('timeAndAmountValidator')
-        and:
-            context.containsBean('timeService')
-        and:
-            context.containsBean('swaggerConfig')
-        and:
-            context.containsBean('propertiesConfig')
     }
 }

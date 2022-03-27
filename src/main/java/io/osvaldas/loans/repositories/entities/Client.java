@@ -60,6 +60,6 @@ public class Client {
     }
 
     public void setRandomId() {
-        this.setId(UUID.randomUUID().toString());
+        setId(UUID.randomUUID().toString());
     }
 }

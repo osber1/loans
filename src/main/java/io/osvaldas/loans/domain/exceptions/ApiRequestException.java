@@ -18,11 +18,11 @@ public abstract class ApiRequestException extends RuntimeException {
     public abstract HttpStatus getHttpStatus();
 
     public ApiExceptionResource toResource() {
-        return toResource(this.getMessage());
+        return toResource(getMessage());
     }
 
     public ApiExceptionResource toResource(String message) {
-        return new ApiExceptionResource(message, now(), this.getHttpStatus());
+        return new ApiExceptionResource(message, now(), getHttpStatus());
     }
 
     @Getter

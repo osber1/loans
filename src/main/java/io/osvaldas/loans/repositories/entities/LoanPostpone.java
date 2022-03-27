@@ -1,5 +1,7 @@
 package io.osvaldas.loans.repositories.entities;
 
+import static java.math.RoundingMode.HALF_UP;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
@@ -24,7 +26,17 @@ public class LoanPostpone {
     @SequenceGenerator(name = "POSTPONE_SEQ", sequenceName = "POSTPONE_SEQ", allocationSize = 1)
     private long id;
 
-    private ZonedDateTime newReturnDate;
+    private ZonedDateTime returnDate;
 
-    private BigDecimal newInterestRate;
+    private BigDecimal interestRate;
+
+    public void setNewInterestRate(BigDecimal interestRate, BigDecimal interestIncrementFactor) {
+        BigDecimal newInterestRate = interestRate.multiply(interestIncrementFactor).setScale(2, HALF_UP);
+        setInterestRate(newInterestRate);
+    }
+
+    public void setNewReturnDay(ZonedDateTime returnDate, int postponeDays) {
+        ZonedDateTime newReturnDay = returnDate.plusDays(postponeDays);
+        setReturnDate(newReturnDay);
+    }
 }

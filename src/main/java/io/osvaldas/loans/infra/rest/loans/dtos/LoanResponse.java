@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
-import io.osvaldas.loans.infra.rest.extensions.dtos.LoanExtensionResponse;
+import io.osvaldas.loans.infra.rest.postpones.dtos.LoanPostponeResponse;
 import lombok.Data;
 
 @Data
@@ -20,5 +20,5 @@ public class LoanResponse {
 
     private ZonedDateTime returnDate;
 
-    private Set<LoanExtensionResponse> loanPostpones;
+    private Set<LoanPostponeResponse> loanPostpones;
 }

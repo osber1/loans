@@ -1,6 +1,6 @@
 package io.osvaldas.loans.domain
 
-import static java.util.Collections.singletonList
+import static java.util.Arrays.asList
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -11,7 +11,7 @@ import io.osvaldas.loans.repositories.entities.LoanPostpone
 import spock.lang.Shared
 import spock.lang.Specification
 
-class AbstractServiceSpec extends Specification {
+abstract class AbstractServiceSpec extends Specification {
 
     @Shared
     long existingPersonalCode = 12345678910
@@ -48,14 +48,11 @@ class AbstractServiceSpec extends Specification {
 //        valueOperations.get(_ as String) >> 2
 //    }
 
-//    @Shared
-//    LoanPostpone firstPostpone = buildExtension(15.00, date.plusWeeks(1))
-//
-//    @Shared
-//    LoanPostpone secondPostpone = buildExtension(22.50, date.plusWeeks(2))
-//
-//    @Shared
-//    Loan loanWithPostpone = buildLoanWithPostpone(buildLoan(100.00), firstPostpone)
+    @Shared
+    LoanPostpone firstPostpone = buildPostpone(15.00, date.plusWeeks(1))
+
+    @Shared
+    LoanPostpone secondPostpone = buildPostpone(22.50, date.plusWeeks(2))
 
     @Shared
     Loan loan = buildLoan(100.0)
@@ -69,24 +66,17 @@ class AbstractServiceSpec extends Specification {
     @Shared
     Client clientWithLoan = buildClient(clientId, Set.of(loan))
 
-    LoanPostpone buildExtension(BigDecimal newRate, ZonedDateTime newDate) {
+    LoanPostpone buildPostpone(BigDecimal newRate, ZonedDateTime newDate) {
         new LoanPostpone().tap {
             id = 1
-            newInterestRate = newRate
-            newReturnDate = newDate
+            interestRate = newRate
+            returnDate = newDate
         }
     }
 
-    Loan buildLoanWithPostpone(Loan loanRequest, LoanPostpone postpone) {
-        List<LoanPostpone> list = singletonList(postpone)
-        loanRequest.with { loanPostpones = new HashSet<>(list) }
-        return loanRequest
-    }
-
-    Loan buildLoanWithPostpones(Loan loanRequest, LoanPostpone postpone, LoanPostpone secondPostpone) {
-        List<LoanPostpone> list = Arrays.asList(postpone, secondPostpone)
-        loanRequest.with { loanPostpones = new HashSet<>(list) }
-        return loanRequest
+    Loan addPostponeToLoan(Loan loan, LoanPostpone... postpones) {
+        loan.with { loanPostpones = new HashSet<>(asList(postpones)) }
+        return loan
     }
 
     Loan buildLoan(BigDecimal loanAmount) {

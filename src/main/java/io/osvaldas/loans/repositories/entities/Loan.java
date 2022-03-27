@@ -1,5 +1,7 @@
 package io.osvaldas.loans.repositories.entities;
 
+import static java.util.Comparator.comparing;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
@@ -14,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
 
+import io.osvaldas.loans.infra.configuration.PropertiesConfig;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,8 +45,25 @@ public class Loan {
     @OneToMany(cascade = CascadeType.ALL)
     private Set<LoanPostpone> loanPostpones = new HashSet<>();
 
+    public void addLoanPostpone(LoanPostpone loanPostpone) {
+        loanPostpones.add(loanPostpone);
+    }
+
     public void setNewLoanInterestAndReturnDate(BigDecimal interestRate, ZonedDateTime currentDateTime) {
         setInterestRate(interestRate);
         setReturnDate(currentDateTime.plusMonths(getTermInMonths()));
+    }
+
+    public void postponeLoan(PropertiesConfig config) {
+        getLoanPostpones().stream()
+            .max(comparing(LoanPostpone::getReturnDate))
+            .ifPresentOrElse(postpone -> setNewInterestAndReturnDay(postpone, postpone.getInterestRate(), postpone.getReturnDate(), config),
+                () -> setNewInterestAndReturnDay(new LoanPostpone(), getInterestRate(), getReturnDate(), config));
+    }
+
+    private void setNewInterestAndReturnDay(LoanPostpone loanPostpone, BigDecimal interestRate, ZonedDateTime returnDate, PropertiesConfig config) {
+        loanPostpone.setNewInterestRate(interestRate, config.getInterestIncrementFactor());
+        loanPostpone.setNewReturnDay(returnDate, config.getPostponeDays());
+        addLoanPostpone(loanPostpone);
     }
 }

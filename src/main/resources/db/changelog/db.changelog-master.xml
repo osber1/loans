@@ -57,8 +57,8 @@
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_loanpostpone"/>
             </column>
-            <column name="new_return_date" type="timestamp with time zone"/>
-            <column name="new_interest_rate" type="DECIMAL"/>
+            <column name="return_date" type="timestamp with time zone"/>
+            <column name="interest_rate" type="DECIMAL"/>
         </createTable>
     </changeSet>
 
