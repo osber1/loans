@@ -28,7 +28,7 @@ public class IpValidator implements IpValidationRule {
         int requestsFromSameIpLimit = config.getRequestsFromSameIpLimit();
         ofNullable(redisTemplate.opsForValue().get(ip))
             .ifPresentOrElse(s -> checkIfIpLimitIsNotExceeded(ip, requestsFromSameIpLimit, s),
-            () -> redisTemplate.opsForValue().set(ip, 1));
+                () -> redisTemplate.opsForValue().set(ip, 1));
     }
 
     private void checkIfIpLimitIsNotExceeded(String ipAddress, int requestsFromSameIpLimit, Integer ipTimesUsed) {
