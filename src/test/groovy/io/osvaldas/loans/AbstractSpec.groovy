@@ -1,5 +1,6 @@
-package io.osvaldas.loans.domain
+package io.osvaldas.loans
 
+import static java.lang.Long.parseLong
 import static java.util.Arrays.asList
 
 import java.time.ZoneId
@@ -11,16 +12,7 @@ import io.osvaldas.loans.repositories.entities.LoanPostpone
 import spock.lang.Shared
 import spock.lang.Specification
 
-abstract class AbstractServiceSpec extends Specification {
-
-    @Shared
-    long existingPersonalCode = 12345678910
-
-    @Shared
-    String clientId = 'userId'
-
-    @Shared
-    long loanId = 1
+abstract class AbstractSpec extends Specification {
 
     @Shared
     String timeZone = 'Europe/Vilnius'
@@ -29,10 +21,34 @@ abstract class AbstractServiceSpec extends Specification {
     ZonedDateTime date = generateDate()
 
     @Shared
-    String clientErrorMessage = 'Client with id ${clientId} does not exist.'
+    String clientId = 'clientId'
 
     @Shared
-    String loanErrorMessage = 'Loan with id ${loanId} does not exist.'
+    String name = 'Name'
+
+    @Shared
+    String surname = 'Surname'
+
+    @Shared
+    String clientPersonalCode = '12345678910'
+
+    @Shared
+    String clientEmail = 'test@mail.com'
+
+    @Shared
+    String clientPhoneNumber = '+37062514361'
+
+    @Shared
+    long existingPersonalCode = 12345678910
+
+    @Shared
+    long loanId = 1
+
+    @Shared
+    String clientErrorMessage = "Client with id ${clientId} does not exist."
+
+    @Shared
+    String loanErrorMessage = "Loan with id ${loanId} does not exist."
 
     @Shared
     String riskMessage = 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
@@ -76,23 +92,25 @@ abstract class AbstractServiceSpec extends Specification {
             id = loanId
             amount = loanAmount
             termInMonths = 12
-            interestRate = 10
+            interestRate = 10.0
             returnDate = date.plusYears(1)
         }
     }
 
     Client buildClient(String clientId, Set<Loan> clientLoans) {
-        return new Client().tap {
+        new Client().tap {
             id = clientId
-            firstName = 'Testas'
-            lastName = 'Testaitis'
-            personalCode = existingPersonalCode
+            firstName = name
+            lastName = surname
+            email = clientEmail
+            phoneNumber = clientPhoneNumber
+            personalCode = parseLong(clientPersonalCode)
             loans = clientLoans
         }
     }
 
     ZonedDateTime generateDate() {
-        return ZonedDateTime.of(
+        ZonedDateTime.of(
             2020,
             1,
             1,

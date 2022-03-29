@@ -1,186 +1,167 @@
 package io.osvaldas.loans.infra.rest.clients
 
+import static java.lang.String.format
+import static org.springframework.http.HttpStatus.BAD_REQUEST
+import static org.springframework.http.HttpStatus.NOT_FOUND
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.MediaType.APPLICATION_JSON
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
+
+import org.springframework.mock.web.MockHttpServletResponse
+import org.springframework.test.web.servlet.MvcResult
+
+import groovy.json.JsonBuilder
 import io.osvaldas.loans.infra.rest.AbstractControllerSpec
+import io.osvaldas.loans.infra.rest.clients.dtos.ClientRequest
+import io.osvaldas.loans.infra.rest.clients.dtos.ClientResponse
+import io.osvaldas.loans.repositories.entities.Client
+import io.osvaldas.loans.repositories.entities.Loan
+import spock.lang.Shared
 
 class ClientControllerSpec extends AbstractControllerSpec {
 
-//    void 'should fail when ip limit is exceeded taking loans'() {
-//        given:
-//            LoanRequest loanRequest = new LoanRequest().tap {
-//                amount = 50
-//                termInMonths = 5
-//            }
-//        when:
-//            postLoanRequest(loanRequest, ID)
-//            postLoanRequest(loanRequest, ID)
-//        then:
-//            IpException exception = thrown()
-//            exception.message == 'Too many requests from the same ip per day.'
-//    }
-//
-//    void 'should take loan when request is correct'() {
-//        given:
-//            clientRepository.save(client)
-//            LoanRequest request = new LoanRequest().tap {
-//                amount = 50
-//                termInMonths = 5
-//            }
-//        when:
-//            MockHttpServletResponse response = postLoanRequest(request, ID)
-//        then:
-//            response.status == HttpStatus.OK.value()
-//        and:
-//            LoanResponse loanResponse = objectMapper.readValue(response.contentAsString, LoanResponse)
-//            with(loanResponse) {
-//                amount == request.amount
-//                termInMonths == request.termInMonths
-//            }
-//    }
-//
-//    void 'should throw exception when client\'s first name is null'() {
-//        given:
-//            ClientRequest clientRequest = buildClientRequest(null, SURNAME, PERSONAL_CODE, EMAIL, PHONE_NUMBER)
-//        when:
-//            MockHttpServletResponse response = postClientRequest(clientRequest)
-//        then:
-//            response.status == HttpStatus.BAD_REQUEST.value()
-//        and:
-//            response.contentAsString.contains('First name must be not empty.')
-//    }
-//
-//    void 'should throw exception when client\'s last name is null'() {
-//        given:
-//            ClientRequest clientRequest = buildClientRequest(NAME, null, PERSONAL_CODE, EMAIL, PHONE_NUMBER)
-//        when:
-//            MockHttpServletResponse response = postClientRequest(clientRequest)
-//        then:
-//            response.status == HttpStatus.BAD_REQUEST.value()
-//        and:
-//            response.contentAsString.contains('Last name must be not empty.')
-//    }
-//
-//    void 'should throw exception when client\'s personal code is null'() {
-//        given:
-//            ClientRequest clientRequest = buildClientRequest(NAME, SURNAME, null, EMAIL, PHONE_NUMBER)
-//        when:
-//            MockHttpServletResponse response = postClientRequest(clientRequest)
-//        then:
-//            response.status == HttpStatus.BAD_REQUEST.value()
-//        and:
-//            response.contentAsString.contains('Personal code must be not empty.')
-//    }
-//
-//    void 'should throw exception when client\'s personal code is too short'() {
-//        given:
-//            ClientRequest clientRequest = buildClientRequest(NAME, SURNAME, '123456789', EMAIL, PHONE_NUMBER)
-//        when:
-//            MockHttpServletResponse response = postClientRequest(clientRequest)
-//        then:
-//            response.status == HttpStatus.BAD_REQUEST.value()
-//        and:
-//            response.contentAsString.contains('Personal code must be 11 digits length.')
-//    }
-//
-//    void 'should throw exception when client\'s personal code contains letters'() {
-//        given:
-//            ClientRequest clientRequest = buildClientRequest(NAME, SURNAME, '123456789aa', EMAIL, PHONE_NUMBER)
-//        when:
-//            MockHttpServletResponse response = postClientRequest(clientRequest)
-//        then:
-//            response.status == HttpStatus.BAD_REQUEST.value()
-//        and:
-//            response.contentAsString.contains('All characters must be digits.')
-//    }
-//
-//    void 'should throw exception when client\'s email is null'() {
-//        given:
-//            ClientRequest clientRequest = buildClientRequest(NAME, SURNAME, PERSONAL_CODE, null, PHONE_NUMBER)
-//        when:
-//            MockHttpServletResponse response = postClientRequest(clientRequest)
-//        then:
-//            response.status == HttpStatus.BAD_REQUEST.value()
-//        and:
-//            response.contentAsString.contains('Email must be not empty.')
-//    }
-//
-//    void 'should throw exception when client\'s email is wrong'() {
-//        given:
-//            ClientRequest clientRequest = buildClientRequest(NAME, SURNAME, PERSONAL_CODE, 'bad email', PHONE_NUMBER)
-//        when:
-//            MockHttpServletResponse response = postClientRequest(clientRequest)
-//        then:
-//            response.status == HttpStatus.BAD_REQUEST.value()
-//        and:
-//            response.contentAsString.contains('must be a well-formed email address')
-//    }
-//
-//    void 'should throw exception when client\'s phone number is null'() {
-//        given:
-//            ClientRequest clientRequest = buildClientRequest(NAME, SURNAME, PERSONAL_CODE, EMAIL, null)
-//        when:
-//            MockHttpServletResponse response = postClientRequest(clientRequest)
-//        then:
-//            response.status == HttpStatus.BAD_REQUEST.value()
-//        and:
-//            response.contentAsString.contains('Phone number must be not empty.')
-//    }
-//
-//    void 'should return client history when it exists'() {
-//        given:
-//            clientRepository.save(client)
-//        when:
-//            MockHttpServletResponse response = mockMvc.perform(get('/api/client/{id}/loans', ID)
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andReturn().response
-//        then:
-//            response.status == HttpStatus.OK.value()
-//        and:
-//            List<Loan> responseLoanList = new JsonSlurper().parseText(response.contentAsString) as List<Loan>
-//            Loan actualLoan = client.loans[0]
-//            with(responseLoanList.first()) {
-//                amount == actualLoan.amount
-//                interestRate == actualLoan.interestRate
-//                termInMonths == actualLoan.termInMonths
-//                returnDate.toString() == actualLoan.returnDate.toOffsetDateTime().truncatedTo(ChronoUnit.SECONDS).toString()
-//            }
-//    }
-//
-//    void 'should throw an exception when trying to get client history and it not exist'() {
-//        when:
-//            MockHttpServletResponse response = mockMvc.perform(get('/api/client/{id}/loans', 5555)
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andReturn().response
-//        then:
-//            response.status == HttpStatus.NOT_FOUND.value()
-//        and:
-//            response.contentAsString.contains('Client with id 5555 does not exist.')
-//    }
-//
-//    void 'should postpone loan when it exists'() {
-//        given:
-//            Client savedClient = clientRepository.save(client)
-//        when:
-//            MockHttpServletResponse response = mockMvc.perform(post('/api/client/loans/{id}/extensions', savedClient.getLoans()[0].getId())
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andReturn().response
-//        then:
-//            response.status == HttpStatus.OK.value()
-//        and:
-//            LoanPostpone postpone = objectMapper.readValue(response.contentAsString, LoanPostpone.class)
-//            with(postpone) {
-//                id == loanPostpone.id
-//                newInterestRate == loanPostpone.newInterestRate
-//            }
-//    }
-//
-//    void 'should throw an exception when trying to postpone loan'() {
-//        when:
-//            MockHttpServletResponse response = mockMvc.perform(post('/api/client/loans/{id}/extensions', 5555)
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andReturn().response
-//        then:
-//            response.status == HttpStatus.NOT_FOUND.value()
-//        and:
-//            response.contentAsString.contains('Loan with id 5555 does not exist.')
-//    }
+    @Shared
+    String editedName = 'editedName'
+
+    @Shared
+    String editedSurname = "editedSurname"
+
+    void 'should register new client when everything is valid'() {
+        given:
+            ClientRequest clientRequest = buildFullClientRequest()
+        when:
+            MvcResult result = postClientRequest(clientRequest)
+        then:
+            result.response.status == OK.value()
+        and:
+            with(objectMapper.readValue(result.response.contentAsString, ClientResponse)) {
+                firstName == clientRequest.firstName
+                lastName == clientRequest.lastName
+                personalCode == "${clientRequest.personalCode}"
+                email == clientRequest.email
+                phoneNumber == clientRequest.phoneNumber
+            }
+    }
+
+    void 'should throw exception with message #errorMessage when validating client'() {
+        given:
+            ClientRequest clientRequest = request
+        when:
+            MvcResult result = postClientRequest(clientRequest)
+        then:
+            result.response.status == BAD_REQUEST.value()
+        and:
+            result.resolvedException.message.contains(errorMessage)
+        where:
+            request                                                                               || errorMessage
+            buildClientRequest(null, surname, clientPersonalCode, clientEmail, clientPhoneNumber) || 'First name must be not empty.'
+            buildClientRequest(name, null, clientPersonalCode, clientEmail, clientPhoneNumber)    || 'Last name must be not empty.'
+            buildClientRequest(name, surname, null, clientEmail, clientPhoneNumber)               || 'Personal code must be not empty.'
+            buildClientRequest(name, surname, '123456789', clientEmail, clientPhoneNumber)        || 'Personal code must be 11 digits length.'
+            buildClientRequest(name, surname, '123456789as', clientEmail, clientPhoneNumber)      || 'Personal code must contain only digits.'
+            buildClientRequest(name, surname, clientPersonalCode, null, clientPhoneNumber)        || 'Email must be not empty.'
+            buildClientRequest(name, surname, clientPersonalCode, 'test', clientPhoneNumber)      || 'must be a well-formed email address'
+            buildClientRequest(name, surname, clientPersonalCode, clientEmail, null)              || 'Phone number must be not empty.'
+    }
+
+    void 'should return client when it exists'() {
+        given:
+            Client savedClient = clientRepository.save(clientWithId)
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{id}', savedClient.id)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            with(objectMapper.readValue(response.contentAsString, ClientResponse)) {
+                id == savedClient.id
+                firstName == savedClient.firstName
+                lastName == savedClient.lastName
+                personalCode == "${savedClient.personalCode}"
+                email == savedClient.email
+                phoneNumber == savedClient.phoneNumber
+            }
+    }
+
+    void 'should delete client when it exists'() {
+        given:
+            Client savedClient = clientRepository.save(clientWithId)
+        when:
+            MockHttpServletResponse response = mockMvc.perform(delete('/api/v1/client/{id}', savedClient.id)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            clientRepository.findById(savedClient.id).isEmpty()
+    }
+
+    void 'should update client when it exists'() {
+        given:
+            clientRepository.save(clientWithId)
+        when:
+            MockHttpServletResponse response = mockMvc.perform(put('/api/v1/client')
+                .content(new JsonBuilder(buildFullClientRequest()) as String)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            with(clientRepository.findById(clientWithId.id).get()) {
+                firstName == editedName
+                lastName == editedSurname
+            }
+    }
+
+    void 'should get list of clients when they exists'() {
+        given:
+            clientRepository.save(buildClient('123123123', new HashSet<Loan>()))
+            clientRepository.save(buildClient('890890890', new HashSet<Loan>()))
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients')
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == 2
+    }
+
+    void 'should throw an exception when client not found'() {
+        when:
+            MockHttpServletResponse response = mockMvc.perform(method
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == status
+        and:
+            response.contentAsString.contains(format(clientErrorMessage, clientId))
+        where:
+            method                                                                             || status
+            get('/api/v1/client/{id}', clientId)                                               || NOT_FOUND.value()
+            delete('/api/v1/client/{id}', clientId)                                            || NOT_FOUND.value()
+            put('/api/v1/client').content(new JsonBuilder(buildFullClientRequest()) as String) || NOT_FOUND.value()
+    }
+
+    private MvcResult postClientRequest(ClientRequest request) {
+        mockMvc.perform(post('/api/v1/client')
+            .content(new JsonBuilder(request) as String)
+            .contentType(APPLICATION_JSON))
+            .andReturn()
+    }
+
+    private ClientRequest buildFullClientRequest() {
+        new ClientRequest().tap {
+            id = clientId
+            firstName = editedName
+            lastName = editedSurname
+            personalCode = clientPersonalCode
+            email = clientEmail
+            phoneNumber = clientPhoneNumber
+        }
+    }
 }

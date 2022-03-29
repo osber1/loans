@@ -1,6 +1,6 @@
 package io.osvaldas.loans.domain.loans.validators
 
-import io.osvaldas.loans.domain.AbstractServiceSpec
+import io.osvaldas.loans.AbstractSpec
 import io.osvaldas.loans.domain.loans.rules.TimeAndAmountValidationRule.ValidationRuleException
 import io.osvaldas.loans.domain.loans.validators.TimeAndAmountValidator.AmountException
 import io.osvaldas.loans.domain.loans.validators.TimeAndAmountValidator.TimeException
@@ -8,7 +8,7 @@ import io.osvaldas.loans.domain.util.TimeUtils
 import io.osvaldas.loans.infra.configuration.PropertiesConfig
 import spock.lang.Subject
 
-class TimeAndAmountValidatorSpec extends AbstractServiceSpec {
+class TimeAndAmountValidatorSpec extends AbstractSpec {
 
     private TimeUtils timeUtils = Stub {
         hourOfDay >> 10

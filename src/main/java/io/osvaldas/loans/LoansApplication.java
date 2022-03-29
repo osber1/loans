@@ -8,9 +8,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @SpringBootApplication
 @ConfigurationPropertiesScan
-public class InterestApplication {
+public class LoansApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(InterestApplication.class, args);
+        SpringApplication.run(LoansApplication.class, args);
     }
 }

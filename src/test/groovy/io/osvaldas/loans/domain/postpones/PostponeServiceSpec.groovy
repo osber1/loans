@@ -1,12 +1,12 @@
 package io.osvaldas.loans.domain.postpones
 
-import io.osvaldas.loans.domain.AbstractServiceSpec
+import io.osvaldas.loans.AbstractSpec
 import io.osvaldas.loans.domain.loans.LoanService
 import io.osvaldas.loans.infra.configuration.PropertiesConfig
 import io.osvaldas.loans.repositories.entities.LoanPostpone
 import spock.lang.Subject
 
-class PostponeServiceSpec extends AbstractServiceSpec {
+class PostponeServiceSpec extends AbstractSpec {
 
     LoanService loanService = Stub()
 

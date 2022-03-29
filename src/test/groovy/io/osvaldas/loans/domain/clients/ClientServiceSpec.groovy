@@ -3,14 +3,14 @@ package io.osvaldas.loans.domain.clients
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
-import io.osvaldas.loans.domain.AbstractServiceSpec
+import io.osvaldas.loans.AbstractSpec
 import io.osvaldas.loans.domain.exceptions.BadRequestException
 import io.osvaldas.loans.domain.exceptions.NotFoundException
 import io.osvaldas.loans.repositories.ClientRepository
 import io.osvaldas.loans.repositories.entities.Client
 import spock.lang.Subject
 
-class ClientServiceSpec extends AbstractServiceSpec {
+class ClientServiceSpec extends AbstractSpec {
 
     ClientRepository clientRepository = Mock()
 

@@ -1,62 +1,38 @@
 package io.osvaldas.loans.infra.rest
 
-import static java.lang.Long.parseLong
-import static org.springframework.http.MediaType.APPLICATION_JSON
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-
-import java.time.ZoneId
-import java.time.ZonedDateTime
-
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MockMvc
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.jupitertools.springtestredis.RedisTestContainer
 
-import groovy.json.JsonBuilder
+import io.osvaldas.loans.AbstractSpec
 import io.osvaldas.loans.domain.loans.validators.IpValidator
 import io.osvaldas.loans.infra.rest.clients.dtos.ClientRequest
 import io.osvaldas.loans.infra.rest.loans.dtos.LoanRequest
 import io.osvaldas.loans.repositories.ClientRepository
 import io.osvaldas.loans.repositories.LoanRepository
-import io.osvaldas.loans.repositories.entities.Client
-import io.osvaldas.loans.repositories.entities.Loan
-import io.osvaldas.loans.repositories.entities.LoanPostpone
-import spock.lang.Shared
-import spock.lang.Specification
 
 @SpringBootTest
 @RedisTestContainer
 @AutoConfigureMockMvc
-abstract class AbstractControllerSpec extends Specification {
+abstract class AbstractControllerSpec extends AbstractSpec {
 
-    @Shared
-    String timeZone = 'Europe/Vilnius'
+    @Value('${exceptionMessages.clientErrorMessage:}')
+    String clientErrorMessage
 
-    @Shared
-    String name = 'Name'
+    @Value('${exceptionMessages.loanErrorMessage:}')
+    String loanErrorMessage
 
-    @Shared
-    String surname = 'Surname'
+    @Value('${exceptionMessages.riskMessage:}')
+    String riskMessage
 
-    @Shared
-    String clientPersonalCode = '12345678910'
-
-    @Shared
-    String email = 'test@mail.com'
-
-    @Shared
-    String phoneNumber = '+37062514361'
-
-    @Shared
-    String clientId = 'clientId'
-
-    @Shared
-    ZonedDateTime date = generateDate()
+    @Value('${exceptionMessages.amountExceedsMessage:}')
+    String amountExceedsMessage
 
     @Autowired
     MockMvc mockMvc
@@ -76,10 +52,6 @@ abstract class AbstractControllerSpec extends Specification {
     @Autowired
     IpValidator ipValidator
 
-    Client client = buildClient()
-
-    LoanPostpone loanPostpone = buildLoanPostpone()
-
     void cleanup() {
         clientRepository.deleteAll()
         loanRepository.deleteAll()
@@ -88,28 +60,13 @@ abstract class AbstractControllerSpec extends Specification {
         }
     }
 
-    MockHttpServletResponse postClientRequest(ClientRequest request) {
-        mockMvc.perform(post('/api/client')
-            .content(new JsonBuilder(request) as String)
-            .contentType(APPLICATION_JSON))
-            .andReturn().response
-    }
-
-    MockHttpServletResponse postLoanRequest(LoanRequest request, String id) {
-        mockMvc.perform(post('/api/client/' + id + '/loan')
-            .requestAttr('remoteAddr', '0.0.0.0.0.1')
-            .content(new JsonBuilder(request) as String)
-            .contentType(APPLICATION_JSON))
-            .andReturn().response
-    }
-
     ClientRequest buildClientRequest(
         String clientName,
         String clientSurname,
         String clientCode,
         String clientEmail,
         String clientPhoneNumber) {
-        return new ClientRequest().tap {
+        new ClientRequest().tap {
             firstName = clientName
             lastName = clientSurname
             personalCode = clientCode
@@ -119,52 +76,9 @@ abstract class AbstractControllerSpec extends Specification {
     }
 
     LoanRequest buildLoanRequest() {
-        return new LoanRequest().tap {
+        new LoanRequest().tap {
             amount = 100.00
             termInMonths = 12
         }
-    }
-
-    Loan buildLoan() {
-        return new Loan().tap {
-            id = 1
-            amount = 100.00
-            interestRate = 10.00
-            termInMonths = 12
-            returnDate = date.plusYears(1)
-            loanPostpones = []
-        }
-    }
-
-    Client buildClient() {
-        return new Client().tap {
-            id = clientId
-            firstName = name
-            lastName = surname
-            email = email
-            phoneNumber = phoneNumber
-            personalCode = parseLong(clientPersonalCode)
-            loans = Set.of(buildLoan())
-        }
-    }
-
-    LoanPostpone buildLoanPostpone() {
-        return new LoanPostpone().tap {
-            id = 1
-            newReturnDate = date.plusWeeks(1)
-            newInterestRate = 15.00
-        }
-    }
-
-    ZonedDateTime generateDate() {
-        return ZonedDateTime.of(
-            2020,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            ZoneId.of(timeZone))
     }
 }

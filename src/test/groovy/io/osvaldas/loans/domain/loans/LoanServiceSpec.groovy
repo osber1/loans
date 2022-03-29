@@ -5,7 +5,7 @@ import static java.util.Collections.singletonList
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
-import io.osvaldas.loans.domain.AbstractServiceSpec
+import io.osvaldas.loans.AbstractSpec
 import io.osvaldas.loans.domain.clients.ClientService
 import io.osvaldas.loans.domain.exceptions.NotFoundException
 import io.osvaldas.loans.domain.loans.validators.RiskValidator
@@ -18,7 +18,7 @@ import io.osvaldas.loans.repositories.LoanRepository
 import io.osvaldas.loans.repositories.entities.Loan
 import spock.lang.Subject
 
-class LoanServiceSpec extends AbstractServiceSpec {
+class LoanServiceSpec extends AbstractSpec {
 
     ClientService clientService = Stub {
         save(clientWithId) >> clientWithLoan
