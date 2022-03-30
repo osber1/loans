@@ -1,8 +1,8 @@
 package io.osvaldas.loans.domain.util;
 
+import static java.time.ZoneId.of;
 import static java.time.ZonedDateTime.now;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import org.springframework.stereotype.Component;
@@ -19,6 +19,6 @@ public class TimeService implements TimeUtils {
 
     @Override
     public ZonedDateTime getCurrentDateTime() {
-        return now(ZoneId.of(TIME_ZONE));
+        return now(of(TIME_ZONE));
     }
 }

@@ -27,8 +27,8 @@ public class LoansController {
 
     private final LoanMapper loanMapper;
 
-    @GetMapping("client/loans/{loanId}")
-    public LoanResponse getLoans(@PathVariable long loanId) {
+    @GetMapping("loans/{loanId}")
+    public LoanResponse getLoan(@PathVariable long loanId) {
         return loanMapper.loanToDTO(service.getLoan(loanId));
     }
 

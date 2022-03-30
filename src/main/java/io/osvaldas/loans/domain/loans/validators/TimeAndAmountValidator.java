@@ -20,10 +20,8 @@ public class TimeAndAmountValidator implements TimeAndAmountValidationRule {
 
     private final TimeUtils timeUtils;
 
-    public TimeAndAmountValidator(@Value("${exceptionMessages.riskMessage:}") String riskMessage,
-                                  @Value("${exceptionMessages.amountExceedsMessage:}") String amountExceedsMessage,
-                                  PropertiesConfig config,
-                                  TimeUtils timeUtils) {
+    public TimeAndAmountValidator(@Value("${exceptionMessages.riskMessage:}") String riskMessage, @Value("${exceptionMessages.amountExceedsMessage:}") String amountExceedsMessage,
+                                  PropertiesConfig config, TimeUtils timeUtils) {
         this.riskMessage = riskMessage;
         this.amountExceedsMessage = amountExceedsMessage;
         this.config = config;
@@ -38,12 +36,7 @@ public class TimeAndAmountValidator implements TimeAndAmountValidationRule {
 
     private void checkTimeAndAmount(BigDecimal amount) {
         int currentHour = timeUtils.getHourOfDay();
-//        Optional.of(currentHour)
-//            .filter(s -> s <= config.getForbiddenHourTo())
-//            .filter(s -> s <= config.getForbiddenHourFrom());
-        if (config.getForbiddenHourFrom() <= currentHour &&
-            currentHour <= config.getForbiddenHourTo() &&
-            amount.compareTo(config.getMaxAmount()) == 0) {
+        if (config.getForbiddenHourFrom() <= currentHour && currentHour <= config.getForbiddenHourTo() && amount.compareTo(config.getMaxAmount()) == 0) {
             throw new TimeException(riskMessage);
         }
     }

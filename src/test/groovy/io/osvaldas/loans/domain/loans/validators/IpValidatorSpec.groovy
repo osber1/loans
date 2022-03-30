@@ -3,13 +3,13 @@ package io.osvaldas.loans.domain.loans.validators
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.ValueOperations
 
+import io.osvaldas.loans.AbstractSpec
 import io.osvaldas.loans.domain.loans.validators.IpValidator.IpException
 import io.osvaldas.loans.infra.configuration.PropertiesConfig
 import spock.lang.Shared
-import spock.lang.Specification
 import spock.lang.Subject
 
-class IpValidatorSpec extends Specification {
+class IpValidatorSpec extends AbstractSpec {
 
     @Shared
     String ipAddress = '0.0.0.0.0.0.1'
@@ -25,7 +25,7 @@ class IpValidatorSpec extends Specification {
     }
 
     @Subject
-    private IpValidator ipValidator = new IpValidator(config, redisTemplate)
+    private IpValidator ipValidator = new IpValidator(ipExceedsMessage, config, redisTemplate)
 
     void 'should validate when ip limit is not exceeded and log is new'() {
         when:
@@ -51,7 +51,7 @@ class IpValidatorSpec extends Specification {
             ipValidator.validate(ipAddress)
         then:
             IpException e = thrown()
-            e.message == 'Too many requests from the same ip per day.'
+            e.message == ipExceedsMessage
         and:
             1 * valueOperations.get(ipAddress) >> 5
     }

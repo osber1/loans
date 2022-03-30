@@ -1,5 +1,7 @@
 package io.osvaldas.loans.infra.filter;
 
+import static java.util.Optional.of;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -22,13 +24,12 @@ public class IpValidationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (getCurrentUrlFromRequest((HttpServletRequest) request).contains("/api/v1/client") && getCurrentUrlFromRequest((HttpServletRequest) request).contains("loan")) {
-            ipValidationRule.validate(request.getRemoteAddr());
-        }
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        of(httpServletRequest)
+            .filter(r -> r.getRequestURI().contains("/api/v1/client"))
+            .filter(r -> r.getRequestURI().contains("/loan"))
+            .filter(r -> r.getMethod().equals("POST"))
+            .ifPresent(r -> ipValidationRule.validate(request.getRemoteAddr()));
         chain.doFilter(request, response);
-    }
-
-    private String getCurrentUrlFromRequest(HttpServletRequest request) {
-        return request.getRequestURI();
     }
 }

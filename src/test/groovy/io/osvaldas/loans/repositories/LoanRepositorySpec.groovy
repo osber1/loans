@@ -9,10 +9,7 @@ import spock.lang.Subject
 class LoanRepositorySpec extends AbstractDatabaseSpec {
 
     @Shared
-    int validLoanId = 1
-
-    @Shared
-    int invalidLoanId = 4
+    int invalidLoanId = 4758758
 
     @Shared
     Loan loan = createLoan()
@@ -21,22 +18,24 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
     @Autowired
     LoanRepository repository
 
-    void 'should return loan if it exists'() {
+    void 'should not return loan when it exists'() {
         given:
-            repository.save(loan)
+            Loan savedLoan = repository.save(loan)
         when:
-            Optional<Loan> loan = repository.findById(loanId)
+            Optional<Loan> loan = repository.findById(savedLoan.id)
         then:
-            loan.isPresent() == result
-        where:
-            loanId        || result
-            validLoanId   || true
-            invalidLoanId || false
+            loan.isPresent()
+    }
+
+    void 'should not return loan when it does not exist'() {
+        when:
+            Optional<Loan> loan = repository.findById(invalidLoanId)
+        then:
+            loan.isEmpty()
     }
 
     private Loan createLoan() {
         return new Loan().tap {
-            id = validLoanId
             amount = 10.00
             interestRate = 10.00
             termInMonths = 10

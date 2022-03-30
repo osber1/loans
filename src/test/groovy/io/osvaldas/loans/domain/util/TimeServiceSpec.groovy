@@ -3,6 +3,7 @@ package io.osvaldas.loans.domain.util
 import static io.osvaldas.loans.domain.util.TimeService.TIME_ZONE
 import static java.time.ZoneId.of
 import static java.time.ZonedDateTime.now
+import static java.time.temporal.ChronoUnit.SECONDS
 
 import java.time.ZonedDateTime
 
@@ -22,13 +23,7 @@ class TimeServiceSpec extends Specification {
         when:
             ZonedDateTime currentDateTime = service.currentDateTime
         then:
-            with(currentDateTime) {
-                year == now.year
-                month == now.month
-                dayOfMonth == now.dayOfMonth
-                hour == now.hour
-                minute == now.minute
-            }
+            currentDateTime.truncatedTo(SECONDS) == now.truncatedTo(SECONDS)
     }
 
     void 'should return current hour of the day'() {

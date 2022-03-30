@@ -57,6 +57,9 @@ abstract class AbstractSpec extends Specification {
     String amountExceedsMessage = 'The amount you are trying to borrow exceeds the max amount!'
 
     @Shared
+    String ipExceedsMessage = 'Too many requests from the same ip per day.'
+
+    @Shared
     LoanPostpone firstPostpone = buildPostpone(15.00, date.plusWeeks(1))
 
     @Shared
@@ -113,11 +116,11 @@ abstract class AbstractSpec extends Specification {
         ZonedDateTime.of(
             2020,
             1,
-            1,
-            1,
-            1,
-            1,
-            1,
+            5,
+            10,
+            0,
+            0,
+            0,
             ZoneId.of(timeZone))
     }
 }

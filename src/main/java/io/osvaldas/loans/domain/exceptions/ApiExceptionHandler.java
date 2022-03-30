@@ -1,13 +1,13 @@
 package io.osvaldas.loans.domain.exceptions;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class ApiExceptionHandler {
 
     @ExceptionHandler(value = { BadRequestException.class, NotFoundException.class })

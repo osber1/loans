@@ -119,6 +119,10 @@ TODO:
 
 - [ ] Add linting rules or something to check on build (codenarc).
 
+- [ ] I have questions about time amount and etc. errors handling.
+-
+- [ ] Integrations test should fail at nigh time.
+
 - [ ] Add queues with some logic (messaging or notification).
 
 - [ ] Add pagination and sorting with specification.

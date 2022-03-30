@@ -5,22 +5,27 @@ import static java.util.Optional.ofNullable;
 
 import javax.transaction.Transactional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import io.osvaldas.loans.domain.loans.rules.IpValidationRule;
 import io.osvaldas.loans.infra.configuration.PropertiesConfig;
-import lombok.AllArgsConstructor;
 
 @Component
-@AllArgsConstructor
 public class IpValidator implements IpValidationRule {
 
-    private static final String TOO_MANY_REQUESTS = "Too many requests from the same ip per day.";
+    private final String ipExceedsMessage;
 
     private final PropertiesConfig config;
 
     private final RedisTemplate<String, Integer> redisTemplate;
+
+    public IpValidator(@Value("${exceptionMessages.ipExceedsMessage:}") String ipExceedsMessage, PropertiesConfig config, RedisTemplate<String, Integer> redisTemplate) {
+        this.ipExceedsMessage = ipExceedsMessage;
+        this.config = config;
+        this.redisTemplate = redisTemplate;
+    }
 
     @Override
     @Transactional
@@ -32,12 +37,12 @@ public class IpValidator implements IpValidationRule {
     }
 
     private void checkIfIpLimitIsNotExceeded(String ipAddress, int requestsFromSameIpLimit, Integer ipTimesUsed) {
+//        redisTemplate.keys("*").forEach(redisTemplate::delete);
         of(ipTimesUsed)
             .filter(timesUsed -> timesUsed < requestsFromSameIpLimit)
-            .ifPresentOrElse(timesUsed -> redisTemplate.opsForValue().set(ipAddress, timesUsed + 1),
-                () -> {
-                    throw new IpException(TOO_MANY_REQUESTS);
-                });
+            .ifPresentOrElse(timesUsed -> redisTemplate.opsForValue().set(ipAddress, timesUsed + 1), () -> {
+                throw new IpException(ipExceedsMessage);
+            });
     }
 
     public static class IpException extends ValidationRuleException {

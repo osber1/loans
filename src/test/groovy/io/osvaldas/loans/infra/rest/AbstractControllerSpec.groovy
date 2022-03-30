@@ -34,6 +34,9 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Value('${exceptionMessages.amountExceedsMessage:}')
     String amountExceedsMessage
 
+    @Value('${exceptionMessages.ipExceedsMessage:}')
+    String ipExceedsMessage
+
     @Autowired
     MockMvc mockMvc
 
@@ -55,9 +58,7 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     void cleanup() {
         clientRepository.deleteAll()
         loanRepository.deleteAll()
-        for (String key : redisTemplate.keys('*')) {
-            redisTemplate.delete(key)
-        }
+        redisTemplate.keys('*').each { redisTemplate.delete(it) }
     }
 
     ClientRequest buildClientRequest(
@@ -75,10 +76,11 @@ abstract class AbstractControllerSpec extends AbstractSpec {
         }
     }
 
-    LoanRequest buildLoanRequest() {
+    LoanRequest buildLoanRequest(BigDecimal loanAmount) {
         new LoanRequest().tap {
-            amount = 100.00
+            amount = loanAmount
             termInMonths = 12
         }
     }
+
 }

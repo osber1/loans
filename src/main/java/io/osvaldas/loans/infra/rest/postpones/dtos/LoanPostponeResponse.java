@@ -10,7 +10,7 @@ public class LoanPostponeResponse {
 
     private long id;
 
-    private ZonedDateTime newReturnDate;
+    private ZonedDateTime returnDate;
 
-    private BigDecimal newInterestRate;
+    private BigDecimal interestRate;
 }

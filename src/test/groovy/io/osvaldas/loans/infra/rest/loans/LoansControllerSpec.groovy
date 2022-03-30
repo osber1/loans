@@ -1,61 +1,122 @@
 package io.osvaldas.loans.infra.rest.loans
 
+import static java.lang.String.format
+import static java.util.List.of
+import static org.springframework.http.HttpStatus.NOT_FOUND
+import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.MediaType.APPLICATION_JSON
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
 import org.springframework.mock.web.MockHttpServletResponse
+import org.springframework.web.util.NestedServletException
 
 import groovy.json.JsonBuilder
+import io.osvaldas.loans.domain.loans.validators.IpValidator.IpException
 import io.osvaldas.loans.infra.rest.AbstractControllerSpec
 import io.osvaldas.loans.infra.rest.loans.dtos.LoanRequest
+import io.osvaldas.loans.infra.rest.loans.dtos.LoanResponse
+import io.osvaldas.loans.repositories.entities.Client
+import io.osvaldas.loans.repositories.entities.Loan
+import spock.lang.Shared
 
 class LoansControllerSpec extends AbstractControllerSpec {
 
-    //    void 'should fail when ip limit is exceeded taking loans'() {
-//        given:
-//            LoanRequest loanRequest = new LoanRequest().tap {
-//                amount = 50
-//                termInMonths = 5
-//            }
-//        when:
-//            postLoanRequest(loanRequest, ID)
-//            postLoanRequest(loanRequest, ID)
-//        then:
-//            IpException exception = thrown()
-//            exception.message == 'Too many requests from the same ip per day.'
-//    }
-//
-//    void 'should take loan when request is correct'() {
-//        given:
-//            clientRepository.save(client)
-//            LoanRequest request = new LoanRequest().tap {
-//                amount = 50
-//                termInMonths = 5
-//            }
-//        when:
-//            MockHttpServletResponse response = postLoanRequest(request, ID)
-//        then:
-//            response.status == HttpStatus.OK.value()
-//        and:
-//            LoanResponse loanResponse = objectMapper.readValue(response.contentAsString, LoanResponse)
-//            with(loanResponse) {
-//                amount == request.amount
-//                termInMonths == request.termInMonths
-//            }
-//    }
-//
-//and:
-//    List<Loan> responseLoanList = new JsonSlurper().parseText(response.contentAsString) as List<Loan>
-//    Loan actualLoan = client.loans[0]
-//    with(responseLoanList.first()) {
-//        amount == actualLoan.amount
-//        interestRate == actualLoan.interestRate
-//        termInMonths == actualLoan.termInMonths
-//        returnDate.toString() == actualLoan.returnDate.toOffsetDateTime().truncatedTo(ChronoUnit.SECONDS).toString()
-//    }
+    @Shared
+    LoanRequest loanRequest = buildLoanRequest(100.00)
+
+    void 'should return loan when it exists'() {
+        given:
+            Loan savedLoan = loanRepository.save(buildLoan(100.0))
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/{loanId}', savedLoan.id)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            with(objectMapper.readValue(response.contentAsString, LoanResponse)) {
+                id == savedLoan.id
+                amount == savedLoan.amount
+                interestRate == savedLoan.interestRate
+                termInMonths == savedLoan.termInMonths
+                returnDate.toLocalDate() == savedLoan.returnDate.toLocalDate()
+            }
+    }
+
+    void 'should throw an exception when loan not found'() {
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/{id}', loanId)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == NOT_FOUND.value()
+        and:
+            response.contentAsString.contains(format(loanErrorMessage, loanId))
+    }
+
+    void 'should return loans when client exists'() {
+        given:
+            Client savedClient = clientRepository.save(clientWithLoan)
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{clientId}/loans', savedClient.id)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            of(objectMapper.readValue(response.contentAsString, LoanResponse[])).size() == 1
+    }
+
+    void 'should throw an exception when client not found'() {
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{clientId}/loans', clientId)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == NOT_FOUND.value()
+        and:
+            response.contentAsString.contains(format(clientErrorMessage, clientId))
+    }
+
+    void 'should take loan when request is correct'() {
+        given:
+            clientRepository.save(clientWithId)
+        when:
+            MockHttpServletResponse response = postLoanRequest(loanRequest, clientId)
+        then:
+            response.status == OK.value()
+        and:
+            LoanResponse loanResponse = objectMapper.readValue(response.contentAsString, LoanResponse)
+            with(loanResponse) {
+                amount == loanRequest.amount
+                termInMonths == loanRequest.termInMonths
+            }
+    }
+
+    void 'should fail when ip limit is exceeded'() {
+        given:
+            clientRepository.save(clientWithId)
+        when:
+            postLoanRequest(loanRequest, clientId)
+            postLoanRequest(loanRequest, clientId)
+        then:
+            IpException exception = thrown()
+            exception.message == ipExceedsMessage
+    }
+
+    void 'should fail when amount is too high'() {
+        given:
+            clientRepository.save(clientWithId)
+        when:
+            postLoanRequest(buildLoanRequest(999999.0), clientId)
+        then:
+            NestedServletException e = thrown()
+            e.message.contains(amountExceedsMessage)
+    }
 
     MockHttpServletResponse postLoanRequest(LoanRequest request, String id) {
-        mockMvc.perform(post('/api/client/' + id + '/loan')
+        mockMvc.perform(post('/api/v1/client/' + id + '/loan')
             .requestAttr('remoteAddr', '0.0.0.0.0.1')
             .content(new JsonBuilder(request) as String)
             .contentType(APPLICATION_JSON))

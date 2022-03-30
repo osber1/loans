@@ -137,14 +137,12 @@ class ClientControllerSpec extends AbstractControllerSpec {
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
-            response.status == status
+            response.status == NOT_FOUND.value()
         and:
             response.contentAsString.contains(format(clientErrorMessage, clientId))
         where:
-            method                                                                             || status
-            get('/api/v1/client/{id}', clientId)                                               || NOT_FOUND.value()
-            delete('/api/v1/client/{id}', clientId)                                            || NOT_FOUND.value()
-            put('/api/v1/client').content(new JsonBuilder(buildFullClientRequest()) as String) || NOT_FOUND.value()
+            method << [get('/api/v1/client/{id}', clientId), delete('/api/v1/client/{id}', clientId)
+                       , put('/api/v1/client').content(new JsonBuilder(buildFullClientRequest()) as String)]
     }
 
     private MvcResult postClientRequest(ClientRequest request) {
