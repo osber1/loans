@@ -19,7 +19,7 @@ public class PostponeController {
 
     private final LoanPostponesMapper postponeMapper;
 
-    @PostMapping("client/loans/{loanId}/postpones")
+    @PostMapping("client/loans/{loanId}/extensions")
     public LoanPostponeResponse postponeLoan(@PathVariable long loanId) {
         return postponeMapper.loanPostponeToDTO(service.postponeLoan(loanId));
     }
