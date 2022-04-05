@@ -28,12 +28,12 @@ To log in to [pgAdmin](http://localhost:5050) (admin@admin.com:admin) and add ne
 - username:root,
 - password:root.
 
-## Swagger
-
-[Swagger documentation](http://localhost:8080/swagger-ui/)
+## [Swagger documentation](http://localhost:8080/swagger-ui.html)
+## [Actuator](http://localhost:8080/actuator)
 
 ## Features
 
 * Swagger
 * Lombok
 * MapStruct
+* Actuator

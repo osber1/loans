@@ -4,9 +4,6 @@ server:
     include-binding-errors: always
 
 spring:
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
   datasource:
     url: jdbc:postgresql://localhost:5432/loans
     username: root
@@ -33,6 +30,31 @@ spring:
     timeout: 60000
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "*"
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+springdoc:
+  show-actuator: true
+
+info:
+  application:
+    name: Loans Application
+    description: Simple loans application
+    version: v1.0
+  techstack:
+    java: Java 17
+    springBoot: 2.6.4
 
 application:
   maxAmount: 100

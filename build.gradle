@@ -9,7 +9,7 @@ plugins {
 
 group = 'io.osvaldas'
 version = '1.0-SNAPSHOT'
-//sourceCompatibility = '17'
+sourceCompatibility = '17'
 
 repositories {
     mavenCentral()
@@ -19,7 +19,7 @@ ext {
     springBootVersion = '2.6.4'
     groovyVersion = '3.0.10'
     lombokVersion = '1.18.22'
-    springfoxVersion = '3.0.0'
+    openApiVersion = '1.6.6'
     mapstructVersion = '1.4.2.Final'
     spockVersion = '2.1-groovy-3.0'
     lombokMapstructBindingsVersion = '0.2.0'
@@ -36,9 +36,10 @@ dependencies {
         'org.springframework.boot:spring-boot-starter-data-redis',
         'redis.clients:jedis',
         'org.liquibase:liquibase-core',
-        "io.springfox:springfox-boot-starter:${springfoxVersion}",
+        "org.springdoc:springdoc-openapi-ui:${openApiVersion}",
         "org.mapstruct:mapstruct:${mapstructVersion}",
-        'org.postgresql:postgresql'
+        'org.postgresql:postgresql',
+        'org.springframework.boot:spring-boot-starter-actuator',
     )
 
     compileOnly(
