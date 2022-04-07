@@ -52,7 +52,7 @@ public class ClientService {
     @Transactional
     public void deleteClient(String id) {
         clientExists(id)
-            .ifPresentOrElse(s -> clientRepository.deleteById(id), () -> {
+            .ifPresentOrElse(s -> clientRepository.deleteClient(id), () -> {
                 throw new NotFoundException(format(clientErrorMessage, id));
             });
     }

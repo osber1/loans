@@ -76,11 +76,11 @@ class ClientServiceSpec extends AbstractSpec {
             1 * clientRepository.findById(clientId) >> empty()
     }
 
-    void 'should delete client when it exists'() {
+    void 'should change client status to deleted when it exists'() {
         when:
             clientService.deleteClient(clientId)
         then:
-            1 * clientRepository.deleteById(clientId)
+            1 * clientRepository.deleteClient(clientId)
         and:
             1 * clientRepository.existsById(clientId) >> true
     }
@@ -92,7 +92,7 @@ class ClientServiceSpec extends AbstractSpec {
             NotFoundException e = thrown()
             e.message == clientErrorMessage
         and:
-            0 * clientRepository.deleteById(clientId)
+            0 * clientRepository.deleteClient(clientId)
         and:
             1 * clientRepository.existsById(clientId) >> false
     }

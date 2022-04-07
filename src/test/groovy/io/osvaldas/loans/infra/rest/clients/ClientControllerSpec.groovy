@@ -1,5 +1,6 @@
 package io.osvaldas.loans.infra.rest.clients
 
+import static io.osvaldas.loans.repositories.entities.Status.DELETED
 import static java.lang.String.format
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -88,7 +89,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    void 'should delete client when it exists'() {
+    void 'should change client status to deleted client when it exists'() {
         given:
             Client savedClient = clientRepository.save(clientWithId)
         when:
@@ -98,7 +99,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            clientRepository.findById(savedClient.id).isEmpty()
+            clientRepository.findById(savedClient.id).get().status == DELETED
     }
 
     void 'should update client when it exists'() {

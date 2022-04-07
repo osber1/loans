@@ -1,5 +1,7 @@
 package io.osvaldas.loans.repositories
 
+import static io.osvaldas.loans.repositories.entities.Status.DELETED
+
 import org.springframework.beans.factory.annotation.Autowired
 
 import io.osvaldas.loans.repositories.entities.Client
@@ -51,6 +53,13 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
             personalCode        || result
             validPersonalCode   || true
             invalidPersonalCode || false
+    }
+
+    void 'should change client status to deleted when deleting client'() {
+        when:
+            repository.deleteClient(validClientId)
+        then:
+            repository.findById(validClientId).get().status == DELETED
     }
 
     private Client createClient() {
