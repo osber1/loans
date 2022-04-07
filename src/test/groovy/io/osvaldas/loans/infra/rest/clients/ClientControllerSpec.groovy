@@ -15,8 +15,9 @@ import org.springframework.test.web.servlet.MvcResult
 
 import groovy.json.JsonBuilder
 import io.osvaldas.loans.infra.rest.AbstractControllerSpec
-import io.osvaldas.loans.infra.rest.clients.dtos.ClientRequest
+import io.osvaldas.loans.infra.rest.clients.dtos.ClientRegisterRequest
 import io.osvaldas.loans.infra.rest.clients.dtos.ClientResponse
+import io.osvaldas.loans.infra.rest.clients.dtos.ClientUpdateRequest
 import io.osvaldas.loans.repositories.entities.Client
 import io.osvaldas.loans.repositories.entities.Loan
 import spock.lang.Shared
@@ -31,7 +32,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should register new client when everything is valid'() {
         given:
-            ClientRequest clientRequest = buildFullClientRequest()
+            ClientRegisterRequest clientRequest = buildRegisterClientRequest()
         when:
             MvcResult result = postClientRequest(clientRequest)
         then:
@@ -48,7 +49,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should throw exception with message #errorMessage when validating client'() {
         given:
-            ClientRequest clientRequest = request
+            ClientRegisterRequest clientRequest = request
         when:
             MvcResult result = postClientRequest(clientRequest)
         then:
@@ -105,7 +106,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             clientRepository.save(clientWithId)
         when:
             MockHttpServletResponse response = mockMvc.perform(put('/api/v1/client')
-                .content(new JsonBuilder(buildFullClientRequest()) as String)
+                .content(new JsonBuilder(buildUpdateClientRequest()) as String)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -142,18 +143,28 @@ class ClientControllerSpec extends AbstractControllerSpec {
             response.contentAsString.contains(format(clientErrorMessage, clientId))
         where:
             method << [get('/api/v1/client/{id}', clientId), delete('/api/v1/client/{id}', clientId)
-                       , put('/api/v1/client').content(new JsonBuilder(buildFullClientRequest()) as String)]
+                       , put('/api/v1/client').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
-    private MvcResult postClientRequest(ClientRequest request) {
+    private MvcResult postClientRequest(ClientRegisterRequest request) {
         mockMvc.perform(post('/api/v1/client')
             .content(new JsonBuilder(request) as String)
             .contentType(APPLICATION_JSON))
             .andReturn()
     }
 
-    private ClientRequest buildFullClientRequest() {
-        new ClientRequest().tap {
+    private ClientRegisterRequest buildRegisterClientRequest() {
+        new ClientRegisterRequest().tap {
+            firstName = editedName
+            lastName = editedSurname
+            personalCode = clientPersonalCode
+            email = clientEmail
+            phoneNumber = clientPhoneNumber
+        }
+    }
+
+    private ClientUpdateRequest buildUpdateClientRequest() {
+        new ClientUpdateRequest().tap {
             id = clientId
             firstName = editedName
             lastName = editedSurname

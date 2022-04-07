@@ -1,5 +1,8 @@
 package io.osvaldas.loans.repositories.entities;
 
+import static io.osvaldas.loans.repositories.entities.Status.REGISTERED;
+import static javax.persistence.EnumType.STRING;
+
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,6 +11,7 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -41,6 +45,9 @@ public class Client {
 
     @NotNull
     private String phoneNumber;
+
+    @Enumerated(STRING)
+    private Status status = REGISTERED;
 
     @NotNull
     @Column(length = 11)

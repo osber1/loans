@@ -5,10 +5,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import io.osvaldas.loans.repositories.entities.Status;
 import lombok.Data;
 
 @Data
-public class ClientRequest {
+public class ClientUpdateRequest {
 
     private String id;
 
@@ -17,6 +18,8 @@ public class ClientRequest {
 
     @NotBlank(message = "Last name must be not empty.")
     private String lastName;
+
+    private Status status;
 
     @Email
     @NotBlank(message = "Email must be not empty.")
