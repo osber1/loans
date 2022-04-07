@@ -1,5 +1,6 @@
 package io.osvaldas.loans.domain.clients
 
+import static io.osvaldas.loans.repositories.entities.Status.*
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
@@ -8,6 +9,7 @@ import io.osvaldas.loans.domain.exceptions.BadRequestException
 import io.osvaldas.loans.domain.exceptions.NotFoundException
 import io.osvaldas.loans.repositories.ClientRepository
 import io.osvaldas.loans.repositories.entities.Client
+import io.osvaldas.loans.repositories.entities.Status
 import spock.lang.Subject
 
 class ClientServiceSpec extends AbstractSpec {
@@ -19,22 +21,22 @@ class ClientServiceSpec extends AbstractSpec {
 
     void 'should throw exception when registering client with existing personal code'() {
         when:
-            clientService.registerClient(clientWithoutId)
+            clientService.registerClient(registeredClientWithoutId)
         then:
             BadRequestException e = thrown()
             e.message == 'Client with personal code already exists.'
         and:
-            1 * clientRepository.existsByPersonalCode(clientWithoutId.personalCode) >> true
+            1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> true
     }
 
     void 'should register new client when client with new personal code'() {
         when:
-            Client registeredClient = clientService.registerClient(clientWithoutId)
+            Client registeredClient = clientService.registerClient(registeredClientWithoutId)
         then:
             registeredClient.id == clientId
         and:
-            1 * clientRepository.existsByPersonalCode(clientWithoutId.personalCode) >> false
-            1 * clientRepository.save(clientWithoutId) >> clientWithId
+            1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> false
+            1 * clientRepository.save(registeredClientWithoutId) >> registeredClientWithId
     }
 
     void 'should return clients list when there are clients'() {
@@ -43,9 +45,9 @@ class ClientServiceSpec extends AbstractSpec {
         then:
             clients.size() == 2
         and:
-            clients == [clientWithId, clientWithId]
+            clients == [registeredClientWithId, registeredClientWithId]
         and:
-            1 * clientRepository.findAll() >> [clientWithId, clientWithId]
+            1 * clientRepository.findAll() >> [registeredClientWithId, registeredClientWithId]
     }
 
     void 'should return empty list when there are no clients'() {
@@ -63,7 +65,7 @@ class ClientServiceSpec extends AbstractSpec {
         then:
             client.id == clientId
         and:
-            1 * clientRepository.findById(clientId) >> of(clientWithId)
+            1 * clientRepository.findById(clientId) >> of(registeredClientWithId)
     }
 
     void 'should throw exception when trying to get non existing client'() {
@@ -76,11 +78,20 @@ class ClientServiceSpec extends AbstractSpec {
             1 * clientRepository.findById(clientId) >> empty()
     }
 
-    void 'should delete client when it exists'() {
+    void 'should change client status to deleted when it exists'() {
         when:
             clientService.deleteClient(clientId)
         then:
-            1 * clientRepository.deleteById(clientId)
+            1 * clientRepository.changeClientStatus(clientId, DELETED)
+        and:
+            1 * clientRepository.existsById(clientId) >> true
+    }
+
+    void 'should change client status to inactive when it exists'() {
+        when:
+            clientService.inactivateClient(clientId)
+        then:
+            1 * clientRepository.changeClientStatus(clientId, INACTIVE)
         and:
             1 * clientRepository.existsById(clientId) >> true
     }
@@ -92,28 +103,28 @@ class ClientServiceSpec extends AbstractSpec {
             NotFoundException e = thrown()
             e.message == clientErrorMessage
         and:
-            0 * clientRepository.deleteById(clientId)
+            0 * clientRepository.changeClientStatus(clientId, DELETED)
         and:
             1 * clientRepository.existsById(clientId) >> false
     }
 
     void 'should update client when it exists'() {
         when:
-            clientService.updateClient(clientWithId)
+            clientService.updateClient(registeredClientWithId)
         then:
-            1 * clientRepository.save(clientWithId) >> clientWithId
+            1 * clientRepository.save(registeredClientWithId) >> registeredClientWithId
         and:
             1 * clientRepository.existsById(clientId) >> true
     }
 
     void 'should throw exception when trying to update non existing client'() {
         when:
-            clientService.updateClient(clientWithId)
+            clientService.updateClient(registeredClientWithId)
         then:
             NotFoundException e = thrown()
             e.message == clientErrorMessage
         and:
-            0 * clientRepository.save(clientWithId)
+            0 * clientRepository.save(registeredClientWithId)
         and:
             1 * clientRepository.existsById(clientId) >> false
     }

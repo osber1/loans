@@ -1,5 +1,7 @@
 package io.osvaldas.loans
 
+import static io.osvaldas.loans.repositories.entities.Status.ACTIVE
+import static io.osvaldas.loans.repositories.entities.Status.REGISTERED
 import static java.lang.Long.parseLong
 import static java.util.Arrays.asList
 
@@ -9,6 +11,7 @@ import java.time.ZonedDateTime
 import io.osvaldas.loans.repositories.entities.Client
 import io.osvaldas.loans.repositories.entities.Loan
 import io.osvaldas.loans.repositories.entities.LoanPostpone
+import io.osvaldas.loans.repositories.entities.Status
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -60,6 +63,9 @@ abstract class AbstractSpec extends Specification {
     String ipExceedsMessage = 'Too many requests from the same ip per day.'
 
     @Shared
+    String clientNotActiveMessage = 'Client is not active.'
+
+    @Shared
     LoanPostpone firstPostpone = buildPostpone(15.00, date.plusWeeks(1))
 
     @Shared
@@ -69,13 +75,19 @@ abstract class AbstractSpec extends Specification {
     Loan loan = buildLoan(100.0)
 
     @Shared
-    Client clientWithoutId = buildClient('', new HashSet<Loan>())
+    Client registeredClientWithoutId = buildClient('', new HashSet<Loan>(), REGISTERED)
 
     @Shared
-    Client clientWithId = buildClient(clientId, new HashSet<Loan>())
+    Client registeredClientWithId = buildClient(clientId, new HashSet<Loan>(), REGISTERED)
 
     @Shared
-    Client clientWithLoan = buildClient(clientId, Set.of(loan))
+    Client registeredClientWithLoan = buildClient(clientId, Set.of(loan), REGISTERED)
+
+    @Shared
+    Client activeClientWithId = buildClient(clientId, new HashSet<Loan>(), ACTIVE)
+
+    @Shared
+    Client activeClientWithLoan = buildClient(clientId, Set.of(loan), ACTIVE)
 
     LoanPostpone buildPostpone(BigDecimal newRate, ZonedDateTime newDate) {
         new LoanPostpone().tap {
@@ -100,12 +112,13 @@ abstract class AbstractSpec extends Specification {
         }
     }
 
-    Client buildClient(String clientId, Set<Loan> clientLoans) {
+    Client buildClient(String clientId, Set<Loan> clientLoans, Status clientStatus) {
         new Client().tap {
             id = clientId
             firstName = name
             lastName = surname
             email = clientEmail
+            status = clientStatus
             phoneNumber = clientPhoneNumber
             personalCode = parseLong(clientPersonalCode)
             loans = clientLoans

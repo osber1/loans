@@ -1,5 +1,7 @@
 package io.osvaldas.loans.domain.clients;
 
+import static io.osvaldas.loans.repositories.entities.Status.DELETED;
+import static io.osvaldas.loans.repositories.entities.Status.INACTIVE;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 
@@ -14,6 +16,7 @@ import io.osvaldas.loans.domain.exceptions.BadRequestException;
 import io.osvaldas.loans.domain.exceptions.NotFoundException;
 import io.osvaldas.loans.repositories.ClientRepository;
 import io.osvaldas.loans.repositories.entities.Client;
+import io.osvaldas.loans.repositories.entities.Status;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -51,10 +54,12 @@ public class ClientService {
 
     @Transactional
     public void deleteClient(String id) {
-        clientExists(id)
-            .ifPresentOrElse(s -> clientRepository.deleteById(id), () -> {
-                throw new NotFoundException(format(clientErrorMessage, id));
-            });
+        changeClientStatusIfExists(id, DELETED);
+    }
+
+    @Transactional
+    public void inactivateClient(String id) {
+        changeClientStatusIfExists(id, INACTIVE);
     }
 
     @Transactional
@@ -70,13 +75,20 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    private Optional<Boolean> clientExists(String id) {
-        return of(clientRepository.existsById(id))
-            .filter(exists -> exists);
-    }
-
     private Client saveNewClient(Client client) {
         client.setRandomId();
         return save(client);
+    }
+
+    private void changeClientStatusIfExists(String id, Status status) {
+        clientExists(id)
+            .ifPresentOrElse(s -> clientRepository.changeClientStatus(id, status), () -> {
+                throw new NotFoundException(format(clientErrorMessage, id));
+            });
+    }
+
+    private Optional<Boolean> clientExists(String id) {
+        return of(clientRepository.existsById(id))
+            .filter(exists -> exists);
     }
 }

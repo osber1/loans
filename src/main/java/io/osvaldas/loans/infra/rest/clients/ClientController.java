@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.osvaldas.loans.domain.clients.ClientService;
-import io.osvaldas.loans.infra.rest.clients.dtos.ClientRequest;
+import io.osvaldas.loans.infra.rest.clients.dtos.ClientRegisterRequest;
 import io.osvaldas.loans.infra.rest.clients.dtos.ClientResponse;
+import io.osvaldas.loans.infra.rest.clients.dtos.ClientUpdateRequest;
 import io.osvaldas.loans.repositories.entities.Client;
 import io.osvaldas.loans.repositories.mapper.ClientMapper;
 import lombok.AllArgsConstructor;
@@ -30,8 +31,8 @@ public class ClientController {
     private final ClientMapper clientMapper;
 
     @PostMapping("client")
-    public ClientResponse registerClient(@Valid @RequestBody ClientRequest request) {
-        Client client = clientMapper.clientToEntity(request);
+    public ClientResponse registerClient(@Valid @RequestBody ClientRegisterRequest request) {
+        Client client = clientMapper.clientRegisterToEntity(request);
         return clientMapper.clientToDTO(service.registerClient(client));
     }
 
@@ -46,13 +47,18 @@ public class ClientController {
     }
 
     @PutMapping("client")
-    public ClientResponse updateClient(@Valid @RequestBody ClientRequest request) {
-        Client client = clientMapper.clientToEntity(request);
+    public ClientResponse updateClient(@Valid @RequestBody ClientUpdateRequest request) {
+        Client client = clientMapper.clientUpdateToEntity(request);
         return clientMapper.clientToDTO(service.updateClient(client));
     }
 
     @DeleteMapping("client/{id}")
     public void deleteClient(@PathVariable String id) {
         service.deleteClient(id);
+    }
+
+    @PostMapping("client/{id}/inactive")
+    public void inactivateClient(@PathVariable String id) {
+        service.inactivateClient(id);
     }
 }

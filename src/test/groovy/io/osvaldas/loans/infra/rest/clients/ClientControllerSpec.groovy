@@ -1,5 +1,8 @@
 package io.osvaldas.loans.infra.rest.clients
 
+import static io.osvaldas.loans.repositories.entities.Status.ACTIVE
+import static io.osvaldas.loans.repositories.entities.Status.DELETED
+import static io.osvaldas.loans.repositories.entities.Status.INACTIVE
 import static java.lang.String.format
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -10,13 +13,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 
+import org.hibernate.engine.spi.Status
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MvcResult
 
 import groovy.json.JsonBuilder
 import io.osvaldas.loans.infra.rest.AbstractControllerSpec
-import io.osvaldas.loans.infra.rest.clients.dtos.ClientRequest
+import io.osvaldas.loans.infra.rest.clients.dtos.ClientRegisterRequest
 import io.osvaldas.loans.infra.rest.clients.dtos.ClientResponse
+import io.osvaldas.loans.infra.rest.clients.dtos.ClientUpdateRequest
 import io.osvaldas.loans.repositories.entities.Client
 import io.osvaldas.loans.repositories.entities.Loan
 import spock.lang.Shared
@@ -31,7 +36,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should register new client when everything is valid'() {
         given:
-            ClientRequest clientRequest = buildFullClientRequest()
+            ClientRegisterRequest clientRequest = buildRegisterClientRequest()
         when:
             MvcResult result = postClientRequest(clientRequest)
         then:
@@ -48,7 +53,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should throw exception with message #errorMessage when validating client'() {
         given:
-            ClientRequest clientRequest = request
+            ClientRegisterRequest clientRequest = request
         when:
             MvcResult result = postClientRequest(clientRequest)
         then:
@@ -69,7 +74,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should return client when it exists'() {
         given:
-            Client savedClient = clientRepository.save(clientWithId)
+            Client savedClient = clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{id}', savedClient.id)
                 .contentType(APPLICATION_JSON))
@@ -87,9 +92,9 @@ class ClientControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    void 'should delete client when it exists'() {
+    void 'should change client status to deleted client when it exists'() {
         given:
-            Client savedClient = clientRepository.save(clientWithId)
+            Client savedClient = clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc.perform(delete('/api/v1/client/{id}', savedClient.id)
                 .contentType(APPLICATION_JSON))
@@ -97,21 +102,21 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            clientRepository.findById(savedClient.id).isEmpty()
+            clientRepository.findById(savedClient.id).get().status == DELETED
     }
 
     void 'should update client when it exists'() {
         given:
-            clientRepository.save(clientWithId)
+            clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc.perform(put('/api/v1/client')
-                .content(new JsonBuilder(buildFullClientRequest()) as String)
+                .content(new JsonBuilder(buildUpdateClientRequest()) as String)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
             response.status == OK.value()
         and:
-            with(clientRepository.findById(clientWithId.id).get()) {
+            with(clientRepository.findById(registeredClientWithId.id).get()) {
                 firstName == editedName
                 lastName == editedSurname
             }
@@ -119,8 +124,8 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should get list of clients when they exists'() {
         given:
-            clientRepository.save(buildClient('123123123', new HashSet<Loan>()))
-            clientRepository.save(buildClient('890890890', new HashSet<Loan>()))
+            clientRepository.save(buildClient('123123123', new HashSet<Loan>(), ACTIVE))
+            clientRepository.save(buildClient('890890890', new HashSet<Loan>(), ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients')
                 .contentType(APPLICATION_JSON))
@@ -142,18 +147,43 @@ class ClientControllerSpec extends AbstractControllerSpec {
             response.contentAsString.contains(format(clientErrorMessage, clientId))
         where:
             method << [get('/api/v1/client/{id}', clientId), delete('/api/v1/client/{id}', clientId)
-                       , put('/api/v1/client').content(new JsonBuilder(buildFullClientRequest()) as String)]
+                       , put('/api/v1/client').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
-    private MvcResult postClientRequest(ClientRequest request) {
+    void 'should inactive client when it exists'() {
+        given:
+            clientRepository.save(registeredClientWithId)
+        when:
+            MockHttpServletResponse response = mockMvc.perform(post('/api/v1/client/{id}/inactive', registeredClientWithId.id)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            with(clientRepository.findById(registeredClientWithId.id).get()) {
+                status == INACTIVE
+            }
+    }
+
+    private MvcResult postClientRequest(ClientRegisterRequest request) {
         mockMvc.perform(post('/api/v1/client')
             .content(new JsonBuilder(request) as String)
             .contentType(APPLICATION_JSON))
             .andReturn()
     }
 
-    private ClientRequest buildFullClientRequest() {
-        new ClientRequest().tap {
+    private ClientRegisterRequest buildRegisterClientRequest() {
+        new ClientRegisterRequest().tap {
+            firstName = editedName
+            lastName = editedSurname
+            personalCode = clientPersonalCode
+            email = clientEmail
+            phoneNumber = clientPhoneNumber
+        }
+    }
+
+    private ClientUpdateRequest buildUpdateClientRequest() {
+        new ClientUpdateRequest().tap {
             id = clientId
             firstName = editedName
             lastName = editedSurname

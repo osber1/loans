@@ -12,7 +12,7 @@ import com.jupitertools.springtestredis.RedisTestContainer
 
 import io.osvaldas.loans.AbstractSpec
 import io.osvaldas.loans.domain.loans.validators.IpValidator
-import io.osvaldas.loans.infra.rest.clients.dtos.ClientRequest
+import io.osvaldas.loans.infra.rest.clients.dtos.ClientRegisterRequest
 import io.osvaldas.loans.infra.rest.loans.dtos.LoanRequest
 import io.osvaldas.loans.repositories.ClientRepository
 import io.osvaldas.loans.repositories.LoanRepository
@@ -36,6 +36,9 @@ abstract class AbstractControllerSpec extends AbstractSpec {
 
     @Value('${exceptionMessages.ipExceedsMessage:}')
     String ipExceedsMessage
+
+    @Value('${exceptionMessages.clientNotActiveMessage:}')
+    String clientNotActiveMessage
 
     @Autowired
     MockMvc mockMvc
@@ -61,13 +64,13 @@ abstract class AbstractControllerSpec extends AbstractSpec {
         redisTemplate.keys('*').each { redisTemplate.delete(it) }
     }
 
-    ClientRequest buildClientRequest(
+    ClientRegisterRequest buildClientRequest(
         String clientName,
         String clientSurname,
         String clientCode,
         String clientEmail,
         String clientPhoneNumber) {
-        new ClientRequest().tap {
+        new ClientRegisterRequest().tap {
             firstName = clientName
             lastName = clientSurname
             personalCode = clientCode

@@ -2,6 +2,7 @@ package io.osvaldas.loans.infra.rest.loans
 
 import static java.lang.String.format
 import static java.util.List.of
+import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.MediaType.APPLICATION_JSON
@@ -57,7 +58,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loans when client exists'() {
         given:
-            Client savedClient = clientRepository.save(clientWithLoan)
+            Client savedClient = clientRepository.save(registeredClientWithLoan)
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{clientId}/loans', savedClient.id)
                 .contentType(APPLICATION_JSON))
@@ -81,7 +82,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should take loan when request is correct'() {
         given:
-            clientRepository.save(clientWithId)
+            clientRepository.save(activeClientWithId)
         when:
             MockHttpServletResponse response = postLoanRequest(loanRequest, clientId)
         then:
@@ -96,23 +97,34 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should fail when ip limit is exceeded'() {
         given:
-            clientRepository.save(clientWithId)
+            clientRepository.save(registeredClientWithId)
         when:
             postLoanRequest(loanRequest, clientId)
             postLoanRequest(loanRequest, clientId)
         then:
-            IpException exception = thrown()
-            exception.message == ipExceedsMessage
+            IpException e = thrown()
+            e.message == ipExceedsMessage
     }
 
     void 'should fail when amount is too high'() {
         given:
-            clientRepository.save(clientWithId)
+            clientRepository.save(activeClientWithId)
         when:
             postLoanRequest(buildLoanRequest(999999.0), clientId)
         then:
             NestedServletException e = thrown()
             e.message.contains(amountExceedsMessage)
+    }
+
+    void 'should fail when client is not active'() {
+        given:
+            clientRepository.save(registeredClientWithId)
+        when:
+            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(100.0), clientId)
+        then:
+            response.status == BAD_REQUEST.value()
+        and:
+            response.contentAsString.contains(clientNotActiveMessage)
     }
 
     MockHttpServletResponse postLoanRequest(LoanRequest request, String id) {

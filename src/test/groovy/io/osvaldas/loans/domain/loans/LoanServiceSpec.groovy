@@ -7,6 +7,7 @@ import static java.util.Optional.of
 
 import io.osvaldas.loans.AbstractSpec
 import io.osvaldas.loans.domain.clients.ClientService
+import io.osvaldas.loans.domain.exceptions.ClientNotActiveException
 import io.osvaldas.loans.domain.exceptions.NotFoundException
 import io.osvaldas.loans.domain.loans.validators.RiskValidator
 import io.osvaldas.loans.domain.loans.validators.TimeAndAmountValidator
@@ -21,7 +22,7 @@ import spock.lang.Subject
 class LoanServiceSpec extends AbstractSpec {
 
     ClientService clientService = Stub {
-        save(clientWithId) >> clientWithLoan
+        save(activeClientWithId) >> activeClientWithLoan
     }
 
     TimeUtils timeUtils = Stub {
@@ -43,7 +44,7 @@ class LoanServiceSpec extends AbstractSpec {
     LoanRepository loanRepository = Mock()
 
     @Subject
-    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, validator, loanErrorMessage)
+    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, validator, loanErrorMessage, clientNotActiveMessage)
 
     void 'should save loan'() {
         when:
@@ -54,7 +55,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should return loans list when there are loans'() {
         given:
-            clientService.getClient(clientId) >> clientWithLoan
+            clientService.getClient(clientId) >> registeredClientWithLoan
         when:
             Collection loans = loanService.getLoans(clientId)
         then:
@@ -65,7 +66,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should return empty list when there are no loans'() {
         given:
-            clientService.getClient(clientId) >> clientWithId
+            clientService.getClient(clientId) >> registeredClientWithId
         when:
             Collection loans = loanService.getLoans(clientId)
         then:
@@ -92,29 +93,43 @@ class LoanServiceSpec extends AbstractSpec {
     }
 
     void 'should throw exception when amount limit is exceeded'() {
+        given:
+            clientService.getClient(clientId) >> activeClientWithId
         when:
             loanService.takeLoan(buildLoan(1000.00), clientId)
         then:
-            AmountException exception = thrown()
-            exception.message == amountExceedsMessage
+            AmountException e = thrown()
+            e.message == amountExceedsMessage
     }
 
     void 'should throw exception when max amount and forbidden time'() {
+        given:
+            clientService.getClient(clientId) >> activeClientWithId
         when:
             loanService.takeLoan(loan, clientId)
         then:
             timeUtils.hourOfDay >> 4
         and:
-            TimeException exception = thrown()
-            exception.message == 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
+            TimeException e = thrown()
+            e.message == 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
     }
 
     void 'should take loan when validation pass'() {
         given:
-            clientService.getClient(clientId) >> clientWithId
+            clientService.getClient(clientId) >> activeClientWithId
         when:
             Loan takenLoan = loanService.takeLoan(loan, clientId)
         then:
             takenLoan == loan
+    }
+
+    void 'should throw exception when client is not active'() {
+        given:
+            clientService.getClient(clientId) >> registeredClientWithId
+        when:
+            loanService.takeLoan(loan, clientId)
+        then:
+            ClientNotActiveException e = thrown()
+            e.message == clientNotActiveMessage
     }
 }
