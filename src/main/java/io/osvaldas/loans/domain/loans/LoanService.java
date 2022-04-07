@@ -1,5 +1,6 @@
 package io.osvaldas.loans.domain.loans;
 
+import static io.osvaldas.loans.repositories.entities.Status.ACTIVE;
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.osvaldas.loans.domain.clients.ClientService;
+import io.osvaldas.loans.domain.exceptions.ClientNotActiveException;
 import io.osvaldas.loans.domain.exceptions.NotFoundException;
 import io.osvaldas.loans.domain.loans.validators.Validator;
 import io.osvaldas.loans.domain.util.TimeUtils;
@@ -35,18 +37,22 @@ public class LoanService {
 
     private final String loanErrorMessage;
 
+    private final String clientNotActiveMessage;
+
     public LoanService(ClientService clientService,
                        LoanRepository loanRepository,
                        PropertiesConfig config,
                        TimeUtils timeUtils,
                        Validator validator,
-                       @Value("${exceptionMessages.loanErrorMessage:}") String loanErrorMessage) {
+                       @Value("${exceptionMessages.loanErrorMessage:}") String loanErrorMessage,
+                       @Value("${exceptionMessages.clientNotActiveMessage:}") String clientNotActiveMessage) {
         this.clientService = clientService;
         this.loanRepository = loanRepository;
         this.config = config;
         this.timeUtils = timeUtils;
         this.validator = validator;
         this.loanErrorMessage = loanErrorMessage;
+        this.clientNotActiveMessage = clientNotActiveMessage;
     }
 
     @Transactional
@@ -67,17 +73,24 @@ public class LoanService {
 
     @Transactional
     public Loan takeLoan(Loan loan, String clientId) {
+        Client client = getClient(clientId);
+        checkIfClientActive(client);
         validate(loan);
         loan.setNewLoanInterestAndReturnDate(config.getInterestRate(), timeUtils.getCurrentDateTime());
-        return addLoanToClient(clientId, loan);
+        return addLoanToClient(client, loan);
+    }
+
+    private void checkIfClientActive(Client client) {
+        if (ACTIVE != client.getStatus()) {
+            throw new ClientNotActiveException(clientNotActiveMessage);
+        }
     }
 
     private void validate(Loan loan) {
         validator.validate(loan.getAmount());
     }
 
-    private Loan addLoanToClient(String clientId, Loan loan) {
-        Client client = getClient(clientId);
+    private Loan addLoanToClient(Client client, Loan loan) {
         client.addLoan(loan);
         return clientService.save(client)
             .getLoans().stream()

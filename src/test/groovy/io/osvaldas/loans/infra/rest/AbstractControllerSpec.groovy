@@ -37,6 +37,9 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Value('${exceptionMessages.ipExceedsMessage:}')
     String ipExceedsMessage
 
+    @Value('${exceptionMessages.clientNotActiveMessage:}')
+    String clientNotActiveMessage
+
     @Autowired
     MockMvc mockMvc
 

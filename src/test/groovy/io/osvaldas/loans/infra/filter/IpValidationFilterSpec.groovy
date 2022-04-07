@@ -39,8 +39,8 @@ class IpValidationFilterSpec extends AbstractSpec {
         when:
             filter.doFilter(servletRequest, Stub(ServletResponse), Stub(FilterChain))
         then:
-            IpException exception = thrown()
-            exception.message == ipExceedsMessage
+            IpException e = thrown()
+            e.message == ipExceedsMessage
         and:
             1 * ipValidationRule.validate(ip) >> {
                 throw new IpException(ipExceedsMessage)

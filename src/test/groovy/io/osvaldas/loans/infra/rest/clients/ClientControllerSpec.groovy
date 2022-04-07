@@ -1,5 +1,6 @@
 package io.osvaldas.loans.infra.rest.clients
 
+import static io.osvaldas.loans.repositories.entities.Status.ACTIVE
 import static io.osvaldas.loans.repositories.entities.Status.DELETED
 import static java.lang.String.format
 import static org.springframework.http.HttpStatus.BAD_REQUEST
@@ -71,7 +72,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should return client when it exists'() {
         given:
-            Client savedClient = clientRepository.save(clientWithId)
+            Client savedClient = clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{id}', savedClient.id)
                 .contentType(APPLICATION_JSON))
@@ -91,7 +92,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should change client status to deleted client when it exists'() {
         given:
-            Client savedClient = clientRepository.save(clientWithId)
+            Client savedClient = clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc.perform(delete('/api/v1/client/{id}', savedClient.id)
                 .contentType(APPLICATION_JSON))
@@ -104,7 +105,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should update client when it exists'() {
         given:
-            clientRepository.save(clientWithId)
+            clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc.perform(put('/api/v1/client')
                 .content(new JsonBuilder(buildUpdateClientRequest()) as String)
@@ -113,7 +114,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            with(clientRepository.findById(clientWithId.id).get()) {
+            with(clientRepository.findById(registeredClientWithId.id).get()) {
                 firstName == editedName
                 lastName == editedSurname
             }
@@ -121,8 +122,8 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should get list of clients when they exists'() {
         given:
-            clientRepository.save(buildClient('123123123', new HashSet<Loan>()))
-            clientRepository.save(buildClient('890890890', new HashSet<Loan>()))
+            clientRepository.save(buildClient('123123123', new HashSet<Loan>(), ACTIVE))
+            clientRepository.save(buildClient('890890890', new HashSet<Loan>(), ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients')
                 .contentType(APPLICATION_JSON))

@@ -19,22 +19,22 @@ class ClientServiceSpec extends AbstractSpec {
 
     void 'should throw exception when registering client with existing personal code'() {
         when:
-            clientService.registerClient(clientWithoutId)
+            clientService.registerClient(registeredClientWithoutId)
         then:
             BadRequestException e = thrown()
             e.message == 'Client with personal code already exists.'
         and:
-            1 * clientRepository.existsByPersonalCode(clientWithoutId.personalCode) >> true
+            1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> true
     }
 
     void 'should register new client when client with new personal code'() {
         when:
-            Client registeredClient = clientService.registerClient(clientWithoutId)
+            Client registeredClient = clientService.registerClient(registeredClientWithoutId)
         then:
             registeredClient.id == clientId
         and:
-            1 * clientRepository.existsByPersonalCode(clientWithoutId.personalCode) >> false
-            1 * clientRepository.save(clientWithoutId) >> clientWithId
+            1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> false
+            1 * clientRepository.save(registeredClientWithoutId) >> registeredClientWithId
     }
 
     void 'should return clients list when there are clients'() {
@@ -43,9 +43,9 @@ class ClientServiceSpec extends AbstractSpec {
         then:
             clients.size() == 2
         and:
-            clients == [clientWithId, clientWithId]
+            clients == [registeredClientWithId, registeredClientWithId]
         and:
-            1 * clientRepository.findAll() >> [clientWithId, clientWithId]
+            1 * clientRepository.findAll() >> [registeredClientWithId, registeredClientWithId]
     }
 
     void 'should return empty list when there are no clients'() {
@@ -63,7 +63,7 @@ class ClientServiceSpec extends AbstractSpec {
         then:
             client.id == clientId
         and:
-            1 * clientRepository.findById(clientId) >> of(clientWithId)
+            1 * clientRepository.findById(clientId) >> of(registeredClientWithId)
     }
 
     void 'should throw exception when trying to get non existing client'() {
@@ -99,21 +99,21 @@ class ClientServiceSpec extends AbstractSpec {
 
     void 'should update client when it exists'() {
         when:
-            clientService.updateClient(clientWithId)
+            clientService.updateClient(registeredClientWithId)
         then:
-            1 * clientRepository.save(clientWithId) >> clientWithId
+            1 * clientRepository.save(registeredClientWithId) >> registeredClientWithId
         and:
             1 * clientRepository.existsById(clientId) >> true
     }
 
     void 'should throw exception when trying to update non existing client'() {
         when:
-            clientService.updateClient(clientWithId)
+            clientService.updateClient(registeredClientWithId)
         then:
             NotFoundException e = thrown()
             e.message == clientErrorMessage
         and:
-            0 * clientRepository.save(clientWithId)
+            0 * clientRepository.save(registeredClientWithId)
         and:
             1 * clientRepository.existsById(clientId) >> false
     }
