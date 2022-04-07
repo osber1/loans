@@ -2,6 +2,7 @@ package io.osvaldas.loans.infra.rest.clients
 
 import static io.osvaldas.loans.repositories.entities.Status.ACTIVE
 import static io.osvaldas.loans.repositories.entities.Status.DELETED
+import static io.osvaldas.loans.repositories.entities.Status.INACTIVE
 import static java.lang.String.format
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -12,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 
+import org.hibernate.engine.spi.Status
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MvcResult
 
@@ -146,6 +148,21 @@ class ClientControllerSpec extends AbstractControllerSpec {
         where:
             method << [get('/api/v1/client/{id}', clientId), delete('/api/v1/client/{id}', clientId)
                        , put('/api/v1/client').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
+    }
+
+    void 'should inactive client when it exists'() {
+        given:
+            clientRepository.save(registeredClientWithId)
+        when:
+            MockHttpServletResponse response = mockMvc.perform(post('/api/v1/client/{id}/inactive', registeredClientWithId.id)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            with(clientRepository.findById(registeredClientWithId.id).get()) {
+                status == INACTIVE
+            }
     }
 
     private MvcResult postClientRequest(ClientRegisterRequest request) {

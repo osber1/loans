@@ -56,4 +56,9 @@ public class ClientController {
     public void deleteClient(@PathVariable String id) {
         service.deleteClient(id);
     }
+
+    @PostMapping("client/{id}/inactive")
+    public void inactivateClient(@PathVariable String id) {
+        service.inactivateClient(id);
+    }
 }

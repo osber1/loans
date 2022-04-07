@@ -1,5 +1,6 @@
 package io.osvaldas.loans.domain.clients
 
+import static io.osvaldas.loans.repositories.entities.Status.*
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
@@ -8,6 +9,7 @@ import io.osvaldas.loans.domain.exceptions.BadRequestException
 import io.osvaldas.loans.domain.exceptions.NotFoundException
 import io.osvaldas.loans.repositories.ClientRepository
 import io.osvaldas.loans.repositories.entities.Client
+import io.osvaldas.loans.repositories.entities.Status
 import spock.lang.Subject
 
 class ClientServiceSpec extends AbstractSpec {
@@ -80,7 +82,16 @@ class ClientServiceSpec extends AbstractSpec {
         when:
             clientService.deleteClient(clientId)
         then:
-            1 * clientRepository.deleteClient(clientId)
+            1 * clientRepository.changeClientStatus(clientId, DELETED)
+        and:
+            1 * clientRepository.existsById(clientId) >> true
+    }
+
+    void 'should change client status to inactive when it exists'() {
+        when:
+            clientService.inactivateClient(clientId)
+        then:
+            1 * clientRepository.changeClientStatus(clientId, INACTIVE)
         and:
             1 * clientRepository.existsById(clientId) >> true
     }
@@ -92,7 +103,7 @@ class ClientServiceSpec extends AbstractSpec {
             NotFoundException e = thrown()
             e.message == clientErrorMessage
         and:
-            0 * clientRepository.deleteClient(clientId)
+            0 * clientRepository.changeClientStatus(clientId, DELETED)
         and:
             1 * clientRepository.existsById(clientId) >> false
     }

@@ -57,7 +57,7 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
 
     void 'should change client status to deleted when deleting client'() {
         when:
-            repository.deleteClient(validClientId)
+            repository.changeClientStatus(validClientId, DELETED)
         then:
             repository.findById(validClientId).get().status == DELETED
     }
