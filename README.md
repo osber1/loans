@@ -18,18 +18,41 @@
 
 ## Startup
 
+### Backend application
+
 To start the application you need to have installed docker in your machine. Cd into project dir and use command ```docker compose up``` to start PostgreSQL and redis.
 
-## pgAdmin
+### RabbitMQ
 
-To log in to [pgAdmin](http://localhost:5050) (admin@admin.com:admin) and add new server connection:
+1) Add new `Queue` with name `notification.queue`
+2) Add new `Exchange` with name `internal.exchange`
+3) Add new `Binding` in `internal.exchange` exchange:
+    * `To queue`: `notification.queue`
+    * `routingKey`: `internal.notification.routing-key`
+
+## [pgAdmin](http://localhost:5050)
+
+* Username: admin@admin.com
+* Password: admin
+
+### Add new server connection
 
 - url: postgres,
-- username:root,
-- password:root.
+- username: root,
+- password: root.
+
+## Flow
+
+1) Register user and confirm email in [email service](http://localhost:1080).
 
 ## [Swagger documentation](http://localhost:8080/swagger-ui.html)
+
 ## [Actuator](http://localhost:8080/actuator)
+
+## [RabbitMQ](http://localhost:15672)
+
+* Username: guest
+* Password: guest
 
 ## Features
 
@@ -37,3 +60,7 @@ To log in to [pgAdmin](http://localhost:5050) (admin@admin.com:admin) and add ne
 * Lombok
 * MapStruct
 * Actuator
+* PostgreSQL
+* Redis
+* Testcontainers
+* Liquibase

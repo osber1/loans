@@ -1,0 +1,22 @@
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+  port: 8082
+
+email:
+  senderAddress: hello@osber.com
+  subject: Confirm your email
+  activationLink: http://localhost:8080/api/v1/client/%s/active
+
+spring:
+  rabbitmq:
+    addresses: localhost:5672
+
+rabbitmq:
+  exchanges:
+    internal: internal.exchange
+  queues:
+    notification: notification.queue
+  routing-keys:
+    internal-notification: internal.notification.routing-key

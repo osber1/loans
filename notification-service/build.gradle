@@ -1,0 +1,29 @@
+plugins {
+    id 'jacoco'
+}
+
+dependencies {
+    implementation(project(':amqp'),
+        project(':api'),
+        'org.springframework.boot:spring-boot-starter-mail',
+        'org.springframework.boot:spring-boot-starter-web',
+        'org.springframework.boot:spring-boot-starter-amqp'
+    )
+
+    testImplementation('com.icegreen:greenmail:1.6.8')
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.enabled true
+        html.enabled false
+        csv.enabled false
+        xml.destination file("${buildDir}/reports/jacoco.xml")
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
