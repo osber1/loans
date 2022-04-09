@@ -11,6 +11,10 @@ bootJar {
     enabled = false
 }
 
+jar {
+    enabled = true
+}
+
 allprojects {
     group = 'io.osvaldas'
     version = '1.0-SNAPSHOT'
