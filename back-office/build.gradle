@@ -22,6 +22,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:${testContainersVersion}",
         "org.testcontainers:spock:${testContainersVersion}",
         "org.testcontainers:postgresql:${testContainersVersion}",
+        'org.testcontainers:rabbitmq:1.16.3',
         "com.jupiter-tools:spring-test-redis:0.1")
 }
 

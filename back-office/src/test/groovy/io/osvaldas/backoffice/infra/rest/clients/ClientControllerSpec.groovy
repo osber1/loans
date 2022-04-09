@@ -150,7 +150,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
                        , put('/api/v1/client').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
-    void 'should inactive client when it exists'() {
+    void 'should inactivate client when it exists'() {
         given:
             clientRepository.save(registeredClientWithId)
         when:
@@ -162,6 +162,21 @@ class ClientControllerSpec extends AbstractControllerSpec {
         and:
             with(clientRepository.findById(registeredClientWithId.id).get()) {
                 status == INACTIVE
+            }
+    }
+
+    void 'should activate client when it exists'() {
+        given:
+            clientRepository.save(registeredClientWithId)
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{id}/active', registeredClientWithId.id)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            with(clientRepository.findById(registeredClientWithId.id).get()) {
+                status == ACTIVE
             }
     }
 

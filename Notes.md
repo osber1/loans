@@ -109,6 +109,8 @@ TODO:
 
 - [ ] Add monitoring.
 
+- [ ] Add wiremock.
+
 - [ ] Add Spring Security with JWT tokens on every request (okta or keycloak).
 
 - [ ] FE.
