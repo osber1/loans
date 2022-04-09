@@ -1,7 +1,9 @@
 package io.osvaldas.backoffice.domain.loans;
 
+import static io.osvaldas.backoffice.repositories.entities.Status.ACTIVE;
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
+import static java.util.Optional.of;
 
 import java.util.Collection;
 
@@ -18,7 +20,6 @@ import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;
 import io.osvaldas.backoffice.repositories.LoanRepository;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.entities.Loan;
-import io.osvaldas.backoffice.repositories.entities.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,24 +62,22 @@ public class LoanService {
 
     @Transactional
     public Loan takeLoan(Loan loan, String clientId) {
-        Client client = getClient(clientId);
-        checkIfClientActive(client);
+        log.info("Taking loan for client: {}", clientId);
+        Client client = of(getClient(clientId))
+            .filter(c -> ACTIVE == c.getStatus())
+            .orElseThrow(() -> new ClientNotActiveException(clientNotActiveMessage));
         validate(loan);
         loan.setNewLoanInterestAndReturnDate(config.getInterestRate(), timeUtils.getCurrentDateTime());
         return addLoanToClient(client, loan);
     }
 
-    private void checkIfClientActive(Client client) {
-        if (Status.ACTIVE != client.getStatus()) {
-            throw new ClientNotActiveException(clientNotActiveMessage);
-        }
-    }
-
     private void validate(Loan loan) {
+        log.info("Validating loan: {}", loan);
         validator.validate(loan.getAmount());
     }
 
     private Loan addLoanToClient(Client client, Loan loan) {
+        log.info("Adding loan: {} to client: {}", loan.getId(), client.getId());
         client.addLoan(loan);
         return clientService.save(client)
             .getLoans().stream()

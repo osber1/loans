@@ -29,7 +29,7 @@ public class IpValidationFilter implements Filter {
             .filter(r -> r.getRequestURI().contains("/api/v1/client"))
             .filter(r -> r.getRequestURI().contains("/loan"))
             .filter(r -> r.getMethod().equals("POST"))
-            .ifPresent(r -> ipValidationRule.validate(request.getRemoteAddr()));
+            .ifPresent(r -> ipValidationRule.validate(r.getRemoteAddr()));
         chain.doFilter(request, response);
     }
 }

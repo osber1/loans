@@ -32,8 +32,9 @@ public class EmailService implements EmailSender {
             helper.setSubject(config.getSubject());
             helper.setFrom(config.getSenderAddress());
             mailSender.send(mimeMessage);
+            log.info("Email sent to: {}", receiverEmail);
         } catch (MessagingException e) {
-            log.error("Failed to send email.", e);
+            log.error("Failed to send email to " + receiverEmail, e);
             throw new IllegalStateException("Failed to send email.");
         }
     }

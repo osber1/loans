@@ -10,15 +10,24 @@ import spock.lang.Subject
 class NotificationConsumerSpec extends Specification {
 
     @Shared
-    String email = "email"
+    String clientId = 'clientId'
 
     @Shared
-    EmailMessage emailMessage = new EmailMessage(email: email)
+    String link = 'http://localhost:8080/api/v1/client/%s/active'
+
+    @Shared
+    String fullName = 'Name Surname'
+
+    @Shared
+    String email = 'user@email.com'
+
+    @Shared
+    EmailMessage emailMessage = new EmailMessage(clientId, fullName, email)
 
     EmailSender emailSender = Mock()
 
     PropertiesConfig config = Stub {
-        activationLink >> 'http://localhost:8080/api/v1/client/%s/active'
+        activationLink >> link
     }
 
     @Subject
@@ -28,6 +37,11 @@ class NotificationConsumerSpec extends Specification {
         when:
             consumer.consume(emailMessage)
         then:
-            1 * emailSender.send(email, _ as String)
+            1 * emailSender.send(email, { String data ->
+                with(data) {
+                    contains(fullName)
+                    contains(link.formatted(clientId))
+                }
+            })
     }
 }

@@ -23,6 +23,7 @@ public class PostponeService {
 
     @Transactional
     public LoanPostpone postponeLoan(long id) {
+        log.info("Postponing loan: {}", id);
         Loan loan = loanService.getLoan(id);
         loan.postponeLoan(config);
         return loanService.save(loan)

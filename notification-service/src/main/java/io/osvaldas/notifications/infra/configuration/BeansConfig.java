@@ -4,14 +4,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 
+@RequiredArgsConstructor
 public class BeansConfig {
+
+    private final PropertiesConfig config;
 
     @Bean
     public JavaMailSenderImpl mailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-        javaMailSender.setPort(1025);
+        javaMailSender.setPort(config.getPort());
         return javaMailSender;
     }
 }

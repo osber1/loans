@@ -60,7 +60,9 @@ To start the application you need to have installed docker in your machine. Cd i
 * Lombok
 * MapStruct
 * Actuator
-* PostgreSQL
+* RabbitMQ
 * Redis
-* Testcontainers
+* PostgreSQL
 * Liquibase
+* Testcontainers
+* JavaMailSender

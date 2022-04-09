@@ -15,4 +15,6 @@ public class PropertiesConfig {
     private String subject;
 
     private String activationLink;
+
+    private int port;
 }

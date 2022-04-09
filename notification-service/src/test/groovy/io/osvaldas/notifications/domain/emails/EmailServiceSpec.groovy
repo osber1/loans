@@ -7,28 +7,14 @@ import javax.mail.internet.InternetAddress
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
-import com.icegreen.greenmail.util.GreenMail
-
 import io.osvaldas.notifications.infra.configuration.PropertiesConfig
 import spock.lang.Shared
-import spock.lang.Specification
 import spock.lang.Subject
 
-class EmailServiceSpec extends Specification {
-
-    @Shared
-    String receiverEmail = 'receiver@email.com'
+class EmailServiceSpec extends AbstractEmailSpec {
 
     @Shared
     String emailContent = '<p>My first paragraph.</p>'
-
-    @Shared
-    String emailSender = 'hello@osber.com'
-
-    @Shared
-    String emailSubject = 'Confirm your email'
-
-    GreenMail greenMail = new GreenMail(SMTP)
 
     PropertiesConfig config = Stub {
         senderAddress >> emailSender

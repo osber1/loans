@@ -1,6 +1,5 @@
 package io.osvaldas.backoffice.infra.rest
 
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -64,13 +63,13 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     IpValidator ipValidator
 
     @Shared
-    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.9-management-alpine')
+    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.9.11-management-alpine')
 
     @DynamicPropertySource
-     static void rabbitMqProperties(DynamicPropertyRegistry registry) {
+    static void rabbitMqProperties(DynamicPropertyRegistry registry) {
         rabbitMQContainer.start()
-        registry.add("spring.rabbitmq.host",  () -> rabbitMQContainer.host)
-        registry.add("spring.rabbitmq.port", () -> rabbitMQContainer.getMappedPort(5672))
+        registry.add('spring.rabbitmq.host', () -> rabbitMQContainer.host)
+        registry.add('spring.rabbitmq.port', () -> rabbitMQContainer.getMappedPort(5672))
     }
 
     void cleanup() {

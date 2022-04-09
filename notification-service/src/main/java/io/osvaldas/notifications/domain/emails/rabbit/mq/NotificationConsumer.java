@@ -10,7 +10,9 @@ import io.osvaldas.api.EmailMessage;
 import io.osvaldas.notifications.domain.emails.EmailSender;
 import io.osvaldas.notifications.infra.configuration.PropertiesConfig;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @AllArgsConstructor
 public class NotificationConsumer {
@@ -21,8 +23,10 @@ public class NotificationConsumer {
 
     @RabbitListener(queues = "${rabbitmq.queues.notification}")
     public void consume(EmailMessage message) {
+        log.info("Received message: {}", message);
         String activationLink = format(config.getActivationLink(), message.getClientId());
-        String emailContent = buildEmailMessage(message.getFullName(), activationLink);
+        String emailContent = buildEmailMessage().formatted(message.getFullName(), activationLink);
+        log.info("Sending email to: {}", message.getEmail());
         emailSender.send(message.getEmail(), emailContent);
     }
 }

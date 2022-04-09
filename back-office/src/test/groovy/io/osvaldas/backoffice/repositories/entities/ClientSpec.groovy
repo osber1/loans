@@ -17,6 +17,6 @@ class ClientSpec extends Specification {
 
     void 'should return full client name'() {
         expect:
-            client.fullName == "John Doe"
+            client.fullName == 'John Doe'
     }
 }

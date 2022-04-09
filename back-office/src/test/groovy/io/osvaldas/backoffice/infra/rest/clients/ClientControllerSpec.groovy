@@ -32,7 +32,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
     String editedName = 'editedName'
 
     @Shared
-    String editedSurname = "editedSurname"
+    String editedSurname = 'editedSurname'
 
     void 'should register new client when everything is valid'() {
         given:

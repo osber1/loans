@@ -60,6 +60,7 @@ public class ClientService {
 
     @Transactional
     public Client updateClient(Client client) {
+        log.info("Updating client: {}", client.getId());
         String id = client.getId();
         return clientExists(id)
             .map(s -> save(client))
@@ -93,10 +94,12 @@ public class ClientService {
 
     private Client saveNewClient(Client client) {
         client.setRandomId();
+        log.info("Client registered: {}", client.getId());
         return save(client);
     }
 
     private void changeClientStatusIfExists(String id, Status status) {
+        log.info("Changing client: {} status to: {}", id, status);
         clientExists(id)
             .ifPresentOrElse(s -> clientRepository.changeClientStatus(id, status), () -> {
                 throw new NotFoundException(format(clientErrorMessage, id));
