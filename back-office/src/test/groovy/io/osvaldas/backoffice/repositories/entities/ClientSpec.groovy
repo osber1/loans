@@ -19,4 +19,5 @@ class ClientSpec extends Specification {
         expect:
             client.fullName == 'John Doe'
     }
+
 }

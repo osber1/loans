@@ -34,7 +34,7 @@ public class IpValidator implements IpValidationRule {
     }
 
     private void checkIfIpLimitIsNotExceeded(String ipAddress, int requestsFromSameIpLimit, Integer ipTimesUsed) {
-//        redisTemplate.keys("*").forEach(redisTemplate::delete);
+        // redisTemplate.keys("*").forEach(redisTemplate::delete);
         of(ipTimesUsed)
             .filter(timesUsed -> timesUsed < requestsFromSameIpLimit)
             .ifPresentOrElse(timesUsed -> redisTemplate.opsForValue().set(ipAddress, timesUsed + 1), () -> {

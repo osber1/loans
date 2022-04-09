@@ -63,7 +63,7 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
     }
 
     private Client createClient() {
-        return new Client().tap {
+        new Client().tap {
             id = validClientId
             firstName = 'Test'
             lastName = 'User'
@@ -72,4 +72,5 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
             personalCode = validPersonalCode
         }
     }
+
 }

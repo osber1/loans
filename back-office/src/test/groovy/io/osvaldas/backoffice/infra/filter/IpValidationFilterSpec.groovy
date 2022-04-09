@@ -46,4 +46,5 @@ class IpValidationFilterSpec extends AbstractSpec {
                 throw new IpException(ipExceedsMessage)
             }
     }
+
 }

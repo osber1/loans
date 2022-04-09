@@ -14,6 +14,7 @@ import io.osvaldas.backoffice.repositories.entities.LoanPostpone
 
 class PostponeControllerSpec extends AbstractControllerSpec {
 
+    @SuppressWarnings('LineLength')
     void 'should postpone loan when it exists'() {
         given:
             Client savedClient = clientRepository.save(registeredClientWithLoan)
@@ -24,13 +25,14 @@ class PostponeControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            LoanPostpone postpone = objectMapper.readValue(response.contentAsString, LoanPostpone.class)
+            LoanPostpone postpone = objectMapper.readValue(response.contentAsString, LoanPostpone)
             with(postpone) {
                 id == firstPostpone.id
                 interestRate == firstPostpone.interestRate
             }
     }
 
+    @SuppressWarnings('LineLength')
     void 'should throw an exception when trying to postpone non existing loan'() {
         given:
             int nonExistingId = 5555
@@ -43,4 +45,5 @@ class PostponeControllerSpec extends AbstractControllerSpec {
         and:
             response.contentAsString.contains(format(loanErrorMessage, nonExistingId))
     }
+
 }

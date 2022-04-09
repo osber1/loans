@@ -30,4 +30,5 @@ class IpWipeOutSchedulerSpec extends Specification {
         then:
             redisTemplate.opsForValue().get(key) == null
     }
+
 }

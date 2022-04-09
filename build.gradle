@@ -5,6 +5,8 @@ plugins {
     id 'groovy'
     id 'application'
     id 'jacoco'
+    id 'checkstyle'
+    id 'codenarc'
 }
 
 bootJar {
@@ -41,6 +43,8 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'application'
+    apply plugin: 'checkstyle'
+    apply plugin: 'codenarc'
 
     dependencyManagement {
         imports {
@@ -51,8 +55,7 @@ subprojects {
     dependencies {
         implementation("org.projectlombok:lombok:${lombokVersion}",
             "org.codehaus.groovy:groovy-all:${groovyVersion}",
-            'org.springframework.boot:spring-boot-starter-web'
-        )
+            'org.springframework.boot:spring-boot-starter-web')
 
         compileOnly("org.projectlombok:lombok:${lombokVersion}")
 

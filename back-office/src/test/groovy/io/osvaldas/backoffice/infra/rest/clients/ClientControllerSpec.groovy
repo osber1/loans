@@ -23,7 +23,6 @@ import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientRegisterRequest
 import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientResponse
 import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientUpdateRequest
 import io.osvaldas.backoffice.repositories.entities.Client
-import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Shared
 
 class ClientControllerSpec extends AbstractControllerSpec {
@@ -51,6 +50,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             }
     }
 
+    @SuppressWarnings('LineLength')
     void 'should throw exception with message #errorMessage when validating client'() {
         given:
             ClientRegisterRequest clientRequest = request
@@ -124,8 +124,8 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     void 'should get list of clients when they exists'() {
         given:
-            clientRepository.save(buildClient('123123123', new HashSet<Loan>(), ACTIVE))
-            clientRepository.save(buildClient('890890890', new HashSet<Loan>(), ACTIVE))
+            clientRepository.save(buildClient('123123123', [] as Set, ACTIVE))
+            clientRepository.save(buildClient('890890890', [] as Set, ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients')
                 .contentType(APPLICATION_JSON))
@@ -150,6 +150,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
                        , put('/api/v1/client').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
+    @SuppressWarnings('LineLength')
     void 'should inactivate client when it exists'() {
         given:
             clientRepository.save(registeredClientWithId)
@@ -165,6 +166,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             }
     }
 
+    @SuppressWarnings('LineLength')
     void 'should activate client when it exists'() {
         given:
             clientRepository.save(registeredClientWithId)
@@ -207,4 +209,5 @@ class ClientControllerSpec extends AbstractControllerSpec {
             phoneNumber = clientPhoneNumber
         }
     }
+
 }

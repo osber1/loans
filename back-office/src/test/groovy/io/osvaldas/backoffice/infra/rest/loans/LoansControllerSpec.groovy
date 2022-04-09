@@ -134,4 +134,5 @@ class LoansControllerSpec extends AbstractControllerSpec {
             .contentType(APPLICATION_JSON))
             .andReturn().response
     }
+
 }

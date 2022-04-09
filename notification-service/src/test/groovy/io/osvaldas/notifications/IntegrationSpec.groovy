@@ -33,4 +33,5 @@ class IntegrationSpec extends AbstractIntegrationSpec {
                 (content as String).contains(fullName)
             }
     }
+
 }

@@ -26,6 +26,9 @@ import spock.lang.Shared
 @AutoConfigureMockMvc
 abstract class AbstractControllerSpec extends AbstractSpec {
 
+    @Shared
+    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.9.11-management-alpine')
+
     @Value('${exceptionMessages.clientErrorMessage:}')
     String clientErrorMessage
 
@@ -62,14 +65,11 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Autowired
     IpValidator ipValidator
 
-    @Shared
-    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.9.11-management-alpine')
-
     @DynamicPropertySource
     static void rabbitMqProperties(DynamicPropertyRegistry registry) {
         rabbitMQContainer.start()
-        registry.add('spring.rabbitmq.host', () -> rabbitMQContainer.host)
-        registry.add('spring.rabbitmq.port', () -> rabbitMQContainer.getMappedPort(5672))
+        registry.add('spring.rabbitmq.host') { rabbitMQContainer.host }
+        registry.add('spring.rabbitmq.port') { rabbitMQContainer.getMappedPort(5672) }
     }
 
     void cleanup() {
@@ -79,12 +79,11 @@ abstract class AbstractControllerSpec extends AbstractSpec {
         rabbitMQContainer.stop()
     }
 
-    ClientRegisterRequest buildClientRequest(
-        String clientName,
-        String clientSurname,
-        String clientCode,
-        String clientEmail,
-        String clientPhoneNumber) {
+    ClientRegisterRequest buildClientRequest(String clientName,
+                                             String clientSurname,
+                                             String clientCode,
+                                             String clientEmail,
+                                             String clientPhoneNumber) {
         new ClientRegisterRequest().tap {
             firstName = clientName
             lastName = clientSurname
@@ -100,4 +99,5 @@ abstract class AbstractControllerSpec extends AbstractSpec {
             termInMonths = 12
         }
     }
+
 }

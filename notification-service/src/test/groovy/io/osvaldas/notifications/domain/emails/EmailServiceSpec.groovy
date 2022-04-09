@@ -29,7 +29,7 @@ class EmailServiceSpec extends AbstractEmailSpec {
     void setup() {
         greenMail.start()
         mailSender = new JavaMailSenderImpl()
-        mailSender.setPort(SMTP.port)
+        mailSender.port = SMTP.port
         emailService = new EmailService(mailSender, config)
     }
 
@@ -49,4 +49,5 @@ class EmailServiceSpec extends AbstractEmailSpec {
                 content == "${emailContent}\r\n"
             }
     }
+
 }

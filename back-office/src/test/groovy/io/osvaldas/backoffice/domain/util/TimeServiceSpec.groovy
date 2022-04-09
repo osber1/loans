@@ -32,4 +32,5 @@ class TimeServiceSpec extends Specification {
         then:
             currentHour == now.hour
     }
+
 }

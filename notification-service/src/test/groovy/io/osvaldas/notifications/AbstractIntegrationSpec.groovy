@@ -32,13 +32,14 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
     static void rabbitMqProperties(DynamicPropertyRegistry registry) {
         greenMail.start()
         rabbitMQContainer.start()
-        registry.add('spring.rabbitmq.host', () -> rabbitMQContainer.host)
-        registry.add('spring.rabbitmq.port', () -> rabbitMQContainer.getMappedPort(5672))
-        registry.add('email.port', () -> SMTP.port)
+        registry.add('spring.rabbitmq.host') { rabbitMQContainer.host }
+        registry.add('spring.rabbitmq.port') { rabbitMQContainer.getMappedPort(5672) }
+        registry.add('email.port') { SMTP.port }
     }
 
     void cleanupSpec() {
         rabbitMQContainer.stop()
         greenMail.stop()
     }
+
 }

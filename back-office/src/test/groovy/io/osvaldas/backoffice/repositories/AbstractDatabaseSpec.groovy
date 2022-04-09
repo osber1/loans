@@ -18,4 +18,5 @@ abstract class AbstractDatabaseSpec extends Specification {
         .withDatabaseName('loans')
         .withUsername('root')
         .withPassword('root')
+
 }
