@@ -97,40 +97,20 @@
 
 TODO:
 
-- [x] Start using Redis for ip validation.
-
-- [x] Enable Testcontainers.
-
-- [x] Migrate from FlyWay to Liquidbase.
-
-- [x] Use ip validation in filter, not in service.
-
-- [x] Add full CRUD for client and loans.
-
-- [x] Add client validation by personal code.
-
-- [x] Separate client and loans logic.
-
-- [ ] Add enum status to client and when deleting only change status.
-
-- [ ] Fix tests for all classes.
-
 - [ ] Extract validator to separate service (feign).
 
 - [ ] Add linting rules or something to check on build (codenarc).
 
-- [ ] I have questions about time amount and etc. errors handling.
--
-- [ ] Integrations test should fail at nigh time.
+- [ ] I have questions about time amount and etc. errors handling in filter.
 
-- [ ] Add queues with some logic (messaging or notification).
+- [ ] Integrations test should fail at nigh time.
 
 - [ ] Add pagination and sorting with specification.
 
-- [ ] Refactor everything and make look nice.
+- [ ] Add monitoring.
+
+- [ ] Add wiremock.
 
 - [ ] Add Spring Security with JWT tokens on every request (okta or keycloak).
-
-- [ ] Users receive email on registration and have to confirm email.
 
 - [ ] FE.

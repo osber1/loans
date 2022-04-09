@@ -1,0 +1,21 @@
+plugins {
+    id 'jacoco'
+
+}
+
+dependencies {}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.enabled true
+        html.enabled false
+        csv.enabled false
+        xml.destination file("${buildDir}/reports/jacoco.xml")
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}

@@ -1,1 +1,6 @@
 rootProject.name = 'loans'
+include 'api'
+include 'amqp'
+include 'back-office'
+include 'fraud-checker'
+include 'notification-service'

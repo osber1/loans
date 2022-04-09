@@ -1,0 +1,17 @@
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+
+email:
+  senderAddress: hello@osber.com
+  subject: Confirm your email
+  activationLink: http://localhost:8080/api/v1/client/%s/active
+
+rabbitmq:
+  exchanges:
+    internal: internal.exchange
+  queues:
+    notification: notification.queue
+  routing-keys:
+    internal-notification: internal.notification.routing-key

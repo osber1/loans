@@ -40,6 +40,32 @@ services:
       - postgres
     restart: unless-stopped
 
+  maildev:
+    container_name: mail-service
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.9.11-management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_NODENAME: "rabbit@staticrabbit"
+    extra_hosts:
+      - "staticrabbit:127.0.0.1"
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - postgres
+    restart: unless-stopped
+
 networks:
   postgres:
     driver: bridge
@@ -47,3 +73,4 @@ networks:
 volumes:
   postgres:
   pgadmin:
+  rabbitmq:
