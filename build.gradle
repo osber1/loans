@@ -7,6 +7,10 @@ plugins {
     id 'jacoco'
 }
 
+bootJar {
+    enabled = false
+}
+
 allprojects {
     group = 'io.osvaldas'
     version = '1.0-SNAPSHOT'
