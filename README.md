@@ -30,8 +30,9 @@
 
 To start the application you need to have installed docker in your machine:
 
-1) Use command ```docker compose up``` to start all dependencies.
-2) Run backoffice and notification services.s
+1) Use command `docker compose up` to start all dependencies.
+2) In Intellij IDEA run `gradle clean bootRun`
+3) Run backoffice and notification services.s
 
 ### RabbitMQ
 
@@ -52,12 +53,14 @@ To start the application you need to have installed docker in your machine:
 - username: root,
 - password: root.
 
-## Flow
-
-1) Register user and confirm email in email service.
+## RabbitMQ
 
 * Username: guest
 * Password: guest
+
+## Flow
+
+1) Register user and confirm email in email service.
 
 ## Features
 
