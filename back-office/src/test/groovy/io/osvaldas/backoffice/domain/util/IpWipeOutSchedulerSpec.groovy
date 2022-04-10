@@ -31,4 +31,11 @@ class IpWipeOutSchedulerSpec extends Specification {
             redisTemplate.opsForValue().get(key) == null
     }
 
+    void 'should not throw exception, when storage is empty'() {
+        when:
+            ipWipeOutScheduler.wipeOutIps()
+        then:
+            notThrown(NullPointerException)
+    }
+
 }
