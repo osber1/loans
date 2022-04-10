@@ -19,7 +19,7 @@ application:
   interestIncrementFactor: 1.5
   postponeDays: 7
   requestsFromSameIpLimit: 1
-  forbiddenHourFrom: 5
+  forbiddenHourFrom: 0
   forbiddenHourTo: 6
 
 exceptionMessages:

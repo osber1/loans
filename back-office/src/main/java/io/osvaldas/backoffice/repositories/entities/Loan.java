@@ -57,7 +57,7 @@ public class Loan {
     public void postponeLoan(PropertiesConfig config) {
         getLoanPostpones().stream()
             .max(comparing(LoanPostpone::getReturnDate))
-            .ifPresentOrElse(postpone -> setNewInterestAndReturnDay(postpone, postpone.getInterestRate(), postpone.getReturnDate(), config),
+            .ifPresentOrElse(postpone -> setNewInterestAndReturnDay(new LoanPostpone(), postpone.getInterestRate(), postpone.getReturnDate(), config),
                 () -> setNewInterestAndReturnDay(new LoanPostpone(), getInterestRate(), getReturnDate(), config));
     }
 
