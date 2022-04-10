@@ -21,21 +21,33 @@ class PostponeServiceSpec extends AbstractSpec {
     void 'should postpone loan when it is first postpone'() {
         given:
             loanService.getLoan(loanId) >> loan
-            loanService.save(loan) >> addPostponeToLoan(loan, firstPostpone)
+            loanService.save(loan) >> loan
         when:
             LoanPostpone loanPostpone = postponeService.postponeLoan(loanId)
         then:
-            firstPostpone == loanPostpone
+            with(loanPostpone) {
+                returnDate == firstPostpone.returnDate
+                interestRate == firstPostpone.interestRate
+            }
+        and:
+            loan.loanPostpones.size() == 1
     }
 
     void 'should postpone loan when it is not first postpone'() {
         given:
-            loanService.getLoan(loanId) >> addPostponeToLoan(loan, firstPostpone)
-            loanService.save(loan) >> addPostponeToLoan(loan, secondPostpone)
+            loan.loanPostpones = [firstPostpone] as Set
+        and:
+            loanService.getLoan(loanId) >> loan
+            loanService.save(loan) >> loan
         when:
             LoanPostpone loanPostpone = postponeService.postponeLoan(loanId)
         then:
-            secondPostpone == loanPostpone
+            with(loanPostpone) {
+                returnDate == secondPostpone.returnDate
+                interestRate == secondPostpone.interestRate
+            }
+        and:
+            loan.loanPostpones.size() == 2
     }
 
 }

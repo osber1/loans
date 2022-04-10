@@ -1,23 +1,21 @@
 plugins {
+    id 'org.springframework.boot' version '2.6.4'
     id 'jacoco'
-    id "com.github.johnrengelman.shadow" version '7.1.2'
 }
 
-mainClassName = 'io.osvaldas.notifications.NotificationServiceApplication'
-
-apply plugin: 'com.github.johnrengelman.shadow'
-
 dependencies {
-    implementation(project(':amqp'),
+    implementation(
+        project(':amqp'),
         project(':api'),
-        'org.springframework.boot:spring-boot-starter-mail',
-        'org.springframework.boot:spring-boot-starter-web',
-        'org.springframework.boot:spring-boot-starter-amqp'
+        libs.springBootStarterAmqp,
+        libs.springBootStarterMail
     )
 
-    testImplementation('com.icegreen:greenmail:1.6.8',
-        'org.testcontainers:rabbitmq:1.16.3',
-        'org.awaitility:awaitility:3.0.0')
+    testImplementation(
+        libs.testcontainersRabbitmq,
+        libs.greenmail,
+        libs.awaitility
+    )
 }
 
 jacocoTestReport {

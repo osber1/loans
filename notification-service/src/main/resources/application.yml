@@ -11,6 +11,9 @@ email:
   port: 1025
 
 spring:
+  output:
+    ansi:
+      enabled: ALWAYS
   rabbitmq:
     addresses: localhost:5672
 

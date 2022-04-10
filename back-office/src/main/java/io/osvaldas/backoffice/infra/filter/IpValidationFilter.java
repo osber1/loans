@@ -26,8 +26,8 @@ public class IpValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         of(httpServletRequest)
-            .filter(r -> r.getRequestURI().contains("/api/v1/client"))
-            .filter(r -> r.getRequestURI().contains("/loan"))
+            .filter(r -> r.getRequestURI().startsWith("/api/v1/client"))
+            .filter(r -> r.getRequestURI().endsWith("/loan"))
             .filter(r -> r.getMethod().equals("POST"))
             .ifPresent(r -> ipValidationRule.validate(r.getRemoteAddr()));
         chain.doFilter(request, response);

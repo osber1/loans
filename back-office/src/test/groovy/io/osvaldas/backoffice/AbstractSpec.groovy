@@ -3,7 +3,6 @@ package io.osvaldas.backoffice
 import static io.osvaldas.backoffice.repositories.entities.Status.ACTIVE
 import static io.osvaldas.backoffice.repositories.entities.Status.REGISTERED
 import static java.lang.Long.parseLong
-import static java.util.Arrays.asList
 import static java.util.Set.of
 
 import java.time.ZoneId
@@ -17,6 +16,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 abstract class AbstractSpec extends Specification {
+
+    @Shared
+    int loanTermInMonths = 12
 
     @Shared
     String timeZone = 'Europe/Vilnius'
@@ -41,9 +43,6 @@ abstract class AbstractSpec extends Specification {
 
     @Shared
     String clientPhoneNumber = '+37062514361'
-
-    @Shared
-    long existingPersonalCode = 12345678910
 
     @Shared
     long loanId = 1
@@ -71,10 +70,10 @@ abstract class AbstractSpec extends Specification {
     String clientNotActiveMessage = 'Client is not active.'
 
     @Shared
-    LoanPostpone firstPostpone = buildPostpone(15.00, date.plusWeeks(1))
+    LoanPostpone firstPostpone = buildPostpone(1, 15.00, date.plusMonths(loanTermInMonths).plusWeeks(1))
 
     @Shared
-    LoanPostpone secondPostpone = buildPostpone(22.50, date.plusWeeks(2))
+    LoanPostpone secondPostpone = buildPostpone(2, 22.50, date.plusMonths(loanTermInMonths).plusWeeks(2))
 
     @Shared
     Loan loan = buildLoan(100.0)
@@ -94,26 +93,21 @@ abstract class AbstractSpec extends Specification {
     @Shared
     Client activeClientWithLoan = buildClient(clientId, of(loan), ACTIVE)
 
-    LoanPostpone buildPostpone(BigDecimal newRate, ZonedDateTime newDate) {
+    LoanPostpone buildPostpone(long loanId, BigDecimal newRate, ZonedDateTime newDate) {
         new LoanPostpone().tap {
-            id = 1
+            id = loanId
             interestRate = newRate
             returnDate = newDate
         }
-    }
-
-    Loan addPostponeToLoan(Loan loan, LoanPostpone... postpones) {
-        loan.with { loanPostpones = new HashSet<>(asList(postpones)) }
-        loan
     }
 
     Loan buildLoan(BigDecimal loanAmount) {
         new Loan().tap {
             id = loanId
             amount = loanAmount
-            termInMonths = 12
+            termInMonths = loanTermInMonths
             interestRate = 10.0
-            returnDate = date.plusYears(1)
+            returnDate = date.plusMonths(loanTermInMonths)
         }
     }
 
