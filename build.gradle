@@ -1,7 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '2.6.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
+    id 'java-library'
     id 'groovy'
     id 'application'
     id 'jacoco'
@@ -9,6 +9,8 @@ plugins {
     id 'codenarc'
     id 'com.github.spotbugs' version '5.0.6'
 }
+
+apply from: 'gradle/dependencies.gradle'
 
 bootJar {
     enabled = false
@@ -21,26 +23,17 @@ jar {
 allprojects {
     group = 'io.osvaldas'
     version = '1.0-SNAPSHOT'
-    sourceCompatibility = '17'
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 
     repositories {
         mavenCentral()
     }
-
-    ext {
-        springBootVersion = '2.6.4'
-        groovyVersion = '3.0.10'
-        lombokVersion = '1.18.22'
-        openApiVersion = '1.6.6'
-        mapstructVersion = '1.4.2.Final'
-        spockVersion = '2.1-groovy-3.0'
-        lombokMapstructBindingsVersion = '0.2.0'
-        testContainersVersion = '1.16.3'
-    }
 }
 
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'groovy'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'application'
@@ -50,7 +43,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+            mavenBom(libs.springBootDependencies)
         }
     }
 
@@ -59,19 +52,25 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.projectlombok:lombok:${lombokVersion}",
-            "org.codehaus.groovy:groovy-all:${groovyVersion}",
-            'org.springframework.boot:spring-boot-starter-web')
-
-        compileOnly("org.projectlombok:lombok:${lombokVersion}")
-
-        annotationProcessor("org.projectlombok:lombok:${lombokVersion}",
-            'org.springframework.boot:spring-boot-configuration-processor'
+        implementation(
+            libs.lombok,
+            libs.groovy,
+            libs.springBootStarterWeb
         )
 
-        testImplementation("org.spockframework:spock-core:${spockVersion}",
-            "org.spockframework:spock-spring:${spockVersion}",
-            'org.springframework.boot:spring-boot-starter-test'
+        compileOnly(
+            libs.lombok
+        )
+
+        annotationProcessor(
+            libs.lombok,
+            libs.springBootConfigurationProcessor
+        )
+
+        testImplementation(
+            libs.spockCore,
+            libs.spockSpring,
+            libs.springBootStarterTest
         )
     }
 }
