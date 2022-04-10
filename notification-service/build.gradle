@@ -1,6 +1,11 @@
 plugins {
     id 'jacoco'
+    id "com.github.johnrengelman.shadow" version '7.1.2'
 }
+
+mainClassName = 'io.osvaldas.notifications.NotificationServiceApplication'
+
+apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     implementation(project(':amqp'),
