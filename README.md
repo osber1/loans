@@ -16,11 +16,22 @@
 * Client should be able to extend a loan. Loan term gets extended for one week, interest gets increased by a factor of 1.5.
 * The whole history of loans is visible for clients, including loan extensions.
 
+## Links
+
+- [Swagger documentation](http://localhost:8080/swagger-ui.html)
+- [Actuator](http://localhost:8080/actuator)
+- [RabbitMQ](http://localhost:15672)
+- [Email service](http://localhost:1080)
+- [pgAdmin](http://localhost:5050)
+
 ## Startup
 
 ### Backend application
 
-To start the application you need to have installed docker in your machine. Cd into project dir and use command ```docker compose up``` to start PostgreSQL and redis.
+To start the application you need to have installed docker in your machine:
+
+1) Use command ```docker compose up``` to start all dependencies.
+2) Run backoffice and notification services.s
 
 ### RabbitMQ
 
@@ -30,7 +41,7 @@ To start the application you need to have installed docker in your machine. Cd i
     * `To queue`: `notification.queue`
     * `routingKey`: `internal.notification.routing-key`
 
-## [pgAdmin](http://localhost:5050)
+## pgAdmin
 
 * Username: admin@admin.com
 * Password: admin
@@ -43,13 +54,7 @@ To start the application you need to have installed docker in your machine. Cd i
 
 ## Flow
 
-1) Register user and confirm email in [email service](http://localhost:1080).
-
-## [Swagger documentation](http://localhost:8080/swagger-ui.html)
-
-## [Actuator](http://localhost:8080/actuator)
-
-## [RabbitMQ](http://localhost:15672)
+1) Register user and confirm email in email service.
 
 * Username: guest
 * Password: guest

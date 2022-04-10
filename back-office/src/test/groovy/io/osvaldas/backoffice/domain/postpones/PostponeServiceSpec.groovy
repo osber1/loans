@@ -37,4 +37,5 @@ class PostponeServiceSpec extends AbstractSpec {
         then:
             secondPostpone == loanPostpone
     }
+
 }

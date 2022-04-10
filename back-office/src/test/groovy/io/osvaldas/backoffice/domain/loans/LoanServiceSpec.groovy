@@ -118,7 +118,7 @@ class LoanServiceSpec extends AbstractSpec {
             timeUtils.hourOfDay >> 4
         and:
             TimeException e = thrown()
-            e.message == 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
+            e.message == riskMessage
     }
 
     void 'should take loan when validation pass'() {
@@ -139,4 +139,5 @@ class LoanServiceSpec extends AbstractSpec {
             ClientNotActiveException e = thrown()
             e.message == clientNotActiveMessage
     }
+
 }

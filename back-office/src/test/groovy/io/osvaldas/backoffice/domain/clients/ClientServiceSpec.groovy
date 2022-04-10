@@ -25,6 +25,7 @@ class ClientServiceSpec extends AbstractSpec {
 
     void setup() {
         clientService.clientErrorMessage = clientErrorMessage
+        clientService.clientAlreadyExistErrorMessage = clientAlreadyExistErrorMessage
     }
 
     void 'should throw exception when registering client with existing personal code'() {
@@ -138,4 +139,5 @@ class ClientServiceSpec extends AbstractSpec {
         and:
             1 * clientRepository.existsById(clientId) >> false
     }
+
 }

@@ -37,11 +37,12 @@ class NotificationConsumerSpec extends Specification {
         when:
             consumer.consume(emailMessage)
         then:
-            1 * emailSender.send(email, { String data ->
+            1 * emailSender.send(email) { String data ->
                 with(data) {
                     contains(fullName)
                     contains(link.formatted(clientId))
                 }
-            })
+            }
     }
+
 }

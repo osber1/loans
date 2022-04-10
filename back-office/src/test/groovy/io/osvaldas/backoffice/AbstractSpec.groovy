@@ -4,6 +4,7 @@ import static io.osvaldas.backoffice.repositories.entities.Status.ACTIVE
 import static io.osvaldas.backoffice.repositories.entities.Status.REGISTERED
 import static java.lang.Long.parseLong
 import static java.util.Arrays.asList
+import static java.util.Set.of
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -51,9 +52,13 @@ abstract class AbstractSpec extends Specification {
     String clientErrorMessage = "Client with id ${clientId} does not exist."
 
     @Shared
+    String clientAlreadyExistErrorMessage = 'Client with personal code already exists.'
+
+    @Shared
     String loanErrorMessage = "Loan with id ${loanId} does not exist."
 
     @Shared
+    @SuppressWarnings('LineLength')
     String riskMessage = 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
 
     @Shared
@@ -75,19 +80,19 @@ abstract class AbstractSpec extends Specification {
     Loan loan = buildLoan(100.0)
 
     @Shared
-    Client registeredClientWithoutId = buildClient('', new HashSet<Loan>(), REGISTERED)
+    Client registeredClientWithoutId = buildClient('', [] as Set, REGISTERED)
 
     @Shared
-    Client registeredClientWithId = buildClient(clientId, new HashSet<Loan>(), REGISTERED)
+    Client registeredClientWithId = buildClient(clientId, [] as Set, REGISTERED)
 
     @Shared
-    Client registeredClientWithLoan = buildClient(clientId, Set.of(loan), REGISTERED)
+    Client registeredClientWithLoan = buildClient(clientId, of(loan), REGISTERED)
 
     @Shared
-    Client activeClientWithId = buildClient(clientId, new HashSet<Loan>(), ACTIVE)
+    Client activeClientWithId = buildClient(clientId, [] as Set, ACTIVE)
 
     @Shared
-    Client activeClientWithLoan = buildClient(clientId, Set.of(loan), ACTIVE)
+    Client activeClientWithLoan = buildClient(clientId, of(loan), ACTIVE)
 
     LoanPostpone buildPostpone(BigDecimal newRate, ZonedDateTime newDate) {
         new LoanPostpone().tap {
@@ -99,7 +104,7 @@ abstract class AbstractSpec extends Specification {
 
     Loan addPostponeToLoan(Loan loan, LoanPostpone... postpones) {
         loan.with { loanPostpones = new HashSet<>(asList(postpones)) }
-        return loan
+        loan
     }
 
     Loan buildLoan(BigDecimal loanAmount) {
@@ -136,4 +141,5 @@ abstract class AbstractSpec extends Specification {
             0,
             ZoneId.of(timeZone))
     }
+
 }

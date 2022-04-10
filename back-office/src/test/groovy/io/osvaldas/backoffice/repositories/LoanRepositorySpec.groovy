@@ -35,10 +35,11 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
     }
 
     private Loan createLoan() {
-        return new Loan().tap {
+        new Loan().tap {
             amount = 10.00
             interestRate = 10.00
             termInMonths = 10
         }
     }
+
 }

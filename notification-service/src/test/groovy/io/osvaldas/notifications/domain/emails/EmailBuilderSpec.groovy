@@ -20,4 +20,5 @@ class EmailBuilderSpec extends Specification {
             message.contains(name)
             message.contains(link)
     }
+
 }

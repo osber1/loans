@@ -5,6 +5,9 @@ plugins {
     id 'groovy'
     id 'application'
     id 'jacoco'
+    id 'checkstyle'
+    id 'codenarc'
+    id 'com.github.spotbugs' version '5.0.6'
 }
 
 bootJar {
@@ -41,6 +44,9 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'application'
+    apply plugin: 'checkstyle'
+    apply plugin: 'codenarc'
+    apply plugin: 'com.github.spotbugs'
 
     dependencyManagement {
         imports {
@@ -48,11 +54,14 @@ subprojects {
         }
     }
 
+    spotbugs{
+        excludeFilter = file("${rootDir}/config/spotbugs/exclude.xml")
+    }
+
     dependencies {
         implementation("org.projectlombok:lombok:${lombokVersion}",
             "org.codehaus.groovy:groovy-all:${groovyVersion}",
-            'org.springframework.boot:spring-boot-starter-web'
-        )
+            'org.springframework.boot:spring-boot-starter-web')
 
         compileOnly("org.projectlombok:lombok:${lombokVersion}")
 

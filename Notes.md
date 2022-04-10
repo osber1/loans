@@ -52,10 +52,10 @@
 - [x] Inconsistent use of primitives vs primitive wrappers. (e.g., Integer, int).
 
 - [x] Double is used for currency amount (which might become THE UGLY in some cases as more precises operations may lead to inconsistencies). Would suggest using either BigDecimal,
-  or long and int to represent e.g Eur and cents...
+  or long and int to represent e.g. Eur and cents...
 
 - [x] Configuration object props are not validated (e.g., incorrect configuration of maxAmount, interest rate). ForbiddenHourTo, forbiddenHourFrom, could lead to funky business,
-  eg. forbiddenHourTo < forbiddenHourTo , since it is not defined if configuration accepts value 0 < n < 24. (?) How to check max amount and interest rate?
+  e.g. forbiddenHourTo < forbiddenHourTo , since it is not defined if configuration accepts value 0 < n < 24. (?) How to check max amount and interest rate?
 
 - [x] No validations on persistence model.
 
@@ -99,9 +99,7 @@ TODO:
 
 - [ ] Extract validator to separate service (feign).
 
-- [ ] Add linting rules or something to check on build (codenarc).
-
-- [ ] I have questions about time amount and etc. errors handling in filter.
+- [ ] I have questions about time amount etc. errors handling in filter.
 
 - [ ] Integrations test should fail at nigh time.
 

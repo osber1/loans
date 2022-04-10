@@ -32,6 +32,9 @@ public class ClientService {
 
     private final RabbitMQMessageProducer messageProducer;
 
+    @Value("${exceptionMessages.clientAlreadyExistErrorMessage:}")
+    private String clientAlreadyExistErrorMessage;
+
     @Value("${exceptionMessages.clientErrorMessage:}")
     private String clientErrorMessage;
 
@@ -44,7 +47,7 @@ public class ClientService {
                 sendMessage(savedClient);
                 return savedClient;
             })
-            .orElseThrow(() -> new BadRequestException("Client with personal code already exists."));
+            .orElseThrow(() -> new BadRequestException(clientAlreadyExistErrorMessage));
     }
 
     @Transactional(readOnly = true)

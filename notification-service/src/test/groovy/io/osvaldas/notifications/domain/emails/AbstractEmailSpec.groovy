@@ -10,6 +10,9 @@ import spock.lang.Specification
 class AbstractEmailSpec extends Specification {
 
     @Shared
+    static GreenMail greenMail = new GreenMail(SMTP)
+
+    @Shared
     String receiverEmail = 'receiver@email.com'
 
     @Shared
@@ -18,6 +21,4 @@ class AbstractEmailSpec extends Specification {
     @Shared
     String emailSubject = 'Confirm your email'
 
-    @Shared
-    static GreenMail greenMail = new GreenMail(SMTP)
 }

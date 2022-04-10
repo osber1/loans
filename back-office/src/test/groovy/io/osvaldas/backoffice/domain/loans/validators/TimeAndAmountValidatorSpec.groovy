@@ -10,18 +10,18 @@ import spock.lang.Subject
 
 class TimeAndAmountValidatorSpec extends AbstractSpec {
 
-    private TimeUtils timeUtils = Stub {
+    TimeUtils timeUtils = Stub {
         hourOfDay >> 10
     }
 
-    private PropertiesConfig config = Stub {
+    PropertiesConfig config = Stub {
         maxAmount >> 100.00
         forbiddenHourFrom >> 0
         forbiddenHourTo >> 6
     }
 
     @Subject
-    private TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
+    TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
 
     void setup() {
         timeAndAmountValidator.riskMessage = riskMessage
@@ -52,4 +52,5 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
             AmountException e = thrown()
             e.message == amountExceedsMessage
     }
+
 }

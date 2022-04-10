@@ -25,7 +25,7 @@ class IpValidatorSpec extends AbstractSpec {
     }
 
     @Subject
-    private IpValidator ipValidator = new IpValidator(config, redisTemplate)
+    IpValidator ipValidator = new IpValidator(config, redisTemplate)
 
     void setup() {
         ipValidator.ipExceedsMessage = ipExceedsMessage
@@ -38,7 +38,6 @@ class IpValidatorSpec extends AbstractSpec {
             notThrown(IpException)
         and:
             1 * valueOperations.get(ipAddress) >> null
-
     }
 
     void 'should validate when ip limit is not exceeded and log is not new'() {
@@ -59,4 +58,5 @@ class IpValidatorSpec extends AbstractSpec {
         and:
             1 * valueOperations.get(ipAddress) >> 5
     }
+
 }
