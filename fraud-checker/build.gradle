@@ -1,11 +1,7 @@
 plugins {
+    id 'org.springframework.boot' version '2.6.4'
     id 'jacoco'
-    id "com.github.johnrengelman.shadow" version '7.1.2'
 }
-
-mainClassName = 'io.osvaldas.fraud.FraudCheckerApplication'
-
-apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {}
 
