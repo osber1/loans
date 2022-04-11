@@ -21,9 +21,6 @@ abstract class AbstractSpec extends Specification {
     int loanTermInMonths = 12
 
     @Shared
-    String timeZone = 'Europe/Vilnius'
-
-    @Shared
     ZonedDateTime date = generateDate()
 
     @Shared
@@ -133,7 +130,7 @@ abstract class AbstractSpec extends Specification {
             0,
             0,
             0,
-            ZoneId.of(timeZone))
+            ZoneId.of('UTC'))
     }
 
 }

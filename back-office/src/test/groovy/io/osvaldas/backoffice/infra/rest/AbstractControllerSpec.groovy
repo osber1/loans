@@ -1,9 +1,17 @@
 package io.osvaldas.backoffice.infra.rest
 
+import static java.time.Clock.fixed
+import static java.time.Instant.parse
+import static java.time.ZoneId.of
+
+import java.time.Clock
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -98,6 +106,16 @@ abstract class AbstractControllerSpec extends AbstractSpec {
             amount = loanAmount
             termInMonths = 12
         }
+    }
+
+    @TestConfiguration
+    static class TestClockConfig {
+
+        @Bean
+        Clock clock() {
+            fixed(parse('2022-10-12T10:10:10.00Z'), of('UTC'))
+        }
+
     }
 
 }

@@ -9,7 +9,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockHttpServletResponse
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.util.NestedServletException
 
 import groovy.json.JsonBuilder
@@ -21,6 +23,8 @@ import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Shared
 
+@ContextConfiguration(classes = TestClockConfig)
+@SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 class LoansControllerSpec extends AbstractControllerSpec {
 
     @Shared

@@ -42,11 +42,7 @@ public class ClientService {
     public Client registerClient(Client client) {
         return of(clientRepository.existsByPersonalCode(client.getPersonalCode()))
             .filter(exists -> !exists)
-            .map(s -> {
-                Client savedClient = saveNewClient(client);
-                sendMessage(savedClient);
-                return savedClient;
-            })
+            .map(s -> saveClientAndSendEmail(client))
             .orElseThrow(() -> new BadRequestException(clientAlreadyExistErrorMessage));
     }
 
@@ -88,6 +84,12 @@ public class ClientService {
     @Transactional
     public Client save(Client client) {
         return clientRepository.save(client);
+    }
+
+    private Client saveClientAndSendEmail(Client client) {
+        Client savedClient = saveNewClient(client);
+        sendMessage(savedClient);
+        return savedClient;
     }
 
     private void sendMessage(Client client) {
