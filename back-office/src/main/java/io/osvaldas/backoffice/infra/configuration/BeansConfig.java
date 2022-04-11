@@ -1,5 +1,9 @@
 package io.osvaldas.backoffice.infra.configuration;
 
+import static java.time.Clock.systemUTC;
+
+import java.time.Clock;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,5 +19,10 @@ public class BeansConfig {
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         return template;
+    }
+
+    @Bean
+    public Clock clock() {
+        return systemUTC();
     }
 }

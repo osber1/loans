@@ -1,10 +1,10 @@
 package io.osvaldas.backoffice.domain.util
 
-import static TimeService.TIME_ZONE
-import static java.time.ZoneId.of
+import static java.time.Clock.systemUTC
 import static java.time.ZonedDateTime.now
 import static java.time.temporal.ChronoUnit.SECONDS
 
+import java.time.Clock
 import java.time.ZonedDateTime
 
 import spock.lang.Shared
@@ -14,10 +14,13 @@ import spock.lang.Subject
 class TimeServiceSpec extends Specification {
 
     @Shared
-    ZonedDateTime now = now(of(TIME_ZONE))
+    Clock clock = systemUTC()
+
+    @Shared
+    ZonedDateTime now = now(clock)
 
     @Subject
-    TimeService service = new TimeService()
+    TimeService service = new TimeService(clock)
 
     void 'should return current time'() {
         when:
