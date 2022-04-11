@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.web.util.NestedServletException
 
 import groovy.json.JsonBuilder
 import io.osvaldas.backoffice.domain.loans.validators.IpValidator.IpException
@@ -114,10 +113,11 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         when:
-            postLoanRequest(buildLoanRequest(999999.0), clientId)
+            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(999999.0), clientId)
         then:
-            NestedServletException e = thrown()
-            e.message.contains(amountExceedsMessage)
+            response.status == BAD_REQUEST.value()
+        and:
+            response.contentAsString.contains(amountExceedsMessage)
     }
 
     void 'should fail when client is not active'() {

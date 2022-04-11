@@ -1,7 +1,7 @@
 package io.osvaldas.backoffice.domain.loans.validators
 
 import io.osvaldas.backoffice.AbstractSpec
-import io.osvaldas.backoffice.domain.loans.rules.TimeAndAmountValidationRule.ValidationRuleException
+import io.osvaldas.backoffice.domain.exceptions.ValidationRuleException
 import io.osvaldas.backoffice.domain.loans.validators.TimeAndAmountValidator.AmountException
 import io.osvaldas.backoffice.domain.loans.validators.TimeAndAmountValidator.TimeException
 import io.osvaldas.backoffice.domain.util.TimeUtils

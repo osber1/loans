@@ -1,7 +1,8 @@
 package io.osvaldas.backoffice.domain.util;
 
+import static java.util.stream.Stream.of;
+
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,7 +18,7 @@ public class IpWipeOutScheduler {
 
     @Scheduled(cron = "0 0 0 * * *")
     void wipeOutIps() {
-        Stream.of(redisTemplate.keys("*"))
+        of(redisTemplate.keys("*"))
             .filter(Objects::nonNull)
             .forEach(redisTemplate::delete);
     }

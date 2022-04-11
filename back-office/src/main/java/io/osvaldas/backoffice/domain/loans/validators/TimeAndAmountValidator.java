@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.osvaldas.backoffice.domain.exceptions.ValidationRuleException;
 import io.osvaldas.backoffice.domain.loans.rules.TimeAndAmountValidationRule;
 import io.osvaldas.backoffice.domain.util.TimeUtils;
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;

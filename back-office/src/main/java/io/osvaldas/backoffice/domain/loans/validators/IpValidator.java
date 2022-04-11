@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import io.osvaldas.backoffice.domain.exceptions.ValidationRuleException;
 import io.osvaldas.backoffice.domain.loans.rules.IpValidationRule;
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;
 import lombok.RequiredArgsConstructor;

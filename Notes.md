@@ -99,9 +99,7 @@ TODO:
 
 - [ ] Extract validator to separate service (feign).
 
-- [ ] I have questions about time amount etc. errors handling in filter.
-
-- [ ] Integrations test should fail at nigh time.
+- [ ] I have questions about ip error handling in filter.
 
 - [ ] Add pagination and sorting with specification.
 
