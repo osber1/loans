@@ -7,7 +7,7 @@ import javax.mail.internet.InternetAddress
 import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.beans.factory.annotation.Autowired
 
-import io.osvaldas.api.EmailMessage
+import io.osvaldas.api.email.EmailMessage
 import spock.lang.Shared
 
 class IntegrationSpec extends AbstractIntegrationSpec {

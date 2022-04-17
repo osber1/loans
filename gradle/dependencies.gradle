@@ -1,40 +1,47 @@
 ext {
-    springBoot = '2.6.4'
-    groovy = '3.0.10'
-    lombok = '1.18.22'
-    openApi = '1.6.6'
-    mapstruct = '1.4.2.Final'
-    spock = '2.1-groovy-3.0'
-    lombokMapstructBindings = '0.2.0'
-    testContainers = '1.16.3'
+    versions = [
+        springBoot             : '2.6.4',
+        groovy                 : '3.0.10',
+        lombok                 : '1.18.22',
+        openApi                : '1.6.6',
+        mapstruct              : '1.4.2.Final',
+        spock                  : '2.1-groovy-3.0',
+        lombokMapstructBindings: '0.2.0',
+        testContainers         : '1.16.3',
+        awaitility             : '4.2.0',
+        greenmail              : '1.6.8',
+        springTestRedis        : '0.1',
+        feign                  : '3.1.1'
+    ]
 
     libs = [
-        'springBootDependencies'          : "org.springframework.boot:spring-boot-dependencies:${springBoot}",
-        'groovy'                          : "org.codehaus.groovy:groovy-all:${groovy}",
-        'spockCore'                       : "org.spockframework:spock-core:${spock}",
-        'spockSpring'                     : "org.spockframework:spock-spring:${spock}",
-        'springBootStarterWeb'            : 'org.springframework.boot:spring-boot-starter-web',
-        'springBootStarterTest'           : 'org.springframework.boot:spring-boot-starter-test',
-        'springBootStarterAmqp'           : 'org.springframework.boot:spring-boot-starter-amqp',
-        'springBootStarterMail'           : 'org.springframework.boot:spring-boot-starter-mail',
-        'springBootStarterDataJpa'        : 'org.springframework.boot:spring-boot-starter-data-jpa',
-        'springBootStarterValidation'     : 'org.springframework.boot:spring-boot-starter-validation',
-        'springBootStarterActuator'       : 'org.springframework.boot:spring-boot-starter-actuator',
-        'springBootStarterDataRedis'      : 'org.springframework.boot:spring-boot-starter-data-redis',
-        'springBootConfigurationProcessor': 'org.springframework.boot:spring-boot-configuration-processor',
-        'openApi'                         : "org.springdoc:springdoc-openapi-ui:${openApi}",
-        'jedis'                           : 'redis.clients:jedis',
-        'liquibaseCore'                   : 'org.liquibase:liquibase-core',
-        'postgresql'                      : 'org.postgresql:postgresql',
-        'lombok'                          : "org.projectlombok:lombok:${lombok}",
-        'mapstruct'                       : "org.mapstruct:mapstruct:${mapstruct}",
-        'mapstructProcessor'              : "org.mapstruct:mapstruct-processor:${mapstruct}",
-        'testcontainers'                  : "org.testcontainers:testcontainers:${testContainers}",
-        'testcontainersSpock'             : "org.testcontainers:spock:${testContainers}",
-        'testcontainersPostgresql'        : "org.testcontainers:postgresql:${testContainers}",
-        'testcontainersRabbitmq'          : "org.testcontainers:rabbitmq:${testContainers}",
-        'springTestRedis'                 : "com.jupiter-tools:spring-test-redis:0.1",
-        'greenmail'                       : 'com.icegreen:greenmail:1.6.8',
-        'awaitility'                      : 'org.awaitility:awaitility:3.0.0',
+        springBootDependencies          : "org.springframework.boot:spring-boot-dependencies:${versions.springBoot}",
+        groovy                          : "org.codehaus.groovy:groovy-all:${versions.groovy}",
+        spockCore                       : "org.spockframework:spock-core:${versions.spock}",
+        spockSpring                     : "org.spockframework:spock-spring:${versions.spock}",
+        springBootStarterWeb            : 'org.springframework.boot:spring-boot-starter-web',
+        springBootStarterTest           : 'org.springframework.boot:spring-boot-starter-test',
+        springBootStarterAmqp           : 'org.springframework.boot:spring-boot-starter-amqp',
+        springBootStarterMail           : 'org.springframework.boot:spring-boot-starter-mail',
+        springBootStarterDataJpa        : 'org.springframework.boot:spring-boot-starter-data-jpa',
+        springBootStarterValidation     : 'org.springframework.boot:spring-boot-starter-validation',
+        springBootStarterActuator       : 'org.springframework.boot:spring-boot-starter-actuator',
+        springBootStarterDataRedis      : 'org.springframework.boot:spring-boot-starter-data-redis',
+        springBootConfigurationProcessor: 'org.springframework.boot:spring-boot-configuration-processor',
+        feign                           : "org.springframework.cloud:spring-cloud-starter-openfeign:${versions.feign}",
+        openApi                         : "org.springdoc:springdoc-openapi-ui:${versions.openApi}",
+        jedis                           : 'redis.clients:jedis',
+        liquibaseCore                   : 'org.liquibase:liquibase-core',
+        postgresql                      : 'org.postgresql:postgresql',
+        lombok                          : "org.projectlombok:lombok:${versions.lombok}",
+        mapstruct                       : "org.mapstruct:mapstruct:${versions.mapstruct}",
+        mapstructProcessor              : "org.mapstruct:mapstruct-processor:${versions.mapstruct}",
+        testcontainers                  : "org.testcontainers:testcontainers:${versions.testContainers}",
+        testcontainersSpock             : "org.testcontainers:spock:${versions.testContainers}",
+        testcontainersPostgresql        : "org.testcontainers:postgresql:${versions.testContainers}",
+        testcontainersRabbitmq          : "org.testcontainers:rabbitmq:${versions.testContainers}",
+        springTestRedis                 : "com.jupiter-tools:spring-test-redis:${versions.springTestRedis}",
+        greenmail                       : "com.icegreen:greenmail:${versions.greenmail}",
+        awaitility                      : "org.awaitility:awaitility:${versions.awaitility}",
     ]
 }

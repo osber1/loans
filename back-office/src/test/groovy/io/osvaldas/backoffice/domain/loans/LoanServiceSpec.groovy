@@ -1,19 +1,20 @@
 package io.osvaldas.backoffice.domain.loans
 
 import static java.util.Collections.emptySet
-import static java.util.Collections.singletonList
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
+import java.time.ZonedDateTime
+
+import io.osvaldas.api.exceptions.ClientNotActiveException
+import io.osvaldas.api.exceptions.NotFoundException
+import io.osvaldas.api.exceptions.ValidationRuleException
+import io.osvaldas.api.loans.TodayTakenLoansCount
+import io.osvaldas.api.risk.validation.RiskValidationRequest
+import io.osvaldas.api.risk.validation.RiskValidationResponse
+import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.domain.clients.ClientService
-import io.osvaldas.backoffice.domain.exceptions.ClientNotActiveException
-import io.osvaldas.backoffice.domain.exceptions.NotFoundException
-import io.osvaldas.backoffice.domain.loans.validators.RiskValidator
-import io.osvaldas.backoffice.domain.loans.validators.TimeAndAmountValidator
-import io.osvaldas.backoffice.domain.loans.validators.TimeAndAmountValidator.AmountException
-import io.osvaldas.backoffice.domain.loans.validators.TimeAndAmountValidator.TimeException
-import io.osvaldas.backoffice.domain.util.TimeUtils
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig
 import io.osvaldas.backoffice.repositories.LoanRepository
 import io.osvaldas.backoffice.repositories.entities.Loan
@@ -31,24 +32,19 @@ class LoanServiceSpec extends AbstractSpec {
     }
 
     PropertiesConfig config = Stub {
-        requestsFromSameIpLimit >> 3
         maxAmount >> 100.00
         forbiddenHourFrom >> 0
         forbiddenHourTo >> 6
     }
 
-    TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
-
-    RiskValidator validator = new RiskValidator(singletonList(timeAndAmountValidator))
+    RiskCheckerClient riskCheckerClient = Stub()
 
     LoanRepository loanRepository = Mock()
 
     @Subject
-    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, validator)
+    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient)
 
     void setup() {
-        timeAndAmountValidator.amountExceedsMessage = amountExceedsMessage
-        timeAndAmountValidator.riskMessage = riskMessage
         loanService.loanErrorMessage = loanErrorMessage
         loanService.clientNotActiveMessage = clientNotActiveMessage
     }
@@ -102,42 +98,72 @@ class LoanServiceSpec extends AbstractSpec {
     void 'should throw exception when amount limit is exceeded'() {
         given:
             clientService.getClient(clientId) >> activeClientWithId
+        and:
+            riskCheckerClient.validate(_ as RiskValidationRequest)
+                >> new RiskValidationResponse(false, amountExceedsMessage)
         when:
-            loanService.takeLoan(buildLoan(1000.00), clientId)
+            loanService.addLoan(buildLoan(1000.00), clientId)
         then:
-            AmountException e = thrown()
+            ValidationRuleException e = thrown()
             e.message == amountExceedsMessage
     }
 
     void 'should throw exception when max amount and forbidden time'() {
         given:
             clientService.getClient(clientId) >> activeClientWithId
-        when:
-            loanService.takeLoan(loan, clientId)
-        then:
-            timeUtils.hourOfDay >> 4
         and:
-            TimeException e = thrown()
+            riskCheckerClient.validate(_ as RiskValidationRequest)
+                >> new RiskValidationResponse(false, riskMessage)
+        when:
+            loanService.addLoan(loan, clientId)
+        then:
+            ValidationRuleException e = thrown()
             e.message == riskMessage
+    }
+
+    void 'should throw exception when too much loans taken today'() {
+        given:
+            clientService.getClient(clientId) >> activeClientWithId
+        and:
+            riskCheckerClient.validate(_ as RiskValidationRequest)
+                >> new RiskValidationResponse(false, loanLimitExceedsMessage)
+        when:
+            loanService.addLoan(loan, clientId)
+        then:
+            ValidationRuleException e = thrown()
+            e.message == loanLimitExceedsMessage
     }
 
     void 'should take loan when validation pass'() {
         given:
             clientService.getClient(clientId) >> activeClientWithId
+        and:
+            riskCheckerClient.validate(_ as RiskValidationRequest) >> new RiskValidationResponse(true, '')
         when:
-            Loan takenLoan = loanService.takeLoan(loan, clientId)
+            Loan takenLoan = loanService.addLoan(loan, clientId)
         then:
             takenLoan == loan
+        and:
+            1 * loanRepository.save(loan) >> loan
     }
 
     void 'should throw exception when client is not active'() {
         given:
             clientService.getClient(clientId) >> registeredClientWithId
         when:
-            loanService.takeLoan(loan, clientId)
+            loanService.addLoan(loan, clientId)
         then:
             ClientNotActiveException e = thrown()
             e.message == clientNotActiveMessage
+    }
+
+    void 'should get today taken loans count'() {
+        given:
+            clientService.getLoanTakenTodayCount(clientId, _ as ZonedDateTime) >> 1
+        when:
+            TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(clientId)
+        then:
+            todayTakenLoansCount.takenLoansCount == 1
     }
 
 }

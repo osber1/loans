@@ -22,9 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.jupitertools.springtestredis.RedisTestContainer
 
 import io.osvaldas.backoffice.AbstractSpec
-import io.osvaldas.backoffice.domain.loans.validators.IpValidator
-import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientRegisterRequest
-import io.osvaldas.backoffice.infra.rest.loans.dtos.LoanRequest
+import io.osvaldas.api.clients.ClientRegisterRequest
+import io.osvaldas.api.loans.LoanRequest
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.LoanRepository
 import spock.lang.Shared
@@ -49,8 +48,8 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Value('${exceptionMessages.amountExceedsMessage:}')
     String amountExceedsMessage
 
-    @Value('${exceptionMessages.ipExceedsMessage:}')
-    String ipExceedsMessage
+    @Value('${exceptionMessages.loanLimitExceedsMessage:}')
+    String loanLimitExceedsMessage
 
     @Value('${exceptionMessages.clientNotActiveMessage:}')
     String clientNotActiveMessage
@@ -69,9 +68,6 @@ abstract class AbstractControllerSpec extends AbstractSpec {
 
     @Autowired
     RedisTemplate<String, Integer> redisTemplate
-
-    @Autowired
-    IpValidator ipValidator
 
     @DynamicPropertySource
     static void rabbitMqProperties(DynamicPropertyRegistry registry) {
@@ -113,7 +109,7 @@ abstract class AbstractControllerSpec extends AbstractSpec {
 
         @Bean
         Clock clock() {
-            fixed(parse('2022-10-12T10:10:10.00Z'), of('UTC'))
+            fixed(parse('2021-10-12T10:10:10.00Z'), of('UTC'))
         }
 
     }

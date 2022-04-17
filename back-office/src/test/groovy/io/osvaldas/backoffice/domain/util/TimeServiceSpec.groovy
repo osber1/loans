@@ -7,6 +7,7 @@ import static java.time.temporal.ChronoUnit.SECONDS
 import java.time.Clock
 import java.time.ZonedDateTime
 
+import io.osvaldas.api.util.TimeService
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject

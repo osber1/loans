@@ -1,14 +1,14 @@
 package io.osvaldas.backoffice.domain.clients
 
-import static io.osvaldas.backoffice.repositories.entities.Status.DELETED
-import static io.osvaldas.backoffice.repositories.entities.Status.INACTIVE
+import static io.osvaldas.api.clients.Status.DELETED
+import static io.osvaldas.api.clients.Status.INACTIVE
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
-import io.osvaldas.api.EmailMessage
+import io.osvaldas.api.email.EmailMessage
+import io.osvaldas.api.exceptions.BadRequestException
+import io.osvaldas.api.exceptions.NotFoundException
 import io.osvaldas.backoffice.AbstractSpec
-import io.osvaldas.backoffice.domain.exceptions.BadRequestException
-import io.osvaldas.backoffice.domain.exceptions.NotFoundException
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.messages.RabbitMQMessageProducer
@@ -16,7 +16,9 @@ import spock.lang.Subject
 
 class ClientServiceSpec extends AbstractSpec {
 
-    ClientRepository clientRepository = Mock()
+    ClientRepository clientRepository = Mock {
+        countByIdAndLoansCreatedAtAfter(clientId, date) >> 2
+    }
 
     RabbitMQMessageProducer messageProducer = Mock()
 
@@ -138,6 +140,13 @@ class ClientServiceSpec extends AbstractSpec {
             0 * clientRepository.save(registeredClientWithId)
         and:
             1 * clientRepository.existsById(clientId) >> false
+    }
+
+    void 'should return loan taken today count'() {
+        when:
+            int loansTakenTodayCount = clientService.getLoanTakenTodayCount(clientId, date)
+        then:
+            loansTakenTodayCount == 2
     }
 
 }

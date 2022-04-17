@@ -1,8 +1,8 @@
 package io.osvaldas.backoffice.infra.rest.clients
 
-import static io.osvaldas.backoffice.repositories.entities.Status.ACTIVE
-import static io.osvaldas.backoffice.repositories.entities.Status.DELETED
-import static io.osvaldas.backoffice.repositories.entities.Status.INACTIVE
+import static io.osvaldas.api.clients.Status.ACTIVE
+import static io.osvaldas.api.clients.Status.DELETED
+import static io.osvaldas.api.clients.Status.INACTIVE
 import static java.lang.String.format
 import static java.util.List.of
 import static org.springframework.http.HttpStatus.BAD_REQUEST
@@ -19,9 +19,9 @@ import org.springframework.test.web.servlet.MvcResult
 
 import groovy.json.JsonBuilder
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
-import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientRegisterRequest
-import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientResponse
-import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientUpdateRequest
+import io.osvaldas.api.clients.ClientRegisterRequest
+import io.osvaldas.api.clients.ClientResponse
+import io.osvaldas.api.clients.ClientUpdateRequest
 import io.osvaldas.backoffice.repositories.entities.Client
 import spock.lang.Shared
 
@@ -150,12 +150,12 @@ class ClientControllerSpec extends AbstractControllerSpec {
                        , put('/api/v1/client').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
-    @SuppressWarnings('LineLength')
     void 'should inactivate client when it exists'() {
         given:
             clientRepository.save(registeredClientWithId)
         when:
-            MockHttpServletResponse response = mockMvc.perform(post('/api/v1/client/{id}/inactive', registeredClientWithId.id)
+            MockHttpServletResponse response = mockMvc
+                .perform(post('/api/v1/client/{id}/inactive', registeredClientWithId.id)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -166,12 +166,12 @@ class ClientControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    @SuppressWarnings('LineLength')
     void 'should activate client when it exists'() {
         given:
             clientRepository.save(registeredClientWithId)
         when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{id}/active', registeredClientWithId.id)
+            MockHttpServletResponse response = mockMvc
+                .perform(get('/api/v1/client/{id}/active', registeredClientWithId.id)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:

@@ -16,7 +16,8 @@ dependencies {
         libs.liquibaseCore,
         libs.openApi,
         libs.mapstruct,
-        libs.postgresql
+        libs.postgresql,
+        libs.feign
     )
 
     annotationProcessor(

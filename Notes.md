@@ -99,14 +99,32 @@ TODO:
 
 - [ ] Extract validator to separate service (feign).
 
-- [ ] I have questions about ip error handling in filter.
+- [ ] Add wiremock.
+
+- [ ] Error handling
+
+- [ ] improve redis usage in back-office on get loan.
+
+- [ ] Feign back to back-office to get loan details
+
+- [ ] Optimistic locking.
 
 - [ ] Add pagination and sorting with specification.
 
 - [ ] Add monitoring.
 
-- [ ] Add wiremock.
+- [ ] Istio. (Zipkin, Sleuth; Elasticsearch, Logstash, Kibana)
+
+- [ ] Togglz
+
+- [ ] k8s
+
+- [ ] Vault
+
+- [ ] Smart ID
 
 - [ ] Add Spring Security with JWT tokens on every request (okta or keycloak).
 
-- [ ] FE.
+- [ ] FE nextjs.
+
+- [ ] Cucumber tests.

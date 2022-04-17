@@ -1,35 +1,23 @@
 package io.osvaldas.backoffice.repositories
 
-import static io.osvaldas.backoffice.repositories.entities.Status.DELETED
+import static io.osvaldas.api.clients.Status.DELETED
 
 import org.springframework.beans.factory.annotation.Autowired
 
 import io.osvaldas.backoffice.repositories.entities.Client
-import spock.lang.Shared
 import spock.lang.Subject
 
 class ClientRepositorySpec extends AbstractDatabaseSpec {
 
-    @Shared
-    String invalidClientId = 'invalidClientId'
-
-    @Shared
-    String validClientId = 'validClientId'
-
-    @Shared
-    long validPersonalCode = 12345678911
-
-    @Shared
-    long invalidPersonalCode = 12345678910
-
-    @Shared
-    Client client = createClient()
+    @Autowired
+    LoanRepository loanRepository
 
     @Subject
     @Autowired
     ClientRepository repository
 
     void setup() {
+        client.addLoan(loan)
         repository.save(client)
     }
 
@@ -62,15 +50,15 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
             repository.findById(validClientId).get().status == DELETED
     }
 
-    private Client createClient() {
-        new Client().tap {
-            id = validClientId
-            firstName = 'Test'
-            lastName = 'User'
-            email = 'user@mail.com'
-            phoneNumber = '+37062541365'
-            personalCode = validPersonalCode
-        }
+    void 'should return #takenLoans when getting loan count taken today'() {
+        when:
+            int loansTakenTodayCount = repository.countByIdAndLoansCreatedAtAfter(validClientId, todaysDate)
+        then:
+            loansTakenTodayCount == takenLoans
+        where:
+            todaysDate || takenLoans
+            date       || 1
+            futureDate || 0
     }
 
 }

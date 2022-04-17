@@ -11,4 +11,5 @@ import io.osvaldas.backoffice.repositories.entities.Loan;
 public interface LoanRepository extends JpaRepository<Loan, Integer> {
 
     Optional<Loan> findById(long id);
+
 }

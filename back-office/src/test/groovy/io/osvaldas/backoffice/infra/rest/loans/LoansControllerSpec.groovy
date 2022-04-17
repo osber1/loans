@@ -14,10 +14,10 @@ import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.context.ContextConfiguration
 
 import groovy.json.JsonBuilder
-import io.osvaldas.backoffice.domain.loans.validators.IpValidator.IpException
+import io.osvaldas.api.exceptions.ValidationRuleException.LoanLimitException
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
-import io.osvaldas.backoffice.infra.rest.loans.dtos.LoanRequest
-import io.osvaldas.backoffice.infra.rest.loans.dtos.LoanResponse
+import io.osvaldas.api.loans.LoanRequest
+import io.osvaldas.api.loans.LoanResponse
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Shared
@@ -98,15 +98,15 @@ class LoansControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    void 'should fail when ip limit is exceeded'() {
+    void 'should fail when loan limit is exceeded'() {
         given:
-            clientRepository.save(registeredClientWithId)
+            clientRepository.save(activeClientWithId)
         when:
             postLoanRequest(loanRequest, clientId)
             postLoanRequest(loanRequest, clientId)
         then:
-            IpException e = thrown()
-            e.message == ipExceedsMessage
+            LoanLimitException e = thrown()
+            e.message == loanLimitExceedsMessage
     }
 
     void 'should fail when amount is too high'() {
@@ -131,9 +131,21 @@ class LoansControllerSpec extends AbstractControllerSpec {
             response.contentAsString.contains(clientNotActiveMessage)
     }
 
+    void 'should return loans taken today count'() {
+        given:
+            clientRepository.save(activeClientWithLoan)
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{clientId}/loans/today', clientId)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            response.contentAsString.contains('1')
+    }
+
     MockHttpServletResponse postLoanRequest(LoanRequest request, String id) {
         mockMvc.perform(post('/api/v1/client/' + id + '/loan')
-            .requestAttr('remoteAddr', '0.0.0.0.0.1')
             .content(new JsonBuilder(request) as String)
             .contentType(APPLICATION_JSON))
             .andReturn().response

@@ -14,12 +14,12 @@ import io.osvaldas.backoffice.repositories.entities.LoanPostpone
 
 class PostponeControllerSpec extends AbstractControllerSpec {
 
-    @SuppressWarnings('LineLength')
     void 'should postpone loan when it exists'() {
         given:
             Client savedClient = clientRepository.save(registeredClientWithLoan)
         when:
-            MockHttpServletResponse response = mockMvc.perform(post('/api/v1/client/loans/{id}/extensions', savedClient.loans[0].id)
+            MockHttpServletResponse response = mockMvc
+                .perform(post('/api/v1/client/loans/{id}/extensions', savedClient.loans[0].id)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -32,12 +32,12 @@ class PostponeControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    @SuppressWarnings('LineLength')
     void 'should throw an exception when trying to postpone non existing loan'() {
         given:
             int nonExistingId = 5555
         when:
-            MockHttpServletResponse response = mockMvc.perform(post('/api/v1/client/loans/{id}/extensions', nonExistingId)
+            MockHttpServletResponse response = mockMvc
+                .perform(post('/api/v1/client/loans/{id}/extensions', nonExistingId)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:

@@ -43,7 +43,9 @@
             <column name="amount" type="DECIMAL"/>
             <column name="interest_rate" type="DECIMAL"/>
             <column name="term_in_months" type="INT"/>
+            <column name="status" type="VARCHAR(20)"/>
             <column name="return_date" type="timestamp with time zone"/>
+            <column name="created_at" type="timestamp with time zone"/>
         </createTable>
 
         <createTable tableName="loan_loan_postpones">
