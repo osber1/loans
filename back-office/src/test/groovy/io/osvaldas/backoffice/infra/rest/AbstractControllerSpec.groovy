@@ -21,9 +21,9 @@ import org.testcontainers.containers.RabbitMQContainer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.jupitertools.springtestredis.RedisTestContainer
 
-import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.api.clients.ClientRegisterRequest
 import io.osvaldas.api.loans.LoanRequest
+import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.LoanRepository
 import spock.lang.Shared

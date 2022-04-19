@@ -102,7 +102,9 @@ class LoanServiceSpec extends AbstractSpec {
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(false, amountExceedsMessage)
         when:
-            loanService.addLoan(buildLoan(1000.00), clientId)
+            Loan addedLoan = loanService.addLoan(buildLoan(1000.00), clientId)
+        and:
+            loanService.validate(addedLoan, clientId)
         then:
             ValidationRuleException e = thrown()
             e.message == amountExceedsMessage
@@ -115,7 +117,9 @@ class LoanServiceSpec extends AbstractSpec {
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(false, riskMessage)
         when:
-            loanService.addLoan(loan, clientId)
+            Loan addedLoan = loanService.addLoan(loan, clientId)
+        and:
+            loanService.validate(addedLoan, clientId)
         then:
             ValidationRuleException e = thrown()
             e.message == riskMessage
@@ -128,7 +132,9 @@ class LoanServiceSpec extends AbstractSpec {
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(false, loanLimitExceedsMessage)
         when:
-            loanService.addLoan(loan, clientId)
+            Loan addedLoan = loanService.addLoan(loan, clientId)
+        and:
+            loanService.validate(addedLoan, clientId)
         then:
             ValidationRuleException e = thrown()
             e.message == loanLimitExceedsMessage
@@ -137,14 +143,14 @@ class LoanServiceSpec extends AbstractSpec {
     void 'should take loan when validation pass'() {
         given:
             clientService.getClient(clientId) >> activeClientWithId
+            clientService.save(activeClientWithId) >> activeClientWithLoan
         and:
-            riskCheckerClient.validate(_ as RiskValidationRequest) >> new RiskValidationResponse(true, '')
+            riskCheckerClient.validate(_ as RiskValidationRequest)
+                >> new RiskValidationResponse(true, 'Risk validation passed.')
         when:
             Loan takenLoan = loanService.addLoan(loan, clientId)
         then:
             takenLoan == loan
-        and:
-            1 * loanRepository.save(loan) >> loan
     }
 
     void 'should throw exception when client is not active'() {

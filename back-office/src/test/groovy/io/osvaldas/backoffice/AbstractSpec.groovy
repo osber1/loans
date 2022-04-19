@@ -2,16 +2,17 @@ package io.osvaldas.backoffice
 
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.REGISTERED
+import static io.osvaldas.api.loans.Status.PENDING
 import static java.lang.Long.parseLong
 import static java.util.Set.of
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+import io.osvaldas.api.clients.Status
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import io.osvaldas.backoffice.repositories.entities.LoanPostpone
-import io.osvaldas.api.clients.Status
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -102,6 +103,7 @@ abstract class AbstractSpec extends Specification {
         new Loan().tap {
             id = loanId
             amount = loanAmount
+            status = PENDING
             termInMonths = loanTermInMonths
             interestRate = 10.0
             returnDate = date.plusMonths(loanTermInMonths)

@@ -7,14 +7,15 @@ import org.springframework.stereotype.Component;
 
 import io.osvaldas.api.exceptions.ValidationRuleException.LoanLimitException;
 import io.osvaldas.api.loans.TodayTakenLoansCount;
-import io.osvaldas.fraud.domain.rules.LoanLimitValidationRule;
 import io.osvaldas.fraud.domain.validation.BackOfficeClient;
+import io.osvaldas.fraud.domain.validation.ValidationRule;
 import io.osvaldas.fraud.infra.configuration.PropertiesConfig;
+import io.osvaldas.fraud.repositories.risk.RiskValidationTarget;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class LoanLimitValidator implements LoanLimitValidationRule {
+public class LoanLimitValidator implements ValidationRule {
 
     private final PropertiesConfig config;
 
@@ -24,8 +25,8 @@ public class LoanLimitValidator implements LoanLimitValidationRule {
     private String loanLimitExceedsMessage;
 
     @Override
-    public void validate(String clientId) {
-        of(client.getLoansTakenTodayCount(clientId))
+    public void validate(RiskValidationTarget target) {
+        of(client.getLoansTakenTodayCount(target.getClientId()))
             .map(TodayTakenLoansCount::getTakenLoansCount)
             .filter(count -> count > config.getLoanLimitPerDay())
             .ifPresent(count -> {

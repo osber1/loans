@@ -6,6 +6,7 @@ import io.osvaldas.api.exceptions.ValidationRuleException.TimeException
 import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.fraud.AbstractSpec
 import io.osvaldas.fraud.infra.configuration.PropertiesConfig
+import io.osvaldas.fraud.repositories.risk.RiskValidationTarget
 import spock.lang.Subject
 
 class TimeAndAmountValidatorSpec extends AbstractSpec {
@@ -30,14 +31,14 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
 
     void 'should validate when amount is not to high and correct time'() {
         when:
-            timeAndAmountValidator.validate(100.00)
+            timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: 100.00))
         then:
             notThrown(ValidationRuleException)
     }
 
     void 'should throw exception when max amount and forbidden time'() {
         when:
-            timeAndAmountValidator.validate(100.00)
+            timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: 100.00))
         then:
             timeUtils.hourOfDay >> 3
         and:
@@ -47,7 +48,7 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
 
     void 'should throw exception when amount exceeds max amount'() {
         when:
-            timeAndAmountValidator.validate(1000.00)
+            timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: 90000000000000.00))
         then:
             AmountException e = thrown()
             e.message == amountExceedsMessage

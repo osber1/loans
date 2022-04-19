@@ -1,7 +1,13 @@
 package io.osvaldas.backoffice.infra.rest.loans
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import static com.github.tomakehurst.wiremock.client.WireMock.containing
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import static io.osvaldas.api.loans.Status.REJECTED
 import static java.lang.String.format
 import static java.util.List.of
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
@@ -10,18 +16,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.transaction.annotation.Transactional
+
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
 import groovy.json.JsonBuilder
-import io.osvaldas.api.exceptions.ValidationRuleException.LoanLimitException
-import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.api.loans.LoanRequest
 import io.osvaldas.api.loans.LoanResponse
+import io.osvaldas.api.risk.validation.RiskValidationResponse
+import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Shared
 
+@AutoConfigureWireMock(port = 8081)
 @ContextConfiguration(classes = TestClockConfig)
 @SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 class LoansControllerSpec extends AbstractControllerSpec {
@@ -86,6 +98,9 @@ class LoansControllerSpec extends AbstractControllerSpec {
     void 'should take loan when request is correct'() {
         given:
             clientRepository.save(activeClientWithId)
+        and:
+            RiskValidationResponse validationResponse = new RiskValidationResponse(true, 'Risk validation passed.')
+            stubWireMockResponse(validationResponse)
         when:
             MockHttpServletResponse response = postLoanRequest(loanRequest, clientId)
         then:
@@ -98,26 +113,56 @@ class LoansControllerSpec extends AbstractControllerSpec {
             }
     }
 
+    @Transactional
     void 'should fail when loan limit is exceeded'() {
         given:
             clientRepository.save(activeClientWithId)
+        and:
+            RiskValidationResponse validationResponse = new RiskValidationResponse(false, loanLimitExceedsMessage)
+            stubWireMockResponse(validationResponse)
         when:
             postLoanRequest(loanRequest, clientId)
-            postLoanRequest(loanRequest, clientId)
+            MockHttpServletResponse response = postLoanRequest(loanRequest, clientId)
         then:
-            LoanLimitException e = thrown()
-            e.message == loanLimitExceedsMessage
+            response.status == BAD_REQUEST.value()
+        and:
+            response.contentAsString.contains(loanLimitExceedsMessage)
+        and:
+            REJECTED == clientRepository.findById(clientId).get().loans[0].status
     }
 
+    @Transactional
     void 'should fail when amount is too high'() {
         given:
             clientRepository.save(activeClientWithId)
+        and:
+            RiskValidationResponse validationResponse = new RiskValidationResponse(false, amountExceedsMessage)
+            stubWireMockResponse(validationResponse)
         when:
             MockHttpServletResponse response = postLoanRequest(buildLoanRequest(999999.0), clientId)
         then:
             response.status == BAD_REQUEST.value()
         and:
             response.contentAsString.contains(amountExceedsMessage)
+        and:
+            REJECTED == clientRepository.findById(clientId).get().loans[0].status
+    }
+
+    @Transactional
+    void 'should fail when max amount and forbidden time'() {
+        given:
+            clientRepository.save(activeClientWithId)
+        and:
+            RiskValidationResponse validationResponse = new RiskValidationResponse(false, riskMessage)
+            stubWireMockResponse(validationResponse)
+        when:
+            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(50.0), clientId)
+        then:
+            response.status == BAD_REQUEST.value()
+        and:
+            response.contentAsString.contains(riskMessage)
+        and:
+            REJECTED == clientRepository.findById(clientId).get().loans[0].status
     }
 
     void 'should fail when client is not active'() {
@@ -144,11 +189,28 @@ class LoansControllerSpec extends AbstractControllerSpec {
             response.contentAsString.contains('1')
     }
 
-    MockHttpServletResponse postLoanRequest(LoanRequest request, String id) {
+    private StubMapping stubWireMockResponse(RiskValidationResponse response) {
+        stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
+            .withRequestBody(containing(clientId))
+            .willReturn(aResponse()
+                .withHeader(CONTENT_TYPE, APPLICATION_JSON.toString())
+                .withStatus(200)
+                .withBody(toJson(response))))
+    }
+
+    private MockHttpServletResponse postLoanRequest(LoanRequest request, String id) {
         mockMvc.perform(post('/api/v1/client/' + id + '/loan')
             .content(new JsonBuilder(request) as String)
             .contentType(APPLICATION_JSON))
             .andReturn().response
+    }
+
+    private String toJson(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object)
+        } catch (IOException e) {
+            throw new UncheckedIOException(e)
+        }
     }
 
 }

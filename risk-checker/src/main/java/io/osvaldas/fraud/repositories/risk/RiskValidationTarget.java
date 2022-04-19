@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RiskValidationObject {
+public class RiskValidationTarget {
 
     private BigDecimal loanAmount;
 

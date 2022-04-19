@@ -29,7 +29,8 @@ dependencies {
         libs.testcontainersSpock,
         libs.testcontainersPostgresql,
         libs.testcontainersRabbitmq,
-        libs.springTestRedis
+        libs.springTestRedis,
+        libs.wiremock
     )
 }
 

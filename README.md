@@ -9,8 +9,8 @@
 
 * Fully working API.
 * Risk rules:
-  * loan risk too high when taken within forbidden time with max amount.
-  * exceeded max loans per day limit.
+    * loan risk too high when taken within forbidden time with max amount.
+    * exceeded max loans per day limit.
 * Loan extension - term gets extended and interest gets increased.
 
 ## Links

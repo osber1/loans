@@ -1,5 +1,8 @@
 package io.osvaldas.fraud.infra.rest.validation
 
+import static java.time.Clock.fixed
+import static java.time.Instant.parse
+import static java.time.ZoneId.of
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.MediaType.APPLICATION_JSON
@@ -12,27 +15,75 @@ import org.springframework.test.context.ContextConfiguration
 import groovy.json.JsonBuilder
 import io.osvaldas.api.risk.validation.RiskValidationRequest
 import io.osvaldas.fraud.infra.rest.AbstractControllerSpec
+import spock.lang.Shared
 
 @ContextConfiguration(classes = TestClockConfig)
 @SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 class RiskValidationControllerSpec extends AbstractControllerSpec {
 
-    void 'should fail when amount is too high'() {
+    @Shared
+    long validLoanId = 1
+
+    @Shared
+    long tooHighAmountLoanId = 2
+
+    @Shared
+    long maxAmountLoanId = 3
+
+    @Shared
+    String validClientId = 'clientId'
+
+    @Shared
+    String tooMuchLoansClientId = 'tooMuchLoansClientId'
+
+    void setup() {
+        testClockDelegate.changeDelegate(fixed(parse('2022-10-12T10:10:10.00Z'), of('UTC')))
+    }
+
+    void 'should return success when amount is not too high'() {
+        given:
+            RiskValidationRequest request = new RiskValidationRequest(validLoanId, validClientId)
         when:
-            MockHttpServletResponse response = postValidationRequest(new RiskValidationRequest(1, '111'))
+            MockHttpServletResponse response = postValidationRequest(request)
+        then:
+            response.status == OK.value()
+        and:
+            response.contentAsString.contains('Risk validation passed')
+    }
+
+    void 'should fail when amount is too high'() {
+        given:
+            RiskValidationRequest request = new RiskValidationRequest(tooHighAmountLoanId, validClientId)
+        when:
+            MockHttpServletResponse response = postValidationRequest(request)
         then:
             response.status == BAD_REQUEST.value()
         and:
             response.contentAsString.contains(amountExceedsMessage)
     }
 
-    void 'should return success when amount is not too high'() {
+    void 'should fail when too much loans are taken'() {
+        given:
+            RiskValidationRequest request = new RiskValidationRequest(validLoanId, tooMuchLoansClientId)
         when:
-            MockHttpServletResponse response = postValidationRequest(new RiskValidationRequest(1, '111'))
+            MockHttpServletResponse response = postValidationRequest(request)
         then:
-            response.status == OK.value()
+            response.status == BAD_REQUEST.value()
         and:
-            response.contentAsString.contains('Risk validation passed')
+            response.contentAsString.contains(loanLimitExceedsMessage)
+    }
+
+    void 'should fail when max amount and forbidden time'() {
+        given:
+            testClockDelegate.changeDelegate(fixed(parse('2022-10-12T04:10:10.00Z'), of('UTC')))
+        and:
+            RiskValidationRequest request = new RiskValidationRequest(maxAmountLoanId, validClientId)
+        when:
+            MockHttpServletResponse response = postValidationRequest(request)
+        then:
+            response.status == BAD_REQUEST.value()
+        and:
+            response.contentAsString.contains(riskMessage)
     }
 
     MockHttpServletResponse postValidationRequest(RiskValidationRequest request) {

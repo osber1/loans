@@ -1,6 +1,6 @@
 package io.osvaldas.backoffice.repositories.entities;
 
-import static io.osvaldas.api.loans.Status.*;
+import static io.osvaldas.api.loans.Status.PENDING;
 import static java.util.Comparator.comparing;
 
 import java.math.BigDecimal;

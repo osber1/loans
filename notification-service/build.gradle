@@ -8,7 +8,8 @@ dependencies {
         project(':amqp'),
         project(':api'),
         libs.springBootStarterAmqp,
-        libs.springBootStarterMail
+        libs.springBootStarterMail,
+        libs.springBootStarterValidation
     )
 
     testImplementation(

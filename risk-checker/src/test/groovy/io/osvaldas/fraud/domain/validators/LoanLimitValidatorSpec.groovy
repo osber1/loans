@@ -5,13 +5,13 @@ import io.osvaldas.api.loans.TodayTakenLoansCount
 import io.osvaldas.fraud.AbstractSpec
 import io.osvaldas.fraud.domain.validation.BackOfficeClient
 import io.osvaldas.fraud.infra.configuration.PropertiesConfig
+import io.osvaldas.fraud.repositories.risk.RiskValidationTarget
 import spock.lang.Subject
 
 class LoanLimitValidatorSpec extends AbstractSpec {
 
     PropertiesConfig config = Stub {
         loanLimitPerDay >> 1
-
     }
 
     BackOfficeClient client = Stub()
@@ -27,7 +27,7 @@ class LoanLimitValidatorSpec extends AbstractSpec {
         given:
             client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(1)
         when:
-            loanLimitValidator.validate(clientId)
+            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
         then:
             notThrown(LoanLimitException)
     }
@@ -36,7 +36,7 @@ class LoanLimitValidatorSpec extends AbstractSpec {
         given:
             client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(6)
         when:
-            loanLimitValidator.validate(clientId)
+            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
         then:
             LoanLimitException e = thrown()
             e.message == loanLimitExceedsMessage

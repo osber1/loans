@@ -89,8 +89,10 @@ public class LoanService {
             log.info("Risk validation response: {}", response);
             of(response)
                 .filter(RiskValidationResponse::isSuccess)
-                .ifPresentOrElse(r -> setStatusAndSave(loan, OPEN),
-                    () -> rejectLoanAndThrow(loan, response.getMessage()));
+                .ifPresentOrElse(r -> {
+                    log.info("Success validating loan: {}", loan.getId());
+                    setStatusAndSave(loan, OPEN);
+                }, () -> rejectLoanAndThrow(loan, response.getMessage()));
         } catch (Exception e) {
             log.error("Error validating loan: {}", loan.getId(), e);
             rejectLoanAndThrow(loan, e.getMessage());
@@ -107,15 +109,14 @@ public class LoanService {
         return clientService.getClient(clientId);
     }
 
-    private void setStatusAndSave(Loan loan, Status open) {
-        log.info("Success validating loan: {}", loan.getId());
-        loan.setStatus(open);
-        save(loan);
-    }
-
     private void rejectLoanAndThrow(Loan loan, String message) {
         setStatusAndSave(loan, REJECTED);
         throw new ValidationRuleException(message);
+    }
+
+    private void setStatusAndSave(Loan loan, Status open) {
+        loan.setStatus(open);
+        save(loan);
     }
 
 }

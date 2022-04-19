@@ -8,13 +8,14 @@ import org.springframework.stereotype.Component;
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException;
 import io.osvaldas.api.exceptions.ValidationRuleException.TimeException;
 import io.osvaldas.api.util.TimeUtils;
-import io.osvaldas.fraud.domain.rules.TimeAndAmountValidationRule;
+import io.osvaldas.fraud.domain.validation.ValidationRule;
 import io.osvaldas.fraud.infra.configuration.PropertiesConfig;
+import io.osvaldas.fraud.repositories.risk.RiskValidationTarget;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class TimeAndAmountValidator implements TimeAndAmountValidationRule {
+public class TimeAndAmountValidator implements ValidationRule {
 
     private final PropertiesConfig config;
 
@@ -27,9 +28,9 @@ public class TimeAndAmountValidator implements TimeAndAmountValidationRule {
     private String riskMessage;
 
     @Override
-    public void validate(BigDecimal clientAmount) {
-        checkTimeAndAmount(clientAmount);
-        checkIfAmountIsNotToHigh(clientAmount);
+    public void validate(RiskValidationTarget target) {
+        checkTimeAndAmount(target.getLoanAmount());
+        checkIfAmountIsNotToHigh(target.getLoanAmount());
     }
 
     private void checkTimeAndAmount(BigDecimal amount) {

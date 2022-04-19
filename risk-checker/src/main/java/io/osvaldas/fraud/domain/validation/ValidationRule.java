@@ -2,7 +2,7 @@ package io.osvaldas.fraud.domain.validation;
 
 import io.osvaldas.fraud.repositories.risk.RiskValidationTarget;
 
-public interface Validator {
+public interface ValidationRule {
 
-    void validate(RiskValidationTarget riskValidationTarget);
+    void validate(RiskValidationTarget target);
 }

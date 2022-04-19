@@ -2,7 +2,7 @@ package io.osvaldas.fraud.domain.validation
 
 import io.osvaldas.api.loans.LoanResponse
 import io.osvaldas.api.risk.validation.RiskValidationRequest
-import io.osvaldas.fraud.repositories.risk.RiskValidationObject
+import io.osvaldas.fraud.repositories.risk.RiskValidationTarget
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -23,6 +23,7 @@ class ValidationServiceSpec extends Specification {
         when:
             validationService.validate(request)
         then:
-            1 * validator.validate(_ as RiskValidationObject)
+            1 * validator.validate(_ as RiskValidationTarget)
     }
+
 }

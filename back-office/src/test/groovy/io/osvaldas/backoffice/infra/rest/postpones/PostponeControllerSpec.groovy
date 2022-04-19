@@ -20,7 +20,7 @@ class PostponeControllerSpec extends AbstractControllerSpec {
         when:
             MockHttpServletResponse response = mockMvc
                 .perform(post('/api/v1/client/loans/{id}/extensions', savedClient.loans[0].id)
-                .contentType(APPLICATION_JSON))
+                    .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
             response.status == OK.value()
@@ -38,7 +38,7 @@ class PostponeControllerSpec extends AbstractControllerSpec {
         when:
             MockHttpServletResponse response = mockMvc
                 .perform(post('/api/v1/client/loans/{id}/extensions', nonExistingId)
-                .contentType(APPLICATION_JSON))
+                    .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
             response.status == NOT_FOUND.value()

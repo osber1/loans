@@ -18,10 +18,10 @@ import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MvcResult
 
 import groovy.json.JsonBuilder
-import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.api.clients.ClientRegisterRequest
 import io.osvaldas.api.clients.ClientResponse
 import io.osvaldas.api.clients.ClientUpdateRequest
+import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Client
 import spock.lang.Shared
 
@@ -156,7 +156,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         when:
             MockHttpServletResponse response = mockMvc
                 .perform(post('/api/v1/client/{id}/inactive', registeredClientWithId.id)
-                .contentType(APPLICATION_JSON))
+                    .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
             response.status == OK.value()
@@ -172,7 +172,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         when:
             MockHttpServletResponse response = mockMvc
                 .perform(get('/api/v1/client/{id}/active', registeredClientWithId.id)
-                .contentType(APPLICATION_JSON))
+                    .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
             response.status == OK.value()

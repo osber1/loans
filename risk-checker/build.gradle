@@ -9,6 +9,10 @@ dependencies {
         libs.springBootStarterValidation,
         libs.feign
     )
+
+    testImplementation(
+        libs.wiremock
+    )
 }
 
 jacocoTestReport {
