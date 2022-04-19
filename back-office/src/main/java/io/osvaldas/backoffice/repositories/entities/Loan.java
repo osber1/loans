@@ -1,5 +1,6 @@
 package io.osvaldas.backoffice.repositories.entities;
 
+import static io.osvaldas.api.loans.Status.PENDING;
 import static java.util.Comparator.comparing;
 
 import java.math.BigDecimal;
@@ -16,6 +17,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.CreationTimestamp;
+
+import io.osvaldas.api.loans.Status;
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +46,11 @@ public class Loan {
 
     private ZonedDateTime returnDate;
 
+    private Status status = PENDING;
+
+    @CreationTimestamp
+    private ZonedDateTime createdAt;
+
     @OneToMany(cascade = CascadeType.ALL)
     private Set<LoanPostpone> loanPostpones = new HashSet<>();
 
@@ -49,7 +58,7 @@ public class Loan {
         loanPostpones.add(loanPostpone);
     }
 
-    public void setNewLoanInterestAndReturnDate(BigDecimal interestRate, ZonedDateTime currentDateTime) {
+    public void setInterestAndReturnDate(BigDecimal interestRate, ZonedDateTime currentDateTime) {
         setInterestRate(interestRate);
         setReturnDate(currentDateTime.plusMonths(getTermInMonths()));
     }

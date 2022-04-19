@@ -1,6 +1,6 @@
 package io.osvaldas.notifications.domain.emails.rabbit.mq
 
-import io.osvaldas.api.EmailMessage
+import io.osvaldas.api.email.EmailMessage
 import io.osvaldas.notifications.domain.emails.EmailSender
 import io.osvaldas.notifications.infra.configuration.PropertiesConfig
 import spock.lang.Shared

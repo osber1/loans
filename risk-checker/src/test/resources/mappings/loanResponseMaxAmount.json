@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/v1/loans/3"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "id": "1",
+      "amount": "100.0",
+      "interestRate": "10.0",
+      "termInMonths": "12",
+      "status": "PENDING",
+      "returnDate": "2022-05-17T13:56:15.336498Z[UTC]",
+      "createdAt": "2022-04-17T13:56:15.358247Z[UTC]",
+      "loanPostpones": []
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

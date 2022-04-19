@@ -1,11 +1,12 @@
 package io.osvaldas.backoffice.domain.clients;
 
-import static io.osvaldas.backoffice.repositories.entities.Status.ACTIVE;
-import static io.osvaldas.backoffice.repositories.entities.Status.DELETED;
-import static io.osvaldas.backoffice.repositories.entities.Status.INACTIVE;
+import static io.osvaldas.api.clients.Status.ACTIVE;
+import static io.osvaldas.api.clients.Status.DELETED;
+import static io.osvaldas.api.clients.Status.INACTIVE;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -13,12 +14,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.osvaldas.api.EmailMessage;
-import io.osvaldas.backoffice.domain.exceptions.BadRequestException;
-import io.osvaldas.backoffice.domain.exceptions.NotFoundException;
+import io.osvaldas.api.clients.Status;
+import io.osvaldas.api.email.EmailMessage;
+import io.osvaldas.api.exceptions.BadRequestException;
+import io.osvaldas.api.exceptions.NotFoundException;
 import io.osvaldas.backoffice.repositories.ClientRepository;
 import io.osvaldas.backoffice.repositories.entities.Client;
-import io.osvaldas.backoffice.repositories.entities.Status;
 import io.osvaldas.messages.RabbitMQMessageProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,6 +85,11 @@ public class ClientService {
     @Transactional
     public Client save(Client client) {
         return clientRepository.save(client);
+    }
+
+    @Transactional
+    public int getLoanTakenTodayCount(String clientId, ZonedDateTime date) {
+        return clientRepository.countByIdAndLoansCreatedAtAfter(clientId, date);
     }
 
     private Client saveClientAndSendEmail(Client client) {

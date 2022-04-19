@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.osvaldas.api.postpones.LoanPostponeResponse;
 import io.osvaldas.backoffice.domain.postpones.PostponeService;
-import io.osvaldas.backoffice.infra.rest.postpones.dtos.LoanPostponeResponse;
 import io.osvaldas.backoffice.repositories.mapper.LoanPostponesMapper;
 import lombok.AllArgsConstructor;
 

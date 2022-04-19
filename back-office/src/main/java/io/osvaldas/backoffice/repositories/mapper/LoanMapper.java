@@ -4,8 +4,8 @@ import java.util.Collection;
 
 import org.mapstruct.Mapper;
 
-import io.osvaldas.backoffice.infra.rest.loans.dtos.LoanRequest;
-import io.osvaldas.backoffice.infra.rest.loans.dtos.LoanResponse;
+import io.osvaldas.api.loans.LoanRequest;
+import io.osvaldas.api.loans.LoanResponse;
 import io.osvaldas.backoffice.repositories.entities.Loan;
 
 @Mapper(componentModel = "spring")

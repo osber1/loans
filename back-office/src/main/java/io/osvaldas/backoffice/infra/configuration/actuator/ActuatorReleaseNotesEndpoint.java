@@ -24,7 +24,7 @@ public class ActuatorReleaseNotesEndpoint {
 
     @PostConstruct
     public void initNotes() {
-        releaseNotesMap.put("version-1.0", of("Risk evaluation added", "Using Redis as for IP validation", "Using PostgreSQL for storage"));
+        releaseNotesMap.put("version-1.0", of("Risk evaluation added", "Using PostgreSQL for storage"));
     }
 
     @ReadOperation

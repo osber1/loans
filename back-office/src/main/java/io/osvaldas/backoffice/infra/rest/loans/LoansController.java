@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.osvaldas.api.loans.LoanRequest;
+import io.osvaldas.api.loans.LoanResponse;
+import io.osvaldas.api.loans.TodayTakenLoansCount;
 import io.osvaldas.backoffice.domain.loans.LoanService;
-import io.osvaldas.backoffice.infra.rest.loans.dtos.LoanRequest;
-import io.osvaldas.backoffice.infra.rest.loans.dtos.LoanResponse;
 import io.osvaldas.backoffice.repositories.entities.Loan;
 import io.osvaldas.backoffice.repositories.mapper.LoanMapper;
 import lombok.AllArgsConstructor;
@@ -37,9 +38,16 @@ public class LoansController {
         return loanMapper.loanToDTOs(service.getLoans(clientId));
     }
 
+    @GetMapping("client/{clientId}/loans/today")
+    public TodayTakenLoansCount getTodayTakenLoansCount(@PathVariable String clientId) {
+        return service.getTodayTakenLoansCount(clientId);
+    }
+
     @PostMapping("client/{clientId}/loan")
     public LoanResponse takeLoan(@PathVariable String clientId, @Valid @RequestBody LoanRequest request) {
         Loan loan = loanMapper.loanToEntity(request);
-        return loanMapper.loanToDTO(service.takeLoan(loan, clientId));
+        Loan takenLoan = service.addLoan(loan, clientId);
+        service.validate(takenLoan, clientId);
+        return loanMapper.loanToDTO(takenLoan);
     }
 }

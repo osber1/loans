@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/v1/client/clientId/loans/today"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "takenLoansCount": "1"
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -97,18 +97,26 @@
 
 TODO:
 
-- [ ] Extract validator to separate service (feign).
+- [ ] improve redis usage in back-office on get loan.
 
-- [ ] I have questions about time amount etc. errors handling in filter.
-
-- [ ] Integrations test should fail at nigh time.
+- [ ] Optimistic locking.
 
 - [ ] Add pagination and sorting with specification.
 
 - [ ] Add monitoring.
 
-- [ ] Add wiremock.
+- [ ] Istio. (Zipkin, Sleuth; Elasticsearch, Logstash, Kibana)
+
+- [ ] Togglz
+
+- [ ] k8s
+
+- [ ] Vault
+
+- [ ] Smart ID
 
 - [ ] Add Spring Security with JWT tokens on every request (okta or keycloak).
 
-- [ ] FE.
+- [ ] FE nextjs.
+
+- [ ] Cucumber tests.

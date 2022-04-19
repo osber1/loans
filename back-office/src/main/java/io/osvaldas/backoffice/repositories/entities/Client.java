@@ -1,6 +1,8 @@
 package io.osvaldas.backoffice.repositories.entities;
 
-import static io.osvaldas.backoffice.repositories.entities.Status.REGISTERED;
+import static io.osvaldas.api.clients.Status.REGISTERED;
+import static java.util.Comparator.comparing;
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.STRING;
 
 import java.time.ZonedDateTime;
@@ -8,7 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -20,6 +21,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import io.osvaldas.api.clients.Status;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,7 +55,7 @@ public class Client {
     @Column(length = 11)
     private Long personalCode;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = ALL)
     private Set<Loan> loans = new HashSet<>();
 
     @CreationTimestamp
@@ -72,5 +74,11 @@ public class Client {
 
     public String getFullName() {
         return this.firstName + " " + this.lastName;
+    }
+
+    public Loan getLastLoan() {
+        return this.getLoans().stream()
+            .max(comparing(Loan::getId))
+            .orElse(null);
     }
 }

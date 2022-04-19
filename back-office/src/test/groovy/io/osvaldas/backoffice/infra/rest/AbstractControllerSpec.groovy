@@ -12,25 +12,21 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.testcontainers.containers.RabbitMQContainer
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.jupitertools.springtestredis.RedisTestContainer
 
+import io.osvaldas.api.clients.ClientRegisterRequest
+import io.osvaldas.api.loans.LoanRequest
 import io.osvaldas.backoffice.AbstractSpec
-import io.osvaldas.backoffice.domain.loans.validators.IpValidator
-import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientRegisterRequest
-import io.osvaldas.backoffice.infra.rest.loans.dtos.LoanRequest
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.LoanRepository
 import spock.lang.Shared
 
 @SpringBootTest
-@RedisTestContainer
 @AutoConfigureMockMvc
 abstract class AbstractControllerSpec extends AbstractSpec {
 
@@ -49,8 +45,8 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Value('${exceptionMessages.amountExceedsMessage:}')
     String amountExceedsMessage
 
-    @Value('${exceptionMessages.ipExceedsMessage:}')
-    String ipExceedsMessage
+    @Value('${exceptionMessages.loanLimitExceedsMessage:}')
+    String loanLimitExceedsMessage
 
     @Value('${exceptionMessages.clientNotActiveMessage:}')
     String clientNotActiveMessage
@@ -67,12 +63,6 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Autowired
     LoanRepository loanRepository
 
-    @Autowired
-    RedisTemplate<String, Integer> redisTemplate
-
-    @Autowired
-    IpValidator ipValidator
-
     @DynamicPropertySource
     static void rabbitMqProperties(DynamicPropertyRegistry registry) {
         rabbitMQContainer.start()
@@ -83,7 +73,6 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     void cleanup() {
         clientRepository.deleteAll()
         loanRepository.deleteAll()
-        redisTemplate.keys('*').each { redisTemplate.delete(it) }
         rabbitMQContainer.stop()
     }
 
@@ -113,7 +102,7 @@ abstract class AbstractControllerSpec extends AbstractSpec {
 
         @Bean
         Clock clock() {
-            fixed(parse('2022-10-12T10:10:10.00Z'), of('UTC'))
+            fixed(parse('2021-10-12T10:10:10.00Z'), of('UTC'))
         }
 
     }

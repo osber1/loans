@@ -6,7 +6,7 @@ import static java.lang.String.format;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-import io.osvaldas.api.EmailMessage;
+import io.osvaldas.api.email.EmailMessage;
 import io.osvaldas.notifications.domain.emails.EmailSender;
 import io.osvaldas.notifications.infra.configuration.PropertiesConfig;
 import lombok.AllArgsConstructor;

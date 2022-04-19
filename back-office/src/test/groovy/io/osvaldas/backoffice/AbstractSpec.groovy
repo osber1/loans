@@ -1,17 +1,18 @@
 package io.osvaldas.backoffice
 
-import static io.osvaldas.backoffice.repositories.entities.Status.ACTIVE
-import static io.osvaldas.backoffice.repositories.entities.Status.REGISTERED
+import static io.osvaldas.api.clients.Status.ACTIVE
+import static io.osvaldas.api.clients.Status.REGISTERED
+import static io.osvaldas.api.loans.Status.PENDING
 import static java.lang.Long.parseLong
 import static java.util.Set.of
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+import io.osvaldas.api.clients.Status
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import io.osvaldas.backoffice.repositories.entities.LoanPostpone
-import io.osvaldas.backoffice.repositories.entities.Status
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -54,14 +55,14 @@ abstract class AbstractSpec extends Specification {
     String loanErrorMessage = "Loan with id ${loanId} does not exist."
 
     @Shared
-    @SuppressWarnings('LineLength')
-    String riskMessage = 'Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
+    String riskMessage = 'Risk is too high, because you are trying ' +
+        'to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
 
     @Shared
     String amountExceedsMessage = 'The amount you are trying to borrow exceeds the max amount!'
 
     @Shared
-    String ipExceedsMessage = 'Too many requests from the same ip per day.'
+    String loanLimitExceedsMessage = 'Too many loans taken in a single day.'
 
     @Shared
     String clientNotActiveMessage = 'Client is not active.'
@@ -102,6 +103,7 @@ abstract class AbstractSpec extends Specification {
         new Loan().tap {
             id = loanId
             amount = loanAmount
+            status = PENDING
             termInMonths = loanTermInMonths
             interestRate = 10.0
             returnDate = date.plusMonths(loanTermInMonths)

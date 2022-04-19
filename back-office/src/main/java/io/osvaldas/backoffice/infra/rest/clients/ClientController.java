@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.osvaldas.api.clients.ClientRegisterRequest;
+import io.osvaldas.api.clients.ClientResponse;
+import io.osvaldas.api.clients.ClientUpdateRequest;
 import io.osvaldas.backoffice.domain.clients.ClientService;
-import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientRegisterRequest;
-import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientResponse;
-import io.osvaldas.backoffice.infra.rest.clients.dtos.ClientUpdateRequest;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.mapper.ClientMapper;
 import lombok.AllArgsConstructor;

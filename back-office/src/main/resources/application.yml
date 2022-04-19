@@ -63,19 +63,12 @@ info:
     springBoot: 2.6.4
 
 application:
-  maxAmount: 100
   interestRate: 10
   interestIncrementFactor: 1.5
   postponeDays: 7
-  requestsFromSameIpLimit: 3
-  forbiddenHourFrom: 0
-  forbiddenHourTo: 6
 
 exceptionMessages:
   clientErrorMessage: Client with id %s does not exist.
   loanErrorMessage: Loan with id %s does not exist.
-  riskMessage: Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!
-  amountExceedsMessage: The amount you are trying to borrow exceeds the max amount!
-  ipExceedsMessage: Too many requests from the same ip per day.
   clientNotActiveMessage: Client is not active.
   clientAlreadyExistErrorMessage: Client with personal code already exists.
