@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import javax.validation.Valid;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +30,7 @@ public class LoansController {
 
     private final LoanMapper loanMapper;
 
+    @Cacheable(value = "LoanResponse", key = "#loanId")
     @GetMapping("loans/{loanId}")
     public LoanResponse getLoan(@PathVariable long loanId) {
         return loanMapper.loanToDTO(service.getLoan(loanId));
@@ -43,6 +46,7 @@ public class LoansController {
         return service.getTodayTakenLoansCount(clientId);
     }
 
+    @CacheEvict(value = "LoanResponse", allEntries = true)
     @PostMapping("client/{clientId}/loan")
     public LoanResponse takeLoan(@PathVariable String clientId, @Valid @RequestBody LoanRequest request) {
         Loan loan = loanMapper.loanToEntity(request);

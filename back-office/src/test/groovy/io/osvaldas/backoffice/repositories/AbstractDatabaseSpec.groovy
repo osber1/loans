@@ -31,10 +31,10 @@ abstract class AbstractDatabaseSpec extends Specification {
     String validClientId = 'validClientId'
 
     @Shared
-    long validPersonalCode = 12345678911
+    String validPersonalCode = '12345678911'
 
     @Shared
-    long invalidPersonalCode = 12345678910
+    String invalidPersonalCode = '12345678910'
 
     @Shared
     Client client = createClient()

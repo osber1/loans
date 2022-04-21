@@ -12,6 +12,7 @@
 - [RabbitMQ](http://localhost:15672)
 - [Email service](http://localhost:1080)
 - [pgAdmin](http://localhost:5050)
+- [Redis Commander](http://localhost:5123)
 
 ## Startup
 

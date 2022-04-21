@@ -191,8 +191,8 @@ class ClientControllerSpec extends AbstractControllerSpec {
 
     private ClientRegisterRequest buildRegisterClientRequest() {
         new ClientRegisterRequest().tap {
-            firstName = editedName
-            lastName = editedSurname
+            firstName = name
+            lastName = surname
             personalCode = clientPersonalCode
             email = clientEmail
             phoneNumber = clientPhoneNumber

@@ -3,7 +3,6 @@ package io.osvaldas.backoffice
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.REGISTERED
 import static io.osvaldas.api.loans.Status.PENDING
-import static java.lang.Long.parseLong
 import static java.util.Set.of
 
 import java.time.ZoneId
@@ -40,7 +39,7 @@ abstract class AbstractSpec extends Specification {
     String clientEmail = 'test@mail.com'
 
     @Shared
-    String clientPhoneNumber = '+37062514361'
+    String clientPhoneNumber = '37062514361'
 
     @Shared
     long loanId = 1
@@ -118,7 +117,7 @@ abstract class AbstractSpec extends Specification {
             email = clientEmail
             status = clientStatus
             phoneNumber = clientPhoneNumber
-            personalCode = parseLong(clientPersonalCode)
+            personalCode = clientPersonalCode
             loans = clientLoans
         }
     }

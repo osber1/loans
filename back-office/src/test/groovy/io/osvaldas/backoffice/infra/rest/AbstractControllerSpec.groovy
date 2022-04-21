@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.cache.CacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.testcontainers.containers.RabbitMQContainer
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.jupitertools.springtestredis.RedisTestContainer
 
 import io.osvaldas.api.clients.ClientRegisterRequest
 import io.osvaldas.api.loans.LoanRequest
@@ -27,6 +29,7 @@ import io.osvaldas.backoffice.repositories.LoanRepository
 import spock.lang.Shared
 
 @SpringBootTest
+@RedisTestContainer
 @AutoConfigureMockMvc
 abstract class AbstractControllerSpec extends AbstractSpec {
 
@@ -63,6 +66,9 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Autowired
     LoanRepository loanRepository
 
+    @Autowired
+    CacheManager cacheManager
+
     @DynamicPropertySource
     static void rabbitMqProperties(DynamicPropertyRegistry registry) {
         rabbitMQContainer.start()
@@ -74,6 +80,9 @@ abstract class AbstractControllerSpec extends AbstractSpec {
         clientRepository.deleteAll()
         loanRepository.deleteAll()
         rabbitMQContainer.stop()
+        cacheManager.cacheNames
+            .parallelStream()
+            .each { cacheName -> cacheManager.getCache(cacheName).clear() }
     }
 
     ClientRegisterRequest buildClientRequest(String clientName,

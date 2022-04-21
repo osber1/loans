@@ -16,7 +16,7 @@ public interface ClientRepository extends JpaRepository<Client, String> {
 
     Optional<Client> findById(String id);
 
-    boolean existsByPersonalCode(long personalCode);
+    boolean existsByPersonalCode(String personalCode);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Client c SET c.status = ?2 WHERE c.id = ?1")

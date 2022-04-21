@@ -53,7 +53,7 @@ public class Client {
 
     @NotNull
     @Column(length = 11)
-    private Long personalCode;
+    private String personalCode;
 
     @OneToMany(cascade = ALL)
     private Set<Loan> loans = new HashSet<>();

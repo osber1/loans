@@ -11,12 +11,13 @@ dependencies {
         libs.springBootStarterDataJpa,
         libs.springBootStarterValidation,
         libs.springBootStarterActuator,
-        libs.jedis,
+        libs.springBootStarterDataRedis,
         libs.liquibaseCore,
         libs.openApi,
         libs.mapstruct,
         libs.postgresql,
-        libs.feign
+        libs.feign,
+        libs.jacksonDatatypeJsr310
     )
 
     annotationProcessor(
@@ -28,6 +29,7 @@ dependencies {
         libs.testcontainersSpock,
         libs.testcontainersPostgresql,
         libs.testcontainersRabbitmq,
+        libs.springTestRedis,
         libs.wiremock
     )
 }
