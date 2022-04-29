@@ -1,7 +1,7 @@
 ext {
     versions = [
         springBoot             : '2.6.7',
-        springCloud            : '2021.0.1',
+        springCloud            : '2021.0.2',
         groovy                 : '3.0.10',
         lombok                 : '1.18.24',
         openApi                : '1.6.8',
