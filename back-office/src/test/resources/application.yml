@@ -23,3 +23,11 @@ exceptionMessages:
   loanLimitExceedsMessage: Too many loans taken in a single day.
   clientNotActiveMessage: Client is not active.
   clientAlreadyExistErrorMessage: Client with personal code already exists.
+
+rabbitmq:
+  exchanges:
+    internal: internal.exchange
+  queues:
+    notification: notification.queue
+  routing-keys:
+    internal-notification: internal.notification.routing-key

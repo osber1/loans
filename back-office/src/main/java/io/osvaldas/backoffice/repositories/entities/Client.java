@@ -59,6 +59,7 @@ public class Client {
     private Set<Loan> loans = new HashSet<>();
 
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
     @UpdateTimestamp

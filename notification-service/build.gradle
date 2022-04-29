@@ -9,11 +9,12 @@ dependencies {
         project(':api'),
         libs.springBootStarterAmqp,
         libs.springBootStarterMail,
-        libs.springBootStarterValidation
+        libs.vault
     )
 
     testImplementation(
         libs.testcontainersRabbitmq,
+        libs.testcontainersVault,
         libs.greenmail,
         libs.awaitility
     )

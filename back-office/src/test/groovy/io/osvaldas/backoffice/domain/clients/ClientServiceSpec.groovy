@@ -12,6 +12,9 @@ import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.messages.RabbitMQMessageProducer
+import io.osvaldas.messages.RabbitProperties
+import io.osvaldas.messages.RabbitProperties.Exchanges
+import io.osvaldas.messages.RabbitProperties.RoutingKeys
 import spock.lang.Subject
 
 class ClientServiceSpec extends AbstractSpec {
@@ -22,8 +25,17 @@ class ClientServiceSpec extends AbstractSpec {
 
     RabbitMQMessageProducer messageProducer = Mock()
 
+    RabbitProperties rabbitProperties = Stub {
+        exchanges >> Stub(Exchanges) {
+            internal >> 'internal.exchange'
+        }
+        routingKeys >> Stub(RoutingKeys) {
+            internalNotification >> 'internal.notification.routing-key'
+        }
+    }
+
     @Subject
-    ClientService clientService = new ClientService(clientRepository, messageProducer)
+    ClientService clientService = new ClientService(clientRepository, messageProducer, rabbitProperties)
 
     void setup() {
         clientService.clientErrorMessage = clientErrorMessage

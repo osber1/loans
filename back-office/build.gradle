@@ -9,7 +9,6 @@ dependencies {
         project(':api'),
         libs.springBootStarterAmqp,
         libs.springBootStarterDataJpa,
-        libs.springBootStarterValidation,
         libs.springBootStarterActuator,
         libs.springBootStarterDataRedis,
         libs.liquibaseCore,
@@ -17,7 +16,8 @@ dependencies {
         libs.mapstruct,
         libs.postgresql,
         libs.feign,
-        libs.jacksonDatatypeJsr310
+        libs.jacksonDatatypeJsr310,
+        libs.vault
     )
 
     annotationProcessor(
@@ -28,6 +28,7 @@ dependencies {
         libs.testcontainers,
         libs.testcontainersSpock,
         libs.testcontainersPostgresql,
+        libs.testcontainersVault,
         libs.testcontainersRabbitmq,
         libs.springTestRedis,
         libs.wiremock

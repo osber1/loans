@@ -21,6 +21,7 @@ import io.osvaldas.api.exceptions.NotFoundException;
 import io.osvaldas.backoffice.repositories.ClientRepository;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.messages.RabbitMQMessageProducer;
+import io.osvaldas.messages.RabbitProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,8 @@ public class ClientService {
     private final ClientRepository clientRepository;
 
     private final RabbitMQMessageProducer messageProducer;
+
+    private final RabbitProperties rabbitProperties;
 
     @Value("${exceptionMessages.clientAlreadyExistErrorMessage:}")
     private String clientAlreadyExistErrorMessage;
@@ -100,7 +103,7 @@ public class ClientService {
 
     private void sendMessage(Client client) {
         EmailMessage message = new EmailMessage(client.getId(), client.getFullName(), client.getEmail());
-        messageProducer.publish(message, "internal.exchange", "internal.notification.routing-key");
+        messageProducer.publish(message, rabbitProperties.getExchanges().getInternal(), rabbitProperties.getRoutingKeys().getInternalNotification());
     }
 
     private Client saveNewClient(Client client) {

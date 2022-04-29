@@ -1,0 +1,7 @@
+{
+  "data": {
+    "rabbitmq.exchanges.internal": "internal.exchange",
+    "rabbitmq.queues.notification": "notification.queue",
+    "rabbitmq.routing-keys.internal-notification": "internal.notification.routing-key"
+  }
+}

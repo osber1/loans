@@ -1,13 +1,10 @@
 server:
-
+  port: 8080
   error:
     include-message: always
     include-binding-errors: always
 
-  port: 8080
-
 spring:
-
   output:
     ansi:
       enabled: ALWAYS
@@ -63,7 +60,6 @@ info:
     name: Loans Application
     description: Simple loans application
     version: v1.0
-
   techstack:
     java: Java 17
     springBoot: 2.6.4

@@ -63,8 +63,8 @@ services:
     restart: unless-stopped
 
   rabbitmq:
-    image: rabbitmq:3.9.11-management-alpine
     container_name: rabbitmq
+    image: rabbitmq:3.9.11-management-alpine
     environment:
       RABBITMQ_NODENAME: "rabbit@staticrabbit"
     extra_hosts:
@@ -78,6 +78,22 @@ services:
       - postgres
     restart: unless-stopped
 
+  vault:
+    container_name: vault
+    image: hashicorp/vault:latest
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: 'super-secret-token'
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault:/vault/data
+      - vault:/etc/vault/logs
+    ports:
+      - "8200:8200"
+    networks:
+      - postgres
+    restart: unless-stopped
+
 networks:
   postgres:
     driver: bridge
@@ -86,3 +102,4 @@ volumes:
   postgres:
   pgadmin:
   rabbitmq:
+  vault:

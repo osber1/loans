@@ -31,7 +31,8 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom(libs.springBootDependencies)
+            mavenBom libs.springBootDependencies
+            mavenBom libs.springBootCloud
         }
     }
 
@@ -43,7 +44,9 @@ subprojects {
         implementation(
             libs.lombok,
             libs.groovy,
-            libs.springBootStarterWeb
+            libs.springBootStarterWeb,
+            libs.springBootStarterBootstrap,
+            libs.springBootStarterValidation
         )
 
         compileOnly(

@@ -97,21 +97,19 @@
 
 TODO:
 
-- [ ] improve redis usage in back-office on get loan.
-
 - [ ] Optimistic locking.
 
 - [ ] Add pagination and sorting with specification.
 
+- [ ] Vault Test containers.
+
 - [ ] Add monitoring.
 
-- [ ] Istio. (Zipkin, Sleuth; Elasticsearch, Logstash, Kibana)
+- [ ] Argo CD.
 
-- [ ] Togglz
+- [ ] Istio. (Zipkin, Sleuth; Elasticsearch, Logstash, Kibana), Kiali
 
 - [ ] k8s
-
-- [ ] Vault
 
 - [ ] Smart ID
 

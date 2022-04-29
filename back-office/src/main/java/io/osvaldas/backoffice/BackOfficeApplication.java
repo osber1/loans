@@ -15,7 +15,11 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
         "io.osvaldas.api"
     }
 )
-@ConfigurationPropertiesScan
+@ConfigurationPropertiesScan(
+    basePackages = {
+        "io.osvaldas.backoffice",
+        "io.osvaldas.messages"
+    })
 public class BackOfficeApplication {
 
     public static void main(String[] args) {

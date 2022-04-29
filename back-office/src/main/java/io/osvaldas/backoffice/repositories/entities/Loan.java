@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -49,6 +50,7 @@ public class Loan {
     private Status status = PENDING;
 
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
     @OneToMany(cascade = CascadeType.ALL)

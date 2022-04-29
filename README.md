@@ -13,6 +13,7 @@
 - [Email service](http://localhost:1080)
 - [pgAdmin](http://localhost:5050)
 - [Redis Commander](http://localhost:5123)
+- [Vault](http://localhost:8200)
 
 ## Startup
 
@@ -41,6 +42,11 @@ Run `./start.sh` to start everything.
 
 * Username: admin@admin.com
 * Password: admin
+
+## Vault
+
+* Method: Token
+* Token: super-secret-token
 
 ### Add new server connection
 
