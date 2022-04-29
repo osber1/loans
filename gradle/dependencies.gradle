@@ -11,7 +11,7 @@ ext {
         testContainers         : '1.17.1',
         awaitility             : '4.2.0',
         greenmail              : '1.6.8',
-        feign                  : '3.1.1',
+        feign                  : '3.1.2',
         wiremock               : '3.1.1']
 
     libs = [
