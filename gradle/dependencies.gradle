@@ -12,7 +12,7 @@ ext {
         awaitility             : '4.2.0',
         greenmail              : '1.6.8',
         feign                  : '3.1.2',
-        wiremock               : '3.1.1']
+        wiremock               : '3.1.2']
 
     libs = [
         springBootDependencies          : "org.springframework.boot:spring-boot-dependencies:${versions.springBoot}",
