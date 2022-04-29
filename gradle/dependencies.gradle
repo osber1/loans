@@ -1,7 +1,7 @@
 ext {
     versions = [
-        springBoot             : '2.6.4',
-        springCloud            : '2021.0.1',
+        springBoot             : '2.6.7',
+        springCloud            : '2021.0.2',
         groovy                 : '3.0.10',
         lombok                 : '1.18.24',
         openApi                : '1.6.8',
@@ -11,8 +11,8 @@ ext {
         testContainers         : '1.17.1',
         awaitility             : '4.2.0',
         greenmail              : '1.6.8',
-        feign                  : '3.1.1',
-        wiremock               : '3.1.1']
+        feign                  : '3.1.2',
+        wiremock               : '3.1.2']
 
     libs = [
         springBootDependencies          : "org.springframework.boot:spring-boot-dependencies:${versions.springBoot}",
