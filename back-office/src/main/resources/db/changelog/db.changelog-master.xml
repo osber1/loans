@@ -25,6 +25,7 @@
             <column name="personal_code" type="VARCHAR(20)"/>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="updated_at" type="timestamp with time zone"/>
+            <column name="version" type="BIGINT"/>
         </createTable>
 
         <createTable tableName="client_loans">
