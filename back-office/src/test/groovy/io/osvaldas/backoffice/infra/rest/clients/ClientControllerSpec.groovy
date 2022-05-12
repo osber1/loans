@@ -37,7 +37,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         given:
             ClientRegisterRequest clientRequest = buildRegisterClientRequest()
         when:
-            MvcResult result = postClientRequest(clientRequest)
+            MvcResult result = sendRegistrationClientRequest(clientRequest)
         then:
             result.response.status == OK.value()
         and:
@@ -55,7 +55,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         given:
             ClientRegisterRequest clientRequest = request
         when:
-            MvcResult result = postClientRequest(clientRequest)
+            MvcResult result = sendRegistrationClientRequest(clientRequest)
         then:
             result.response.status == BAD_REQUEST.value()
         and:
@@ -109,10 +109,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(registeredClientWithId)
         when:
-            MockHttpServletResponse response = mockMvc.perform(put('/api/v1/client')
-                .content(new JsonBuilder(buildUpdateClientRequest()) as String)
-                .contentType(APPLICATION_JSON))
-                .andReturn().response
+            MockHttpServletResponse response = sendUpdateRequest().response
         then:
             response.status == OK.value()
         and:
@@ -120,6 +117,18 @@ class ClientControllerSpec extends AbstractControllerSpec {
                 firstName == editedName
                 lastName == editedSurname
             }
+    }
+
+    void 'should throw when updating client with incorrect version'() {
+        given:
+            clientRepository.save(registeredClientWithId)
+        and:
+            sendUpdateRequest()
+        when:
+            sendUpdateRequest()
+        then:
+            Exception e = thrown()
+            e.message.contains('optimistic locking failed')
     }
 
     void 'should get list of clients when they exists'() {
@@ -182,9 +191,16 @@ class ClientControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    private MvcResult postClientRequest(ClientRegisterRequest request) {
+    private MvcResult sendRegistrationClientRequest(ClientRegisterRequest request) {
         mockMvc.perform(post('/api/v1/client')
             .content(new JsonBuilder(request) as String)
+            .contentType(APPLICATION_JSON))
+            .andReturn()
+    }
+
+    private MvcResult sendUpdateRequest() {
+        mockMvc.perform(put('/api/v1/client')
+            .content(new JsonBuilder(buildUpdateClientRequest()) as String)
             .contentType(APPLICATION_JSON))
             .andReturn()
     }
@@ -207,6 +223,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             personalCode = clientPersonalCode
             email = clientEmail
             phoneNumber = clientPhoneNumber
+            version = 0
         }
     }
 
