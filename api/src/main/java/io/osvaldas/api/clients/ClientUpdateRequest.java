@@ -2,6 +2,7 @@ package io.osvaldas.api.clients;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -10,6 +11,7 @@ import lombok.Data;
 @Data
 public class ClientUpdateRequest {
 
+    @NotBlank(message = "Id must be not empty.")
     private String id;
 
     @NotBlank(message = "First name must be not empty.")
@@ -32,4 +34,7 @@ public class ClientUpdateRequest {
     @NotBlank(message = "Personal code must be not empty.")
     @Size(message = "Personal code must be 11 digits length.", min = 11, max = 11)
     private String personalCode;
+
+    @NotNull(message = "Version must be not empty.")
+    private Long version;
 }

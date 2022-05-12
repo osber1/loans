@@ -24,4 +24,6 @@ public class ClientResponse {
     private ZonedDateTime createdAt;
 
     private ZonedDateTime updatedAt;
+
+    private long version;
 }

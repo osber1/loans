@@ -16,6 +16,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -64,6 +65,9 @@ public class Client {
 
     @UpdateTimestamp
     private ZonedDateTime updatedAt;
+
+    @Version
+    private long version;
 
     public void addLoan(Loan loan) {
         loans.add(loan);
