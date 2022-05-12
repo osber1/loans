@@ -23,20 +23,12 @@ To start the application you need to have Docker ant Java 17 installed.
 
 ### Intellij IDEA
 
-1) Use command `docker compose up -d.` to start all dependencies.
+1) Use command `./start-infra.sh` to start all dependencies.
 2) In Intellij IDEA run `gradle clean bootRun --parallel`
 
 ### Command Line
 
 Run `./start.sh` to start everything.
-
-### RabbitMQ
-
-1) Add new `Queue` with name `notification.queue`
-2) Add new `Exchange` with name `internal.exchange`
-3) Add new `Binding` in `internal.exchange` exchange:
-    * `To queue`: `notification.queue`
-    * `routingKey`: `internal.notification.routing-key`
 
 ## pgAdmin
 
@@ -62,6 +54,8 @@ Run `./start.sh` to start everything.
 ## Flow
 
 1) Register user and confirm email in email service.
+2) Take loan.
+3) You can postpone loan.
 
 ## Features
 

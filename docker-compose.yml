@@ -70,7 +70,8 @@ services:
     extra_hosts:
       - "staticrabbit:127.0.0.1"
     volumes:
-      - rabbitmq:/var/lib/rabbitmq
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -101,5 +102,4 @@ networks:
 volumes:
   postgres:
   pgadmin:
-  rabbitmq:
   vault:

@@ -1,0 +1,32 @@
+{
+  "queues": [
+    {
+      "name": "notification.queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "internal.exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "internal.exchange",
+      "vhost": "/",
+      "destination": "notification.queue",
+      "destination_type": "queue",
+      "routing_key": "internal.notification.routing-key",
+      "arguments": {}
+    }
+  ]
+}

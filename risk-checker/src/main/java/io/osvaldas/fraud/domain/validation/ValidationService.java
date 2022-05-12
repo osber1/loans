@@ -7,7 +7,9 @@ import io.osvaldas.api.risk.validation.RiskValidationRequest;
 import io.osvaldas.api.risk.validation.RiskValidationResponse;
 import io.osvaldas.fraud.repositories.risk.RiskValidationTarget;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ValidationService {
@@ -17,6 +19,7 @@ public class ValidationService {
     private final BackOfficeClient backOfficeClient;
 
     public RiskValidationResponse validate(RiskValidationRequest request) {
+        log.info("Validating client {} request.", request.getClientId());
         LoanResponse loan = backOfficeClient.getLoan(request.getLoanId());
         RiskValidationTarget riskValidationTarget = new RiskValidationTarget(loan.getAmount(), request.getClientId());
         validator.validate(riskValidationTarget);
