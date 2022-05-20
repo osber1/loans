@@ -10,7 +10,7 @@ spring:
       enabled: ALWAYS
 
 application:
-  loanLimitPerDay: 3
+  loanLimitPerDay: 30
   maxAmount: 100
   forbiddenHourFrom: 0
   forbiddenHourTo: 6
