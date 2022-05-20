@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,8 +54,9 @@ public class ClientService {
     }
 
     @Transactional(readOnly = true)
-    public Collection<Client> getClients() {
-        return clientRepository.findAll();
+    public Collection<Client> getClients(int page, int size) {
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("lastName").descending());
+        return clientRepository.findAll(pageRequest).getContent();
     }
 
     @Transactional(readOnly = true)
@@ -90,7 +94,7 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int getLoanTakenTodayCount(String clientId, ZonedDateTime date) {
         return clientRepository.countByIdAndLoansCreatedAtAfter(clientId, date);
     }
@@ -124,4 +128,5 @@ public class ClientService {
         return of(clientRepository.existsById(id))
             .filter(exists -> exists);
     }
+
 }

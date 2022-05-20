@@ -1,5 +1,6 @@
 package io.osvaldas.backoffice.repositories
 
+import static io.osvaldas.api.clients.Status.ACTIVE
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE
 
 import java.time.ZoneId
@@ -80,6 +81,7 @@ abstract class AbstractDatabaseSpec extends Specification {
             email = 'user@mail.com'
             phoneNumber = '+37062541365'
             personalCode = validPersonalCode
+            status = ACTIVE
         }
     }
 

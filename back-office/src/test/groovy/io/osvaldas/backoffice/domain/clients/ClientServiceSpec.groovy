@@ -4,6 +4,11 @@ import static io.osvaldas.api.clients.Status.DELETED
 import static io.osvaldas.api.clients.Status.INACTIVE
 import static java.util.Optional.empty
 import static java.util.Optional.of
+import static org.springframework.data.domain.Pageable.unpaged
+
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 
 import io.osvaldas.api.email.EmailMessage
 import io.osvaldas.api.exceptions.BadRequestException
@@ -66,22 +71,23 @@ class ClientServiceSpec extends AbstractSpec {
 
     void 'should return clients list when there are clients'() {
         when:
-            Collection clients = clientService.getClients()
+            Collection clients = clientService.getClients(0, 2)
         then:
             clients.size() == 2
         and:
             clients == [registeredClientWithId, registeredClientWithId]
         and:
-            1 * clientRepository.findAll() >> [registeredClientWithId, registeredClientWithId]
+            1 * clientRepository.findAll(_ as Pageable)
+                >> new PageImpl<>([registeredClientWithId, registeredClientWithId], unpaged(), 1)
     }
 
     void 'should return empty list when there are no clients'() {
         when:
-            Collection clients = clientService.getClients()
+            Collection clients = clientService.getClients(0, 2)
         then:
             clients == []
         and:
-            1 * clientRepository.findAll() >> []
+            1 * clientRepository.findAll(_ as Pageable) >> Page.empty()
     }
 
     void 'should return client when it exists'() {
