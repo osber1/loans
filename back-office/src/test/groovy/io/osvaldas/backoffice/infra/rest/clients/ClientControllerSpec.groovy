@@ -147,6 +147,24 @@ class ClientControllerSpec extends AbstractControllerSpec {
             of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == 2
     }
 
+    void 'should get list of clients by status'() {
+        given:
+            clientRepository.save(buildClient('123123123', [] as Set, ACTIVE))
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients/status')
+                .param('status', status.name())
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == listSize
+        where:
+            status  || listSize
+            ACTIVE  || 1
+            DELETED || 0
+    }
+
     void 'should throw an exception when client not found'() {
         when:
             MockHttpServletResponse response = mockMvc.perform(method

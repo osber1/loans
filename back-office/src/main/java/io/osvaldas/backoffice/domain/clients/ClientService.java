@@ -3,11 +3,14 @@ package io.osvaldas.backoffice.domain.clients;
 import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.clients.Status.DELETED;
 import static io.osvaldas.api.clients.Status.INACTIVE;
+import static io.osvaldas.backoffice.repositories.Specifications.statusIs;
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +60,11 @@ public class ClientService {
     public Collection<Client> getClients(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("lastName").descending());
         return clientRepository.findAll(pageRequest).getContent();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Client> getClientsByStatus(Status status) {
+        return clientRepository.findAll(where(statusIs(status)));
     }
 
     @Transactional(readOnly = true)

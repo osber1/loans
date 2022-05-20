@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.osvaldas.api.clients.ClientRegisterRequest;
 import io.osvaldas.api.clients.ClientResponse;
 import io.osvaldas.api.clients.ClientUpdateRequest;
+import io.osvaldas.api.clients.Status;
 import io.osvaldas.backoffice.domain.clients.ClientService;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.mapper.ClientMapper;
@@ -40,6 +41,11 @@ public class ClientController {
     @GetMapping("clients")
     public Collection<ClientResponse> getClients(@RequestParam int page, @RequestParam int size) {
         return clientMapper.clientsToDTOs(service.getClients(page, size));
+    }
+
+    @GetMapping("clients/status")
+    public Collection<ClientResponse> getClientsByStatus(@RequestParam Status status) {
+        return clientMapper.clientsToDTOs(service.getClientsByStatus(status));
     }
 
     @GetMapping("clients/{id}")

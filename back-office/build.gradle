@@ -21,7 +21,8 @@ dependencies {
     )
 
     annotationProcessor(
-        libs.mapstructProcessor
+        libs.mapstructProcessor,
+        libs.jpamodelgen
     )
 
     testImplementation(
