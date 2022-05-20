@@ -47,5 +47,7 @@ ext {
         greenmail                       : "com.icegreen:greenmail:${versions.greenmail}",
         awaitility                      : "org.awaitility:awaitility:${versions.awaitility}",
         wiremock                        : "org.springframework.cloud:spring-cloud-contract-wiremock:${versions.wiremock}",
-        jacksonDatatypeJsr310           : 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310']
+        jacksonDatatypeJsr310           : 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310',
+        jpamodelgen                     : 'org.hibernate:hibernate-jpamodelgen'
+    ]
 }
