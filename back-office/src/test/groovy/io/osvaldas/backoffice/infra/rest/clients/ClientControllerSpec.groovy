@@ -76,7 +76,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         given:
             Client savedClient = clientRepository.save(registeredClientWithId)
         when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{id}', savedClient.id)
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients/{id}', savedClient.id)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -96,7 +96,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         given:
             Client savedClient = clientRepository.save(registeredClientWithId)
         when:
-            MockHttpServletResponse response = mockMvc.perform(delete('/api/v1/client/{id}', savedClient.id)
+            MockHttpServletResponse response = mockMvc.perform(delete('/api/v1/clients/{id}', savedClient.id)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -137,12 +137,32 @@ class ClientControllerSpec extends AbstractControllerSpec {
             clientRepository.save(buildClient('890890890', [] as Set, ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients')
+                .param('page', '0')
+                .param('size', '10')
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
             response.status == OK.value()
         and:
             of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == 2
+    }
+
+    void 'should get list of clients by status'() {
+        given:
+            clientRepository.save(buildClient('123123123', [] as Set, ACTIVE))
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients/status')
+                .param('status', status.name())
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == listSize
+        where:
+            status  || listSize
+            ACTIVE  || 1
+            DELETED || 0
     }
 
     void 'should throw an exception when client not found'() {
@@ -155,8 +175,8 @@ class ClientControllerSpec extends AbstractControllerSpec {
         and:
             response.contentAsString.contains(format(clientErrorMessage, clientId))
         where:
-            method << [get('/api/v1/client/{id}', clientId), delete('/api/v1/client/{id}', clientId)
-                       , put('/api/v1/client').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
+            method << [get('/api/v1/clients/{id}', clientId), delete('/api/v1/clients/{id}', clientId),
+                       put('/api/v1/clients').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
     void 'should inactivate client when it exists'() {
@@ -164,7 +184,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc
-                .perform(post('/api/v1/client/{id}/inactive', registeredClientWithId.id)
+                .perform(post('/api/v1/clients/{id}/inactive', registeredClientWithId.id)
                     .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -180,7 +200,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc
-                .perform(get('/api/v1/client/{id}/active', registeredClientWithId.id)
+                .perform(get('/api/v1/clients/{id}/active', registeredClientWithId.id)
                     .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -192,14 +212,14 @@ class ClientControllerSpec extends AbstractControllerSpec {
     }
 
     private MvcResult sendRegistrationClientRequest(ClientRegisterRequest request) {
-        mockMvc.perform(post('/api/v1/client')
+        mockMvc.perform(post('/api/v1/clients')
             .content(new JsonBuilder(request) as String)
             .contentType(APPLICATION_JSON))
             .andReturn()
     }
 
     private MvcResult sendUpdateRequest() {
-        mockMvc.perform(put('/api/v1/client')
+        mockMvc.perform(put('/api/v1/clients')
             .content(new JsonBuilder(buildUpdateClientRequest()) as String)
             .contentType(APPLICATION_JSON))
             .andReturn()
