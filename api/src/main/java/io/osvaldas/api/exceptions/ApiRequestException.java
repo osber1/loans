@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 public abstract class ApiRequestException extends RuntimeException {
 
@@ -26,14 +28,16 @@ public abstract class ApiRequestException extends RuntimeException {
     }
 
     @Getter
+    @Setter
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class ApiExceptionResource {
 
-        private final String message;
+        private String message;
 
-        private final ZonedDateTime timestamp;
+        private ZonedDateTime timestamp;
 
-        private final HttpStatus status;
+        private HttpStatus status;
 
     }
 }
