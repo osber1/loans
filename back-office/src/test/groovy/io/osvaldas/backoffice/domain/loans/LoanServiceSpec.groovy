@@ -4,7 +4,7 @@ import static java.util.Collections.emptySet
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
-import java.time.ZonedDateTime
+import org.springframework.data.jpa.domain.Specification
 
 import io.osvaldas.api.exceptions.ClientNotActiveException
 import io.osvaldas.api.exceptions.NotFoundException
@@ -22,9 +22,7 @@ import spock.lang.Subject
 
 class LoanServiceSpec extends AbstractSpec {
 
-    ClientService clientService = Stub {
-        save(activeClientWithId) >> activeClientWithLoan
-    }
+    ClientService clientService = Stub()
 
     TimeUtils timeUtils = Stub {
         currentDateTime >> date
@@ -39,7 +37,9 @@ class LoanServiceSpec extends AbstractSpec {
 
     RiskCheckerClient riskCheckerClient = Stub()
 
-    LoanRepository loanRepository = Mock()
+    LoanRepository loanRepository = Mock {
+        save(_ as Loan) >> loan
+    }
 
     @Subject
     LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient)
@@ -164,12 +164,12 @@ class LoanServiceSpec extends AbstractSpec {
     }
 
     void 'should get today taken loans count'() {
-        given:
-            clientService.getLoanTakenTodayCount(clientId, _ as ZonedDateTime) >> 1
         when:
             TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(clientId)
         then:
             todayTakenLoansCount.takenLoansCount == 1
+        and:
+            1 * loanRepository.findAll(_ as Specification) >> [loan]
     }
 
 }

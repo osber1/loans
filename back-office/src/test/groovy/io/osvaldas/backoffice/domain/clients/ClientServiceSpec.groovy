@@ -162,13 +162,6 @@ class ClientServiceSpec extends AbstractSpec {
             1 * clientRepository.existsById(clientId) >> false
     }
 
-    void 'should return loan taken today count'() {
-        when:
-            int loansTakenTodayCount = clientService.getLoanTakenTodayCount(clientId, date)
-        then:
-            loansTakenTodayCount == 2
-    }
-
     void 'should return all clients by status'() {
         when:
             Collection clients = clientService.getClientsByStatus(ACTIVE)

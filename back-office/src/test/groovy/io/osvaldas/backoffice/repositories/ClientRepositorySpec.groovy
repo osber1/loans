@@ -9,9 +9,6 @@ import spock.lang.Subject
 
 class ClientRepositorySpec extends AbstractDatabaseSpec {
 
-    @Autowired
-    LoanRepository loanRepository
-
     @Subject
     @Autowired
     ClientRepository repository
@@ -48,17 +45,6 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
             repository.changeClientStatus(validClientId, DELETED)
         then:
             repository.findById(validClientId).get().status == DELETED
-    }
-
-    void 'should return #takenLoans when getting loan count taken today'() {
-        when:
-            int loansTakenTodayCount = repository.countByIdAndLoansCreatedAtAfter(validClientId, todaysDate)
-        then:
-            loansTakenTodayCount == takenLoans
-        where:
-            todaysDate || takenLoans
-            date       || 1
-            futureDate || 0
     }
 
 }

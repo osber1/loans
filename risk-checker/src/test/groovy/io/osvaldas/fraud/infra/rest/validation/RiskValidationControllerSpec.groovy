@@ -3,7 +3,6 @@ package io.osvaldas.fraud.infra.rest.validation
 import static java.time.Clock.fixed
 import static java.time.Instant.parse
 import static java.time.ZoneId.of
-import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -14,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration
 
 import groovy.json.JsonBuilder
 import io.osvaldas.api.risk.validation.RiskValidationRequest
+import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.fraud.infra.rest.AbstractControllerSpec
 import spock.lang.Shared
 
@@ -57,9 +57,11 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
         when:
             MockHttpServletResponse response = postValidationRequest(request)
         then:
-            response.status == BAD_REQUEST.value()
+            response.status == OK.value()
         and:
-            response.contentAsString.contains(amountExceedsMessage)
+            with(objectMapper.readValue(response.contentAsString, RiskValidationResponse)) {
+                message == amountExceedsMessage
+            }
     }
 
     void 'should fail when too much loans are taken'() {
@@ -68,9 +70,11 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
         when:
             MockHttpServletResponse response = postValidationRequest(request)
         then:
-            response.status == BAD_REQUEST.value()
+            response.status == OK.value()
         and:
-            response.contentAsString.contains(loanLimitExceedsMessage)
+            with(objectMapper.readValue(response.contentAsString, RiskValidationResponse)) {
+                message == loanLimitExceedsMessage
+            }
     }
 
     void 'should fail when max amount and forbidden time'() {
@@ -81,9 +85,11 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
         when:
             MockHttpServletResponse response = postValidationRequest(request)
         then:
-            response.status == BAD_REQUEST.value()
+            response.status == OK.value()
         and:
-            response.contentAsString.contains(riskMessage)
+            with(objectMapper.readValue(response.contentAsString, RiskValidationResponse)) {
+                message == riskMessage
+            }
     }
 
     MockHttpServletResponse postValidationRequest(RiskValidationRequest request) {

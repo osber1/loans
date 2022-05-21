@@ -1,6 +1,5 @@
 package io.osvaldas.backoffice.repositories;
 
-import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,5 +22,4 @@ public interface ClientRepository extends JpaRepository<Client, String>, JpaSpec
     @Query("UPDATE Client c SET c.status = ?2 WHERE c.id = ?1")
     void changeClientStatus(String id, Status status);
 
-    int countByIdAndLoansCreatedAtAfter(String clientId, ZonedDateTime date);
 }

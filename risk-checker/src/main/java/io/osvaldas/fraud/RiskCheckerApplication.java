@@ -13,10 +13,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
     }
 )
 @ConfigurationPropertiesScan
-public class FraudCheckerApplication {
+public class RiskCheckerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(FraudCheckerApplication.class, args);
+        SpringApplication.run(RiskCheckerApplication.class, args);
     }
 
 }

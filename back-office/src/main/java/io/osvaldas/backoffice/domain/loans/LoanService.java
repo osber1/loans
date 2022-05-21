@@ -4,13 +4,19 @@ import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.loans.Status.OPEN;
 import static io.osvaldas.api.loans.Status.PENDING;
 import static io.osvaldas.api.loans.Status.REJECTED;
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.clientIdIs;
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreationDateIsAfter;
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs;
 import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Optional.of;
+import static org.springframework.data.jpa.domain.Specification.where;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,38 +79,49 @@ public class LoanService {
         Client client = of(getClient(clientId))
             .filter(c -> ACTIVE == c.getStatus())
             .orElseThrow(() -> new ClientNotActiveException(clientNotActiveMessage));
+        cancelPreviousPendingLoan(client);
         return addLoanToClient(client, loan);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public TodayTakenLoansCount getTodayTakenLoansCount(String clientId) {
-        int loansTakenToday = clientService.getLoanTakenTodayCount(clientId, timeUtils.getCurrentDateTime().truncatedTo(DAYS));
+        int loansTakenToday = getLoanTakenTodayCount(clientId, timeUtils.getCurrentDateTime().truncatedTo(DAYS));
         return new TodayTakenLoansCount(loansTakenToday);
     }
 
-    @Transactional
+    @Transactional(noRollbackForClassName = { "ValidationRuleException" })
     public void validate(Loan loan, String clientId) {
-        log.info("Validating loan: {}", loan.getId());
+        RiskValidationResponse response = sendValidationRequest(loan, clientId);
+        of(response)
+            .filter(RiskValidationResponse::isSuccess)
+            .ifPresentOrElse(r -> approveAndSave(loan),
+                () -> rejectLoanAndThrow(loan, response.getMessage()));
+    }
+
+    private RiskValidationResponse sendValidationRequest(Loan loan, String clientId) {
         try {
+            log.info("Validating loan: {}", loan.getId());
             RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId));
             log.info("Risk validation response: {}", response);
-            of(response)
-                .filter(RiskValidationResponse::isSuccess)
-                .ifPresentOrElse(r -> {
-                    log.info("Success validating loan: {}", loan.getId());
-                    setStatusAndSave(loan, OPEN);
-                }, () -> rejectLoanAndThrow(loan, response.getMessage()));
+            return response;
         } catch (Exception e) {
             log.error("Error validating loan: {}", loan.getId(), e);
-            rejectLoanAndThrow(loan, e.getMessage());
         }
+        return new RiskValidationResponse(false, "Failed to send validation request");
+    }
+
+    private int getLoanTakenTodayCount(String clientId, ZonedDateTime date) {
+        Specification<Loan> specification = where(
+            clientIdIs(clientId)
+                .and(loanCreationDateIsAfter(date))
+                .and(loanStatusIs(OPEN)));
+        return loanRepository.findAll(specification).size();
     }
 
     private Loan addLoanToClient(Client client, Loan loan) {
-        cancelPreviousPendingLoan(client);
         loan.setInterestAndReturnDate(config.getInterestRate(), timeUtils.getCurrentDateTime());
-        client.addLoan(loan);
-        return clientService.save(client).getLastLoan();
+        loan.setClient(client);
+        return loanRepository.save(loan);
     }
 
     private void cancelPreviousPendingLoan(Client client) {
@@ -119,6 +136,11 @@ public class LoanService {
 
     private Client getClient(String clientId) {
         return clientService.getClient(clientId);
+    }
+
+    private void approveAndSave(Loan loan) {
+        log.info("Success validating loan: {}", loan.getId());
+        setStatusAndSave(loan, OPEN);
     }
 
     private void rejectLoanAndThrow(Loan loan, String message) {

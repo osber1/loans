@@ -19,10 +19,17 @@ public class ValidationService {
     private final BackOfficeClient backOfficeClient;
 
     public RiskValidationResponse validate(RiskValidationRequest request) {
-        log.info("Validating client {} request.", request.getClientId());
-        LoanResponse loan = backOfficeClient.getLoan(request.getLoanId());
-        RiskValidationTarget riskValidationTarget = new RiskValidationTarget(loan.getAmount(), request.getClientId());
-        validator.validate(riskValidationTarget);
-        return new RiskValidationResponse(true, "Risk validation passed.");
+        String clientId = request.getClientId();
+        long loanId = request.getLoanId();
+        log.info("Validating client {} request.", clientId);
+        try {
+            LoanResponse loan = backOfficeClient.getLoan(loanId);
+            RiskValidationTarget riskValidationTarget = new RiskValidationTarget(loan.getAmount(), clientId);
+            validator.validate(riskValidationTarget);
+            return new RiskValidationResponse(true, "Risk validation passed.");
+        } catch (Exception e) {
+            log.error("Risk validation failed for client {} with loan {}", clientId, loanId, e);
+            return new RiskValidationResponse(false, e.getMessage());
+        }
     }
 }

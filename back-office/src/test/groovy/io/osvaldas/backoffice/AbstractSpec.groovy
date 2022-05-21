@@ -2,7 +2,7 @@ package io.osvaldas.backoffice
 
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.REGISTERED
-import static io.osvaldas.api.loans.Status.PENDING
+import static io.osvaldas.api.loans.Status.OPEN
 import static java.util.Set.of
 
 import java.time.ZoneId
@@ -102,7 +102,7 @@ abstract class AbstractSpec extends Specification {
         new Loan().tap {
             id = loanId
             amount = loanAmount
-            status = PENDING
+            status = OPEN
             termInMonths = loanTermInMonths
             interestRate = 10.0
             returnDate = date.plusMonths(loanTermInMonths)
@@ -110,7 +110,7 @@ abstract class AbstractSpec extends Specification {
     }
 
     Client buildClient(String clientId, Set<Loan> clientLoans, Status clientStatus) {
-        new Client().tap {
+        Client newClient = new Client().tap {
             id = clientId
             firstName = name
             lastName = surname
@@ -120,6 +120,8 @@ abstract class AbstractSpec extends Specification {
             personalCode = clientPersonalCode
             loans = clientLoans
         }
+        clientLoans.each { it.client = newClient }
+        newClient
     }
 
     ZonedDateTime generateDate() {

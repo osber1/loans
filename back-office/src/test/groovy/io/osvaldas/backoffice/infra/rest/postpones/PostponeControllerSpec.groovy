@@ -1,6 +1,8 @@
 package io.osvaldas.backoffice.infra.rest.postpones
 
+import static io.osvaldas.api.clients.Status.REGISTERED
 import static java.lang.String.format
+import static java.util.Set.of
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.MediaType.APPLICATION_JSON
@@ -16,10 +18,11 @@ class PostponeControllerSpec extends AbstractControllerSpec {
 
     void 'should postpone loan when it exists'() {
         given:
-            Client savedClient = clientRepository.save(registeredClientWithLoan)
+            Client savedClient = clientRepository.save(buildClient(clientId, of(loan), REGISTERED))
         when:
             MockHttpServletResponse response = mockMvc
-                .perform(post('/api/v1/client/loans/{id}/extensions', savedClient.loans[0].id)
+                .perform(post('/api/v1/loans/extensions')
+                    .param('loanId', "${savedClient.loans[0].id}")
                     .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -37,7 +40,8 @@ class PostponeControllerSpec extends AbstractControllerSpec {
             int nonExistingId = 5555
         when:
             MockHttpServletResponse response = mockMvc
-                .perform(post('/api/v1/client/loans/{id}/extensions', nonExistingId)
+                .perform(post('/api/v1/loans/extensions')
+                    .param('loanId', "${nonExistingId}")
                     .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
