@@ -93,7 +93,7 @@ public class LoanService {
                 .ifPresentOrElse(r -> {
                     log.info("Success validating loan: {}", loan.getId());
                     setStatusAndSave(loan, OPEN);
-                }, () -> rejectLoanAndThrow(loan, "Failed to validate loan risk!"));
+                }, () -> rejectLoanAndThrow(loan, response.getMessage()));
         } catch (Exception e) {
             log.error("Error validating loan: {}", loan.getId(), e);
             rejectLoanAndThrow(loan, e.getMessage());
