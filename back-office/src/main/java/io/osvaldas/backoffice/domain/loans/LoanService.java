@@ -2,6 +2,7 @@ package io.osvaldas.backoffice.domain.loans;
 
 import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.loans.Status.OPEN;
+import static io.osvaldas.api.loans.Status.PENDING;
 import static io.osvaldas.api.loans.Status.REJECTED;
 import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -100,9 +101,20 @@ public class LoanService {
     }
 
     private Loan addLoanToClient(Client client, Loan loan) {
+        cancelPreviousPendingLoan(client);
         loan.setInterestAndReturnDate(config.getInterestRate(), timeUtils.getCurrentDateTime());
         client.addLoan(loan);
         return clientService.save(client).getLastLoan();
+    }
+
+    private void cancelPreviousPendingLoan(Client client) {
+        of(client)
+            .map(Client::getLastLoan)
+            .filter(loan -> PENDING == loan.getStatus())
+            .ifPresent(loan -> {
+                loan.setStatus(REJECTED);
+                loanRepository.save(loan);
+            });
     }
 
     private Client getClient(String clientId) {

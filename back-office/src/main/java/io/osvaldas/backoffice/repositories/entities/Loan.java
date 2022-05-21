@@ -2,6 +2,7 @@ package io.osvaldas.backoffice.repositories.entities;
 
 import static io.osvaldas.api.loans.Status.PENDING;
 import static java.util.Comparator.comparing;
+import static javax.persistence.EnumType.STRING;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -11,6 +12,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,6 +49,7 @@ public class Loan {
 
     private ZonedDateTime returnDate;
 
+    @Enumerated(STRING)
     private Status status = PENDING;
 
     @CreationTimestamp
