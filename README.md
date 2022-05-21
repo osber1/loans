@@ -35,16 +35,16 @@ Run `./start.sh` to start everything.
 * Username: admin@admin.com
 * Password: admin
 
-## Vault
-
-* Method: Token
-* Token: super-secret-token
-
 ### Add new server connection
 
 - url: postgres,
 - username: root,
 - password: root.
+
+## Vault
+
+* Method: Token
+* Token: super-secret-token
 
 ## RabbitMQ
 
