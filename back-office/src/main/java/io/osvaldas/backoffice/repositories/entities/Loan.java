@@ -2,6 +2,11 @@ package io.osvaldas.backoffice.repositories.entities;
 
 import static io.osvaldas.api.loans.Status.PENDING;
 import static java.util.Comparator.comparing;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.DETACH;
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.EnumType.STRING;
 
 import java.math.BigDecimal;
@@ -9,13 +14,14 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
@@ -56,8 +62,12 @@ public class Loan {
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = ALL)
     private Set<LoanPostpone> loanPostpones = new HashSet<>();
+
+    @JoinColumn(name = "client_id")
+    @ManyToOne(cascade = { PERSIST, MERGE, DETACH, REFRESH })
+    private Client client;
 
     public void addLoanPostpone(LoanPostpone loanPostpone) {
         loanPostpones.add(loanPostpone);

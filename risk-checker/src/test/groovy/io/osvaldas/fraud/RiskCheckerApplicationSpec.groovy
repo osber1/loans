@@ -7,8 +7,8 @@ import org.springframework.context.ApplicationContext
 
 import spock.lang.Specification
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = FraudCheckerApplication)
-class FraudCheckerApplicationSpec extends Specification {
+@SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = RiskCheckerApplication)
+class RiskCheckerApplicationSpec extends Specification {
 
     @Autowired
     ApplicationContext context

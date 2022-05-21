@@ -1,7 +1,12 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/v1/client/tooMuchLoansClientId/loans/today"
+    "url": "/api/v1/loans/today?clientId=tooMuchLoansClientId",
+    "queryParameters": {
+      "clientId": {
+        "equalTo": "tooMuchLoansClientId"
+      }
+    }
   },
   "response": {
     "status": 200,

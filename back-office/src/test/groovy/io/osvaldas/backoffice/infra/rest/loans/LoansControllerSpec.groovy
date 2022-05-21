@@ -4,9 +4,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import static com.github.tomakehurst.wiremock.client.WireMock.containing
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.loans.Status.REJECTED
 import static java.lang.String.format
-import static java.util.List.of
+import static java.util.Set.of
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -73,7 +74,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loans when client exists'() {
         given:
-            Client savedClient = clientRepository.save(registeredClientWithLoan)
+            Client savedClient = clientRepository.save(buildClient(clientId, of(loan), ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
                 .param('clientId', savedClient.id)
@@ -130,7 +131,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         and:
             response.contentAsString.contains(loanLimitExceedsMessage)
         and:
-            REJECTED == clientRepository.findById(clientId).get().loans[0].status
+            REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
 
     @Transactional
@@ -147,7 +148,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         and:
             response.contentAsString.contains(amountExceedsMessage)
         and:
-            REJECTED == clientRepository.findById(clientId).get().loans[0].status
+            REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
 
     @Transactional
@@ -164,7 +165,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         and:
             response.contentAsString.contains(riskMessage)
         and:
-            REJECTED == clientRepository.findById(clientId).get().loans[0].status
+            REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
 
     void 'should fail when client is not active'() {
@@ -180,7 +181,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loans taken today count'() {
         given:
-            clientRepository.save(activeClientWithLoan)
+            clientRepository.save(buildClient(clientId, of(loan), ACTIVE))
+            loanRepository.save(loan)
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
                 .param('clientId', clientId)

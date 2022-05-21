@@ -3,12 +3,11 @@ package io.osvaldas.backoffice.domain.clients;
 import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.clients.Status.DELETED;
 import static io.osvaldas.api.clients.Status.INACTIVE;
-import static io.osvaldas.backoffice.repositories.Specifications.statusIs;
+import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.springframework.data.jpa.domain.Specification.where;
 
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +63,7 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public List<Client> getClientsByStatus(Status status) {
-        return clientRepository.findAll(where(statusIs(status)));
+        return clientRepository.findAll(where(clientStatusIs(status)));
     }
 
     @Transactional(readOnly = true)
@@ -100,11 +99,6 @@ public class ClientService {
     @Transactional
     public Client save(Client client) {
         return clientRepository.save(client);
-    }
-
-    @Transactional(readOnly = true)
-    public int getLoanTakenTodayCount(String clientId, ZonedDateTime date) {
-        return clientRepository.countByIdAndLoansCreatedAtAfter(clientId, date);
     }
 
     private Client saveClientAndSendEmail(Client client) {
