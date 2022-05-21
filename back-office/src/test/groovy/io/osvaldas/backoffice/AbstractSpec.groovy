@@ -121,7 +121,7 @@ abstract class AbstractSpec extends Specification {
             loans = clientLoans
         }
         clientLoans.each { it.client = newClient }
-        return newClient
+        newClient
     }
 
     ZonedDateTime generateDate() {

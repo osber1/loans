@@ -1,6 +1,7 @@
 package io.osvaldas.backoffice.repositories
 
 import static io.osvaldas.api.clients.Status.ACTIVE
+import static io.osvaldas.api.loans.Status.OPEN
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE
 
 import java.time.ZoneId
@@ -70,6 +71,7 @@ abstract class AbstractDatabaseSpec extends Specification {
             interestRate = 10.00
             termInMonths = 10
             createdAt = date
+            status = OPEN
         }
     }
 
