@@ -44,7 +44,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loan when it exists'() {
         given:
-            Loan savedLoan = loanRepository.save(buildLoan(100.0))
+            Loan savedLoan = loanRepository.save(loan)
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/{loanId}', savedLoan.id)
                 .contentType(APPLICATION_JSON))
@@ -182,7 +182,6 @@ class LoansControllerSpec extends AbstractControllerSpec {
     void 'should return loans taken today count'() {
         given:
             clientRepository.save(buildClient(clientId, of(loan), ACTIVE))
-            loanRepository.save(loan)
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
                 .param('clientId', clientId)
