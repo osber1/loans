@@ -75,7 +75,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             Client savedClient = clientRepository.save(registeredClientWithLoan)
         when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{clientId}/loans', savedClient.id)
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
+                .param('clientId', savedClient.id)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -86,7 +87,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should throw an exception when client not found'() {
         when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{clientId}/loans', clientId)
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
+                .param('clientId', clientId)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -180,7 +182,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithLoan)
         when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/client/{clientId}/loans/today', clientId)
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
+                .param('clientId', clientId)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -199,7 +202,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
     }
 
     private MockHttpServletResponse postLoanRequest(LoanRequest request, String id) {
-        mockMvc.perform(post('/api/v1/client/' + id + '/loan')
+        mockMvc.perform(post('/api/v1/loans')
+            .param('clientId', id)
             .content(new JsonBuilder(request) as String)
             .contentType(APPLICATION_JSON))
             .andReturn().response
