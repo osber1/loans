@@ -45,8 +45,8 @@ class ClientServiceSpec extends AbstractSpec {
     ClientService clientService = new ClientService(clientRepository, messageProducer, rabbitProperties)
 
     void setup() {
-        clientService.clientErrorMessage = clientErrorMessage
-        clientService.clientAlreadyExistErrorMessage = clientAlreadyExistErrorMessage
+        clientService.clientNotFound = clientNotFound
+        clientService.clientAlreadyExist = clientAlreadyExist
     }
 
     void 'should throw exception when registering client with existing personal code'() {
@@ -106,7 +106,7 @@ class ClientServiceSpec extends AbstractSpec {
             clientService.getClient(clientId)
         then:
             NotFoundException e = thrown()
-            e.message == clientErrorMessage
+            e.message == clientNotFound
         and:
             1 * clientRepository.findById(clientId) >> empty()
     }
@@ -134,7 +134,7 @@ class ClientServiceSpec extends AbstractSpec {
             clientService.deleteClient(clientId)
         then:
             NotFoundException e = thrown()
-            e.message == clientErrorMessage
+            e.message == clientNotFound
         and:
             0 * clientRepository.changeClientStatus(clientId, DELETED)
         and:
@@ -155,7 +155,7 @@ class ClientServiceSpec extends AbstractSpec {
             clientService.updateClient(registeredClientWithId)
         then:
             NotFoundException e = thrown()
-            e.message == clientErrorMessage
+            e.message == clientNotFound
         and:
             0 * clientRepository.save(registeredClientWithId)
         and:

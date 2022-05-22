@@ -70,7 +70,8 @@ application:
   postponeDays: 7
 
 exceptionMessages:
-  clientErrorMessage: Client with id %s does not exist.
-  loanErrorMessage: Loan with id %s does not exist.
-  clientNotActiveMessage: Client is not active.
-  clientAlreadyExistErrorMessage: Client with personal code already exists.
+  clientNotFound: Client with id %s does not exist.
+  loanNotFound: Loan with id %s does not exist.
+  clientNotActive: Client is not active.
+  clientAlreadyExist: Client with personal code already exists.
+  validationRequestFailed: Failed to send validation request.

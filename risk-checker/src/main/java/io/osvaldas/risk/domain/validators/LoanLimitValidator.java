@@ -21,8 +21,8 @@ public class LoanLimitValidator implements ValidationRule {
 
     private final BackOfficeClient client;
 
-    @Value("${exceptionMessages.loanLimitExceedsMessage:}")
-    private String loanLimitExceedsMessage;
+    @Value("${exceptionMessages.loanLimitExceeds:}")
+    private String loanLimitExceeds;
 
     @Override
     public void validate(RiskValidationTarget target) {
@@ -30,7 +30,7 @@ public class LoanLimitValidator implements ValidationRule {
             .map(TodayTakenLoansCount::getTakenLoansCount)
             .filter(count -> count > config.getLoanLimitPerDay())
             .ifPresent(count -> {
-                throw new LoanLimitException(loanLimitExceedsMessage);
+                throw new LoanLimitException(loanLimitExceeds);
             });
     }
 

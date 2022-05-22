@@ -51,11 +51,14 @@ public class LoanService {
 
     private final RiskCheckerClient riskCheckerClient;
 
-    @Value("${exceptionMessages.loanErrorMessage:}")
-    private String loanErrorMessage;
+    @Value("${exceptionMessages.loanNotFound:}")
+    private String loanNotFound;
 
-    @Value("${exceptionMessages.clientNotActiveMessage:}")
-    private String clientNotActiveMessage;
+    @Value("${exceptionMessages.clientNotActive:}")
+    private String clientNotActive;
+
+    @Value("${exceptionMessages.validationRequestFailed:}")
+    private String validationRequestFailed;
 
     @Transactional
     public Loan save(Loan loan) {
@@ -65,7 +68,7 @@ public class LoanService {
     @Transactional(readOnly = true)
     public Loan getLoan(long id) {
         return loanRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(format(loanErrorMessage, id)));
+            .orElseThrow(() -> new NotFoundException(format(loanNotFound, id)));
     }
 
     @Transactional(readOnly = true)
@@ -78,7 +81,7 @@ public class LoanService {
         log.info("Adding loan for client: {}", clientId);
         Client client = of(getClient(clientId))
             .filter(c -> ACTIVE == c.getStatus())
-            .orElseThrow(() -> new ClientNotActiveException(clientNotActiveMessage));
+            .orElseThrow(() -> new ClientNotActiveException(clientNotActive));
         cancelPreviousPendingLoan(client);
         return addLoanToClient(client, loan);
     }
@@ -107,7 +110,7 @@ public class LoanService {
         } catch (Exception e) {
             log.error("Error validating loan: {}", loan.getId(), e);
         }
-        return new RiskValidationResponse(false, "Failed to send validation request");
+        return new RiskValidationResponse(false, validationRequestFailed);
     }
 
     private int getLoanTakenTodayCount(String clientId, ZonedDateTime date) {

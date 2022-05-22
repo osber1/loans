@@ -25,8 +25,8 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
     TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
 
     void setup() {
-        timeAndAmountValidator.riskMessage = riskMessage
-        timeAndAmountValidator.amountExceedsMessage = amountExceedsMessage
+        timeAndAmountValidator.riskTooHigh = riskTooHigh
+        timeAndAmountValidator.amountExceeds = amountExceeds
     }
 
     void 'should validate when amount is not to high and correct time'() {
@@ -43,7 +43,7 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
             timeUtils.hourOfDay >> 3
         and:
             TimeException e = thrown()
-            e.message == riskMessage
+            e.message == riskTooHigh
     }
 
     void 'should throw exception when amount exceeds max amount'() {
@@ -51,7 +51,7 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
             timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: 90000000000000.00))
         then:
             AmountException e = thrown()
-            e.message == amountExceedsMessage
+            e.message == amountExceeds
     }
 
 }

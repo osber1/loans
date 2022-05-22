@@ -45,26 +45,29 @@ abstract class AbstractSpec extends Specification {
     long loanId = 1
 
     @Shared
-    String clientErrorMessage = "Client with id ${clientId} does not exist."
+    String clientNotFound = "Client with id ${clientId} does not exist."
 
     @Shared
-    String clientAlreadyExistErrorMessage = 'Client with personal code already exists.'
+    String clientAlreadyExist = 'Client with personal code already exists.'
 
     @Shared
-    String loanErrorMessage = "Loan with id ${loanId} does not exist."
+    String loanNotFound = "Loan with id ${loanId} does not exist."
 
     @Shared
-    String riskMessage = 'Risk is too high, because you are trying ' +
+    String riskTooHigh = 'Risk is too high, because you are trying ' +
         'to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
 
     @Shared
-    String amountExceedsMessage = 'The amount you are trying to borrow exceeds the max amount!'
+    String amountExceeds = 'The amount you are trying to borrow exceeds the max amount!'
 
     @Shared
-    String loanLimitExceedsMessage = 'Too many loans taken in a single day.'
+    String loanLimitExceeds = 'Too many loans taken in a single day.'
 
     @Shared
-    String clientNotActiveMessage = 'Client is not active.'
+    String clientNotActive = 'Client is not active.'
+
+    @Shared
+    String validationRequestFailed = 'Failed to send validation request.'
 
     @Shared
     LoanPostpone firstPostpone = buildPostpone(1, 15.00, date.plusMonths(loanTermInMonths).plusWeeks(1))
@@ -98,11 +101,11 @@ abstract class AbstractSpec extends Specification {
         }
     }
 
-    Loan buildLoan(BigDecimal loanAmount) {
+    Loan buildLoan(BigDecimal loanAmount, io.osvaldas.api.loans.Status loanStatus = OPEN) {
         new Loan().tap {
             id = loanId
             amount = loanAmount
-            status = OPEN
+            status = loanStatus
             termInMonths = loanTermInMonths
             interestRate = 10.0
             returnDate = date.plusMonths(loanTermInMonths)

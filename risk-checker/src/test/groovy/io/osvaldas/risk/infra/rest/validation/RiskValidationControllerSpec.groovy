@@ -60,7 +60,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             response.status == OK.value()
         and:
             with(objectMapper.readValue(response.contentAsString, RiskValidationResponse)) {
-                message == amountExceedsMessage
+                message == amountExceeds
             }
     }
 
@@ -73,7 +73,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             response.status == OK.value()
         and:
             with(objectMapper.readValue(response.contentAsString, RiskValidationResponse)) {
-                message == loanLimitExceedsMessage
+                message == loanLimitExceeds
             }
     }
 
@@ -88,7 +88,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             response.status == OK.value()
         and:
             with(objectMapper.readValue(response.contentAsString, RiskValidationResponse)) {
-                message == riskMessage
+                message == riskTooHigh
             }
     }
 

@@ -36,23 +36,23 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Shared
     static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.9.11-management-alpine')
 
-    @Value('${exceptionMessages.clientErrorMessage:}')
-    String clientErrorMessage
+    @Value('${exceptionMessages.clientNotFound:}')
+    String clientNotFound
 
-    @Value('${exceptionMessages.loanErrorMessage:}')
-    String loanErrorMessage
+    @Value('${exceptionMessages.loanNotFound:}')
+    String loanNotFound
 
-    @Value('${exceptionMessages.riskMessage:}')
-    String riskMessage
+    @Value('${exceptionMessages.riskTooHigh:}')
+    String riskTooHigh
 
-    @Value('${exceptionMessages.amountExceedsMessage:}')
-    String amountExceedsMessage
+    @Value('${exceptionMessages.amountExceeds:}')
+    String amountExceeds
 
-    @Value('${exceptionMessages.loanLimitExceedsMessage:}')
-    String loanLimitExceedsMessage
+    @Value('${exceptionMessages.loanLimitExceeds:}')
+    String loanLimitExceeds
 
-    @Value('${exceptionMessages.clientNotActiveMessage:}')
-    String clientNotActiveMessage
+    @Value('${exceptionMessages.clientNotActive:}')
+    String clientNotActive
 
     @Autowired
     MockMvc mockMvc

@@ -173,7 +173,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(format(clientErrorMessage, clientId))
+            response.contentAsString.contains(format(clientNotFound, clientId))
         where:
             method << [get('/api/v1/clients/{id}', clientId), delete('/api/v1/clients/{id}', clientId),
                        put('/api/v1/clients').content(new JsonBuilder(buildUpdateClientRequest()) as String)]

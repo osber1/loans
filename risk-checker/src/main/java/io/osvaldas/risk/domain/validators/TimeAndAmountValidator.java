@@ -21,11 +21,11 @@ public class TimeAndAmountValidator implements ValidationRule {
 
     private final TimeUtils timeUtils;
 
-    @Value("${exceptionMessages.amountExceedsMessage:}")
-    private String amountExceedsMessage;
+    @Value("${exceptionMessages.amountExceeds:}")
+    private String amountExceeds;
 
-    @Value("${exceptionMessages.riskMessage:}")
-    private String riskMessage;
+    @Value("${exceptionMessages.riskTooHigh:}")
+    private String riskTooHigh;
 
     @Override
     public void validate(RiskValidationTarget target) {
@@ -36,13 +36,13 @@ public class TimeAndAmountValidator implements ValidationRule {
     private void checkTimeAndAmount(BigDecimal amount) {
         int currentHour = timeUtils.getHourOfDay();
         if (config.getForbiddenHourFrom() <= currentHour && currentHour <= config.getForbiddenHourTo() && amount.compareTo(config.getMaxAmount()) == 0) {
-            throw new TimeException(riskMessage);
+            throw new TimeException(riskTooHigh);
         }
     }
 
     private void checkIfAmountIsNotToHigh(BigDecimal clientAmount) {
         if (clientAmount.compareTo(config.getMaxAmount()) > 0) {
-            throw new AmountException(amountExceedsMessage);
+            throw new AmountException(amountExceeds);
         }
     }
 

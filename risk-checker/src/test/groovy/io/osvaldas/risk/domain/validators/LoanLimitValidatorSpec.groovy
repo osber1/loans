@@ -20,7 +20,7 @@ class LoanLimitValidatorSpec extends AbstractSpec {
     LoanLimitValidator loanLimitValidator = new LoanLimitValidator(config, client)
 
     void setup() {
-        loanLimitValidator.loanLimitExceedsMessage = loanLimitExceedsMessage
+        loanLimitValidator.loanLimitExceeds = loanLimitExceeds
     }
 
     void 'should pass validation when loans per day limit not exceeded'() {
@@ -39,7 +39,7 @@ class LoanLimitValidatorSpec extends AbstractSpec {
             loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
         then:
             LoanLimitException e = thrown()
-            e.message == loanLimitExceedsMessage
+            e.message == loanLimitExceeds
     }
 
 }

@@ -41,18 +41,18 @@ public class ClientService {
 
     private final RabbitProperties rabbitProperties;
 
-    @Value("${exceptionMessages.clientAlreadyExistErrorMessage:}")
-    private String clientAlreadyExistErrorMessage;
+    @Value("${exceptionMessages.clientAlreadyExist:}")
+    private String clientAlreadyExist;
 
-    @Value("${exceptionMessages.clientErrorMessage:}")
-    private String clientErrorMessage;
+    @Value("${exceptionMessages.clientNotFound:}")
+    private String clientNotFound;
 
     @Transactional
     public Client registerClient(Client client) {
         return of(clientRepository.existsByPersonalCode(client.getPersonalCode()))
             .filter(exists -> !exists)
             .map(s -> saveClientAndSendEmail(client))
-            .orElseThrow(() -> new BadRequestException(clientAlreadyExistErrorMessage));
+            .orElseThrow(() -> new BadRequestException(clientAlreadyExist));
     }
 
     @Transactional(readOnly = true)
@@ -69,7 +69,7 @@ public class ClientService {
     @Transactional(readOnly = true)
     public Client getClient(String id) {
         return clientRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(format(clientErrorMessage, id)));
+            .orElseThrow(() -> new NotFoundException(format(clientNotFound, id)));
     }
 
     @Transactional
@@ -78,7 +78,7 @@ public class ClientService {
         String id = client.getId();
         return clientExists(id)
             .map(s -> save(client))
-            .orElseThrow(() -> new NotFoundException(format(clientErrorMessage, id)));
+            .orElseThrow(() -> new NotFoundException(format(clientNotFound, id)));
     }
 
     @Transactional
@@ -122,7 +122,7 @@ public class ClientService {
         log.info("Changing client: {} status to: {}", id, status);
         clientExists(id)
             .ifPresentOrElse(s -> clientRepository.changeClientStatus(id, status), () -> {
-                throw new NotFoundException(format(clientErrorMessage, id));
+                throw new NotFoundException(format(clientNotFound, id));
             });
     }
 

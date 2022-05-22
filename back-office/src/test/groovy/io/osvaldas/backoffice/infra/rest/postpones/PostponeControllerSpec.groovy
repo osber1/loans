@@ -47,7 +47,7 @@ class PostponeControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(format(loanErrorMessage, nonExistingId))
+            response.contentAsString.contains(format(loanNotFound, nonExistingId))
     }
 
 }

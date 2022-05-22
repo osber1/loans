@@ -22,14 +22,14 @@ import spock.lang.Specification
 @AutoConfigureWireMock(port = 8080)
 abstract class AbstractControllerSpec extends Specification {
 
-    @Value('${exceptionMessages.riskMessage:}')
-    String riskMessage
+    @Value('${exceptionMessages.riskTooHigh:}')
+    String riskTooHigh
 
-    @Value('${exceptionMessages.amountExceedsMessage:}')
-    String amountExceedsMessage
+    @Value('${exceptionMessages.amountExceeds:}')
+    String amountExceeds
 
-    @Value('${exceptionMessages.loanLimitExceedsMessage:}')
-    String loanLimitExceedsMessage
+    @Value('${exceptionMessages.loanLimitExceeds:}')
+    String loanLimitExceeds
 
     @Autowired
     MockMvc mockMvc
@@ -47,8 +47,8 @@ abstract class AbstractControllerSpec extends Specification {
     @TestConfiguration
     static class TestClockConfig {
 
-        @Primary
         @Bean
+        @Primary
         TestClockDelegate testClockDelegate(Clock clock) {
             new TestClockDelegate(clock)
         }
