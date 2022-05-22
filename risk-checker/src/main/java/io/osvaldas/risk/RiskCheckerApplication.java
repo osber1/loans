@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication(
     scanBasePackages = {
         "io.osvaldas.api",
-        "io.osvaldas.fraud"
+        "io.osvaldas.risk"
     }
 )
 @ConfigurationPropertiesScan
