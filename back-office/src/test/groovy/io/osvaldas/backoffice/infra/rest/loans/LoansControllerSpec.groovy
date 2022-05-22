@@ -69,7 +69,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(format(loanErrorMessage, loanId))
+            response.contentAsString.contains(format(loanNotFound, loanId))
     }
 
     void 'should return loans when client exists'() {
@@ -95,7 +95,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(format(clientErrorMessage, clientId))
+            response.contentAsString.contains(format(clientNotFound, clientId))
     }
 
     void 'should take loan when request is correct'() {
@@ -121,7 +121,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(false, loanLimitExceedsMessage)
+            RiskValidationResponse validationResponse = new RiskValidationResponse(false, loanLimitExceeds)
             stubWireMockResponse(validationResponse)
         when:
             postLoanRequest(loanRequest, clientId)
@@ -129,7 +129,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         then:
             response.status == BAD_REQUEST.value()
         and:
-            response.contentAsString.contains(loanLimitExceedsMessage)
+            response.contentAsString.contains(loanLimitExceeds)
         and:
             REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
@@ -139,14 +139,14 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(false, amountExceedsMessage)
+            RiskValidationResponse validationResponse = new RiskValidationResponse(false, amountExceeds)
             stubWireMockResponse(validationResponse)
         when:
             MockHttpServletResponse response = postLoanRequest(buildLoanRequest(999999.0), clientId)
         then:
             response.status == BAD_REQUEST.value()
         and:
-            response.contentAsString.contains(amountExceedsMessage)
+            response.contentAsString.contains(amountExceeds)
         and:
             REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
@@ -156,14 +156,14 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(false, riskMessage)
+            RiskValidationResponse validationResponse = new RiskValidationResponse(false, riskTooHigh)
             stubWireMockResponse(validationResponse)
         when:
             MockHttpServletResponse response = postLoanRequest(buildLoanRequest(50.0), clientId)
         then:
             response.status == BAD_REQUEST.value()
         and:
-            response.contentAsString.contains(riskMessage)
+            response.contentAsString.contains(riskTooHigh)
         and:
             REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
@@ -176,7 +176,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         then:
             response.status == BAD_REQUEST.value()
         and:
-            response.contentAsString.contains(clientNotActiveMessage)
+            response.contentAsString.contains(clientNotActive)
     }
 
     void 'should return loans taken today count'() {

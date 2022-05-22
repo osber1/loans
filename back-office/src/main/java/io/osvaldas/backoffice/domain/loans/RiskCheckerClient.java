@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import io.osvaldas.api.risk.validation.RiskValidationRequest;
 import io.osvaldas.api.risk.validation.RiskValidationResponse;
 
-@FeignClient(name = "fraud-checker", url = "http://localhost:8081")
+@FeignClient(name = "risk-checker", url = "http://localhost:8081")
 public interface RiskCheckerClient {
 
     @PostMapping("api/v1/validation")
