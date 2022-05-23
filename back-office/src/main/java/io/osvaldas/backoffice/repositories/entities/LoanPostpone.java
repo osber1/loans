@@ -11,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
+import org.hibernate.envers.Audited;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +21,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
+@Audited
 public class LoanPostpone {
 
     @Id

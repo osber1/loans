@@ -22,6 +22,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.envers.Audited;
 
 import io.osvaldas.api.clients.Status;
 import lombok.Getter;
@@ -33,6 +34,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "client")
+@Audited
 public class Client {
 
     @Id

@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.envers.Audited;
 
 import io.osvaldas.api.loans.Status;
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;
@@ -38,6 +39,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
+@Audited
 public class Loan {
 
     @Id

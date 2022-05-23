@@ -9,6 +9,7 @@ dependencies {
         project(':api'),
         libs.springBootStarterAmqp,
         libs.springBootStarterDataJpa,
+        libs.springDataEnvers,
         libs.springBootStarterActuator,
         libs.springBootStarterDataRedis,
         libs.liquibaseCore,
