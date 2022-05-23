@@ -69,6 +69,8 @@ abstract class AbstractSpec extends Specification {
     @Shared
     String validationRequestFailed = 'Failed to send validation request.'
 
+    String loanNotOpen = "Loan ${loanId} is not open."
+
     @Shared
     LoanPostpone firstPostpone = buildPostpone(1, 15.00, date.plusMonths(loanTermInMonths).plusWeeks(1))
 

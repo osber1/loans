@@ -76,6 +76,12 @@ public class Loan {
         loanPostpones.add(loanPostpone);
     }
 
+    public LoanPostpone getLastLoanPostpone() {
+        return getLoanPostpones().stream()
+            .max(comparing(LoanPostpone::getReturnDate))
+            .orElse(null);
+    }
+
     public void setInterestAndReturnDate(BigDecimal interestRate, ZonedDateTime currentDateTime) {
         setInterestRate(interestRate);
         setReturnDate(currentDateTime.plusMonths(getTermInMonths()));
