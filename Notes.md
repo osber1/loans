@@ -97,10 +97,6 @@
 
 TODO:
 
-- [ ] Optimistic locking.
-
-- [ ] Add pagination and sorting with specification.
-
 - [ ] Vault Test containers.
 
 - [ ] Add monitoring.
@@ -110,8 +106,6 @@ TODO:
 - [ ] Istio. (Zipkin, Sleuth; Elasticsearch, Logstash, Kibana), Kiali
 
 - [ ] k8s
-
-- [ ] Smart ID
 
 - [ ] Add Spring Security with JWT tokens on every request (okta or keycloak).
 

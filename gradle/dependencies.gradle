@@ -1,6 +1,6 @@
 ext {
     versions = [
-        springBoot             : '2.6.7',
+        springBoot             : '2.7.0',
         springCloud            : '2021.0.2',
         groovy                 : '3.0.10',
         lombok                 : '1.18.24',
@@ -8,7 +8,7 @@ ext {
         mapstruct              : '1.4.2.Final',
         spock                  : '2.1-groovy-3.0',
         lombokMapstructBindings: '0.2.0',
-        testContainers         : '1.17.1',
+        testContainers         : '1.17.2',
         awaitility             : '4.2.0',
         greenmail              : '1.6.9',
         feign                  : '3.1.2',
@@ -25,6 +25,7 @@ ext {
         springBootStarterAmqp           : 'org.springframework.boot:spring-boot-starter-amqp',
         springBootStarterMail           : 'org.springframework.boot:spring-boot-starter-mail',
         springBootStarterDataJpa        : 'org.springframework.boot:spring-boot-starter-data-jpa',
+        springDataEnvers                : 'org.springframework.data:spring-data-envers',
         springBootStarterValidation     : 'org.springframework.boot:spring-boot-starter-validation',
         springBootStarterActuator       : 'org.springframework.boot:spring-boot-starter-actuator',
         springBootStarterBootstrap      : 'org.springframework.cloud:spring-cloud-starter-bootstrap',

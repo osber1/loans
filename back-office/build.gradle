@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.6.7'
+    id 'org.springframework.boot' version '2.7.0'
     id 'jacoco'
 }
 
@@ -9,6 +9,7 @@ dependencies {
         project(':api'),
         libs.springBootStarterAmqp,
         libs.springBootStarterDataJpa,
+        libs.springDataEnvers,
         libs.springBootStarterActuator,
         libs.springBootStarterDataRedis,
         libs.liquibaseCore,

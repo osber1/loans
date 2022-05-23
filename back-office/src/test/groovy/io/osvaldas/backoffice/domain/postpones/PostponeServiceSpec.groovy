@@ -1,5 +1,8 @@
 package io.osvaldas.backoffice.domain.postpones
 
+import static io.osvaldas.api.loans.Status.CLOSED
+
+import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.domain.loans.LoanService
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig
@@ -17,6 +20,10 @@ class PostponeServiceSpec extends AbstractSpec {
 
     @Subject
     PostponeService postponeService = new PostponeService(loanService, config)
+
+    void setup() {
+        postponeService.loanNotOpen = loanNotOpen
+    }
 
     void 'should postpone loan when it is first postpone'() {
         given:
@@ -48,6 +55,16 @@ class PostponeServiceSpec extends AbstractSpec {
             }
         and:
             loan.loanPostpones.size() == 2
+    }
+
+    void 'should throw when trying to postpone loan which is not open'() {
+        given:
+            loanService.getLoan(loanId) >> buildLoan(100.0, CLOSED)
+        when:
+            postponeService.postponeLoan(loanId)
+        then:
+            BadRequestException e = thrown()
+            e.message == loanNotOpen
     }
 
 }

@@ -8,6 +8,7 @@ import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.LAZY;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -27,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.envers.Audited;
 
 import io.osvaldas.api.loans.Status;
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;
@@ -38,6 +40,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
+@Audited
 public class Loan {
 
     @Id
@@ -62,7 +65,7 @@ public class Loan {
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
-    @OneToMany(cascade = ALL)
+    @OneToMany(mappedBy = "loan", cascade = ALL, fetch = LAZY)
     private Set<LoanPostpone> loanPostpones = new HashSet<>();
 
     @JoinColumn(name = "client_id")
@@ -71,6 +74,12 @@ public class Loan {
 
     public void addLoanPostpone(LoanPostpone loanPostpone) {
         loanPostpones.add(loanPostpone);
+    }
+
+    public LoanPostpone getLastLoanPostpone() {
+        return getLoanPostpones().stream()
+            .max(comparing(LoanPostpone::getReturnDate))
+            .orElse(null);
     }
 
     public void setInterestAndReturnDate(BigDecimal interestRate, ZonedDateTime currentDateTime) {

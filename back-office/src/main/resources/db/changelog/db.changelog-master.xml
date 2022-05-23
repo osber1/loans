@@ -9,10 +9,8 @@
     <changeSet id="1" author="osvaldas">
         <createSequence incrementBy="1" sequenceName="loans_seq" startValue="1"/>
         <createSequence incrementBy="1" sequenceName="postpone_seq" startValue="1"/>
-        <rollback/>
-    </changeSet>
+        <createSequence incrementBy="1" sequenceName="hibernate_sequence" startValue="1"/>
 
-    <changeSet id="2" author="osvaldas">
         <createTable tableName="client">
             <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_client"/>
@@ -28,6 +26,24 @@
             <column name="version" type="BIGINT"/>
         </createTable>
 
+        <createTable tableName="client_aud">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_client_aud"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(20)"/>
+            <column name="phone_number" type="VARCHAR(255)"/>
+            <column name="personal_code" type="VARCHAR(20)"/>
+            <column name="created_at" type="timestamp with time zone"/>
+            <column name="updated_at" type="timestamp with time zone"/>
+            <column name="rev" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_rev"/>
+            </column>
+            <column name="revtype" type="SMALLINT"/>
+        </createTable>
+
         <createTable tableName="loan">
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_loan"/>
@@ -41,13 +57,21 @@
             <column name="client_id" type="varchar(255)"/>
         </createTable>
 
-        <createTable tableName="loan_loan_postpones">
-            <column name="loan_id" type="BIGINT">
-                <constraints nullable="false"/>
+        <createTable tableName="loan_aud">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_loan_aud"/>
             </column>
-            <column name="loan_postpones_id" type="BIGINT">
-                <constraints nullable="false"/>
+            <column name="amount" type="DECIMAL"/>
+            <column name="interest_rate" type="DECIMAL"/>
+            <column name="term_in_months" type="INT"/>
+            <column name="status" type="VARCHAR(20)"/>
+            <column name="return_date" type="timestamp with time zone"/>
+            <column name="created_at" type="timestamp with time zone"/>
+            <column name="client_id" type="varchar(255)"/>
+            <column name="rev" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_rev"/>
             </column>
+            <column name="revtype" type="SMALLINT"/>
         </createTable>
 
         <createTable tableName="loan_postpone">
@@ -56,28 +80,48 @@
             </column>
             <column name="return_date" type="timestamp with time zone"/>
             <column name="interest_rate" type="DECIMAL"/>
+            <column name="loan_id" type="BIGINT"/>
         </createTable>
-        <rollback/>
-    </changeSet>
 
-    <changeSet id="3" author="osvaldas">
-        <addUniqueConstraint columnNames="loan_postpones_id" constraintName="uc_loan_loan_postpones_loanpostpones"
-                             tableName="loan_loan_postpones"/>
-        <rollback/>
-    </changeSet>
+        <createTable tableName="loan_postpone_aud">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_loanpostpone_aud"/>
+            </column>
+            <column name="return_date" type="timestamp with time zone"/>
+            <column name="interest_rate" type="DECIMAL"/>
+            <column name="loan_id" type="BIGINT"/>
+            <column name="rev" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_rev"/>
+            </column>
+            <column name="revtype" type="SMALLINT"/>
+        </createTable>
 
-    <changeSet id="4" author="osvaldas">
+        <createTable tableName="revinfo">
+            <column name="rev" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_revinfo"/>
+            </column>
+            <column name="revtstmp" type="BIGINT"/>
+        </createTable>
+
         <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="loan"
-                                 constraintName="fk_cliloa_on_client_d_a_o" referencedColumnNames="id"
+                                 constraintName="FK62s5k229ouak16t2k5pvq4n16" referencedColumnNames="id"
                                  referencedTableName="client"/>
 
-        <addForeignKeyConstraint baseColumnNames="loan_id" baseTableName="loan_loan_postpones"
-                                 constraintName="fk_loaloa_on_loan" referencedColumnNames="id"
+        <addForeignKeyConstraint baseColumnNames="loan_id" baseTableName="loan_postpone"
+                                 constraintName="FK69ycfg3aoqi0fhl7mjlvylp8i" referencedColumnNames="id"
                                  referencedTableName="loan"/>
 
-        <addForeignKeyConstraint baseColumnNames="loan_postpones_id" baseTableName="loan_loan_postpones"
-                                 constraintName="fk_loaloa_on_loan_postpone" referencedColumnNames="id"
-                                 referencedTableName="loan_postpone"/>
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="client_aud"
+                                 constraintName="FKq7rlntwn6l0k20fxnu2ro82h6" referencedColumnNames="rev"
+                                 referencedTableName="revinfo"/>
+
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="loan_aud"
+                                 constraintName="FKbfkqegitcyn916sb39dr1516j" referencedColumnNames="rev"
+                                 referencedTableName="revinfo"/>
+
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="loan_postpone_aud"
+                                 constraintName="FKi11mvh4xh7v3cx5340wredmal" referencedColumnNames="rev"
+                                 referencedTableName="revinfo"/>
         <rollback/>
     </changeSet>
 </databaseChangeLog>
