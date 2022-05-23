@@ -30,5 +30,3 @@ public class BackOfficeApplication {
     }
 
 }
-
-// TODO add new tables to the database
