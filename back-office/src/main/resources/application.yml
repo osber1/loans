@@ -16,7 +16,7 @@ spring:
     driverClassName: org.postgresql.Driver
 
   jpa:
-    hibernate.ddl-auto: create
+    hibernate.ddl-auto: none
     #    show-sql: true
     properties:
       #      javax:
@@ -34,7 +34,6 @@ spring:
     type: redis
 
   liquibase:
-    enabled: false
     change-log: classpath:db/changelog/db.changelog-master.xml
 
   rabbitmq:

@@ -1,6 +1,10 @@
 package io.osvaldas.backoffice.repositories.entities;
 
 import static java.math.RoundingMode.HALF_UP;
+import static javax.persistence.CascadeType.DETACH;
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.CascadeType.REFRESH;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -9,6 +13,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 
 import org.hibernate.envers.Audited;
@@ -32,6 +38,10 @@ public class LoanPostpone {
     private ZonedDateTime returnDate;
 
     private BigDecimal interestRate;
+
+    @JoinColumn(name = "loan_id")
+    @ManyToOne(cascade = { PERSIST, MERGE, DETACH, REFRESH })
+    private Loan loan;
 
     public void setNewInterestRate(BigDecimal interestRate, BigDecimal interestIncrementFactor) {
         BigDecimal newInterestRate = interestRate.multiply(interestIncrementFactor).setScale(2, HALF_UP);

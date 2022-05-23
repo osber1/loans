@@ -26,6 +26,7 @@ public class ValidationService {
             LoanResponse loan = backOfficeClient.getLoan(loanId);
             RiskValidationTarget riskValidationTarget = new RiskValidationTarget(loan.getAmount(), clientId);
             validator.validate(riskValidationTarget);
+            log.info("Client {} request successful.", clientId);
             return new RiskValidationResponse(true, "Risk validation passed.");
         } catch (Exception e) {
             log.error("Risk validation failed for client {} with loan {}", clientId, loanId, e);

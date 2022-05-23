@@ -8,6 +8,7 @@ import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.LAZY;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -64,7 +65,7 @@ public class Loan {
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
-    @OneToMany(cascade = ALL)
+    @OneToMany(mappedBy = "loan", cascade = ALL, fetch = LAZY)
     private Set<LoanPostpone> loanPostpones = new HashSet<>();
 
     @JoinColumn(name = "client_id")
