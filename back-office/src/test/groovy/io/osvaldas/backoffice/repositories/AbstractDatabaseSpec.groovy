@@ -48,7 +48,7 @@ abstract class AbstractDatabaseSpec extends Specification {
     Loan loan = createLoan()
 
     @Shared
-    PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:14.1-alpine')
+    PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:14.5-alpine')
         .withDatabaseName('loans')
         .withUsername('root')
         .withPassword('root')

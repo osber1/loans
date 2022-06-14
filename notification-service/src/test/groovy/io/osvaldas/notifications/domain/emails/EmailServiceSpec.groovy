@@ -46,7 +46,7 @@ class EmailServiceSpec extends AbstractEmailSpec {
                 from == [new InternetAddress(emailSender)]
                 allRecipients.contains(new InternetAddress(receiverEmail))
                 subject == emailSubject
-                content == "${emailContent}\r\n"
+                content == "${emailContent}"
             }
     }
 
