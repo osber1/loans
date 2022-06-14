@@ -15,7 +15,7 @@ jobs:
           java-version: 17
           distribution: 'adopt'
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@116ac10f8131939c7e405884cb2456067b0479e9
+        uses: gradle/gradle-build-action@356abb47e7664b5505e25d7997a5a522a17c62d9
         with:
           arguments: clean build
       - name: Upload coverage reports to Codecov with GitHub Action
