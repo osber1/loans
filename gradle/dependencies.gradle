@@ -12,7 +12,15 @@ ext {
         awaitility             : '4.2.0',
         greenmail              : '1.6.10',
         feign                  : '3.1.4',
-        wiremock               : '3.1.4']
+        wiremock               : '3.1.4',
+        cucumber               : '6.10.4',
+        restAssured            : '4.5.1',
+        guice                  : '5.1.0',
+        reflections            : '0.10.2',
+        snakeyaml              : '1.33',
+        javaFaker              : '1.0.2'
+
+    ]
 
     libs = [
         springBootDependencies          : "org.springframework.boot:spring-boot-dependencies:${versions.springBoot}",
@@ -49,6 +57,13 @@ ext {
         awaitility                      : "org.awaitility:awaitility:${versions.awaitility}",
         wiremock                        : "org.springframework.cloud:spring-cloud-contract-wiremock:${versions.wiremock}",
         jacksonDatatypeJsr310           : 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310',
-        jpamodelgen                     : 'org.hibernate:hibernate-jpamodelgen'
+        jpamodelgen                     : 'org.hibernate:hibernate-jpamodelgen',
+        cucumberGroovy                  : "io.cucumber:cucumber-groovy:${versions.cucumber}",
+        cucumberJunit                   : "io.cucumber:cucumber-junit:${versions.cucumber}",
+        restAssured                     : "io.rest-assured:rest-assured:${versions.restAssured}",
+        guice                           : "com.google.inject:guice:${versions.guice}",
+        reflections                     : "org.reflections:reflections:${versions.reflections}",
+        snakeyaml                       : "org.yaml:snakeyaml:${versions.snakeyaml}",
+        javaFaker                       : "com.github.javafaker:javafaker:${versions.javaFaker}"
     ]
 }
