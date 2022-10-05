@@ -18,7 +18,9 @@ dependencies {
         libs.postgresql,
         libs.feign,
         libs.jacksonDatatypeJsr310,
-        libs.vault
+        libs.vault,
+        libs.cucumberGroovy,
+        libs.cucumberJunit
     )
 
     annotationProcessor(

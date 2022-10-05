@@ -8,6 +8,7 @@ import static javax.persistence.FetchType.LAZY;
 
 import java.time.ZonedDateTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -84,9 +85,8 @@ public class Client {
         return this.firstName + " " + this.lastName;
     }
 
-    public Loan getLastLoan() {
+    public Optional<Loan> getLastLoan() {
         return this.getLoans().stream()
-            .max(comparing(Loan::getId))
-            .orElse(null);
+            .max(comparing(Loan::getId));
     }
 }

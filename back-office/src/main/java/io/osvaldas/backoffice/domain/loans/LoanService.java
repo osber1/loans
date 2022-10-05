@@ -79,9 +79,7 @@ public class LoanService {
     @Transactional
     public Loan addLoan(Loan loan, String clientId) {
         log.info("Adding loan for client: {}", clientId);
-        Client client = of(getClient(clientId))
-            .filter(c -> ACTIVE == c.getStatus())
-            .orElseThrow(() -> new ClientNotActiveException(clientNotActive));
+        Client client = getActiveClient(clientId);
         cancelPreviousPendingLoan(client);
         return addLoanToClient(client, loan);
     }
@@ -99,6 +97,12 @@ public class LoanService {
             .filter(RiskValidationResponse::isSuccess)
             .ifPresentOrElse(r -> approveAndSave(loan),
                 () -> rejectLoanAndThrow(loan, response.getMessage()));
+    }
+
+    private Client getActiveClient(String clientId) {
+        return of(getClient(clientId))
+            .filter(c -> ACTIVE == c.getStatus())
+            .orElseThrow(() -> new ClientNotActiveException(clientNotActive));
     }
 
     private RiskValidationResponse sendValidationRequest(Loan loan, String clientId) {
@@ -129,12 +133,9 @@ public class LoanService {
 
     private void cancelPreviousPendingLoan(Client client) {
         of(client)
-            .map(Client::getLastLoan)
+            .flatMap(Client::getLastLoan)
             .filter(loan -> PENDING == loan.getStatus())
-            .ifPresent(loan -> {
-                loan.setStatus(REJECTED);
-                loanRepository.save(loan);
-            });
+            .ifPresent(loan -> setStatusAndSave(loan, REJECTED));
     }
 
     private Client getClient(String clientId) {
@@ -151,8 +152,8 @@ public class LoanService {
         throw new ValidationRuleException(message);
     }
 
-    private void setStatusAndSave(Loan loan, Status open) {
-        loan.setStatus(open);
+    private void setStatusAndSave(Loan loan, Status status) {
+        loan.setStatus(status);
         save(loan);
     }
 
