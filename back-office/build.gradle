@@ -19,8 +19,6 @@ dependencies {
         libs.feign,
         libs.jacksonDatatypeJsr310,
         libs.vault,
-        libs.cucumberGroovy,
-        libs.cucumberJunit
     )
 
     annotationProcessor(
@@ -29,13 +27,18 @@ dependencies {
     )
 
     testImplementation(
+        platform(libs.cucumberBom),
         libs.testcontainers,
         libs.testcontainersSpock,
         libs.testcontainersPostgresql,
         libs.testcontainersVault,
         libs.testcontainersRabbitmq,
         libs.springTestRedis,
-        libs.wiremock
+        libs.wiremock,
+        libs.cucumberGroovy,
+        libs.cucumberJunit,
+        libs.cucumberJunitPlatform,
+        libs.junitPlatformSuite
     )
 }
 

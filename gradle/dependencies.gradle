@@ -13,7 +13,8 @@ ext {
         greenmail              : '1.6.10',
         feign                  : '3.1.4',
         wiremock               : '3.1.4',
-        cucumber               : '6.10.4'
+        cucumber               : '6.10.4',
+        cucumberBom            : '7.8.1'
     ]
 
     libs = [
@@ -53,6 +54,9 @@ ext {
         jacksonDatatypeJsr310           : 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310',
         jpamodelgen                     : 'org.hibernate:hibernate-jpamodelgen',
         cucumberGroovy                  : "io.cucumber:cucumber-groovy:${versions.cucumber}",
-        cucumberJunit                   : "io.cucumber:cucumber-junit:${versions.cucumber}"
+        cucumberJunit                   : "io.cucumber:cucumber-junit:${versions.cucumber}",
+        cucumberJunitPlatform           : 'io.cucumber:cucumber-junit-platform-engine',
+        junitPlatformSuite              : 'org.junit.platform:junit-platform-suite',
+        cucumberBom                     : "io.cucumber:cucumber-bom:${versions.cucumberBom}"
     ]
 }
