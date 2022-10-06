@@ -3,6 +3,8 @@ package io.osvaldas.backoffice.domain.clients;
 import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.clients.Status.DELETED;
 import static io.osvaldas.api.clients.Status.INACTIVE;
+import static io.osvaldas.api.util.ExceptionMessages.CLIENT_ALREADY_EXIST;
+import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
 import static java.lang.String.format;
 import static java.util.Optional.of;
@@ -12,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -41,18 +42,12 @@ public class ClientService {
 
     private final RabbitProperties rabbitProperties;
 
-    @Value("${exceptionMessages.clientAlreadyExist:}")
-    private String clientAlreadyExist;
-
-    @Value("${exceptionMessages.clientNotFound:}")
-    private String clientNotFound;
-
     @Transactional
     public Client registerClient(Client client) {
         return of(clientRepository.existsByPersonalCode(client.getPersonalCode()))
             .filter(exists -> !exists)
             .map(s -> saveClientAndSendEmail(client))
-            .orElseThrow(() -> new BadRequestException(clientAlreadyExist));
+            .orElseThrow(() -> new BadRequestException(CLIENT_ALREADY_EXIST));
     }
 
     @Transactional(readOnly = true)
@@ -69,7 +64,7 @@ public class ClientService {
     @Transactional(readOnly = true)
     public Client getClient(String id) {
         return clientRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(format(clientNotFound, id)));
+            .orElseThrow(() -> new NotFoundException(format(CLIENT_NOT_FOUND, id)));
     }
 
     @Transactional
@@ -78,7 +73,7 @@ public class ClientService {
         String id = client.getId();
         return clientExists(id)
             .map(s -> save(client))
-            .orElseThrow(() -> new NotFoundException(format(clientNotFound, id)));
+            .orElseThrow(() -> new NotFoundException(format(CLIENT_NOT_FOUND, id)));
     }
 
     @Transactional
@@ -122,7 +117,7 @@ public class ClientService {
         log.info("Changing client: {} status to: {}", id, status);
         clientExists(id)
             .ifPresentOrElse(s -> clientRepository.changeClientStatus(id, status), () -> {
-                throw new NotFoundException(format(clientNotFound, id));
+                throw new NotFoundException(format(CLIENT_NOT_FOUND, id));
             });
     }
 

@@ -3,7 +3,6 @@ package io.osvaldas.risk.infra.rest
 import java.time.Clock
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -15,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc
 import com.fasterxml.jackson.databind.ObjectMapper
 
 import io.osvaldas.risk.TestClockDelegate
+import spock.lang.Shared
 import spock.lang.Specification
 
 @SpringBootTest
@@ -22,14 +22,15 @@ import spock.lang.Specification
 @AutoConfigureWireMock(port = 8080)
 abstract class AbstractControllerSpec extends Specification {
 
-    @Value('${exceptionMessages.riskTooHigh:}')
-    String riskTooHigh
+    @Shared
+    String riskTooHigh = 'Risk is too high, because you are trying ' +
+        'to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
 
-    @Value('${exceptionMessages.amountExceeds:}')
-    String amountExceeds
+    @Shared
+    String amountExceeds = 'The amount you are trying to borrow exceeds the max amount!'
 
-    @Value('${exceptionMessages.loanLimitExceeds:}')
-    String loanLimitExceeds
+    @Shared
+    String loanLimitExceeds = 'Too many loans taken in a single day.'
 
     @Autowired
     MockMvc mockMvc

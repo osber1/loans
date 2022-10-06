@@ -49,12 +49,6 @@ class LoanServiceSpec extends AbstractSpec {
     @Subject
     LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient)
 
-    void setup() {
-        loanService.loanNotFound = loanNotFound
-        loanService.clientNotActive = clientNotActive
-        loanService.validationRequestFailed = validationRequestFailed
-    }
-
     void 'should save loan'() {
         when:
             loanService.save(loan)
