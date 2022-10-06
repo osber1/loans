@@ -98,5 +98,6 @@ public class Loan {
         loanPostpone.setNewInterestRate(interestRate, config.getInterestIncrementFactor());
         loanPostpone.setNewReturnDay(returnDate, config.getPostponeDays());
         addLoanPostpone(loanPostpone);
+        loanPostpone.setLoan(this);
     }
 }

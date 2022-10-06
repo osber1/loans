@@ -14,7 +14,12 @@ ext {
         feign                  : '3.1.4',
         wiremock               : '3.1.4',
         cucumber               : '6.10.4',
-        cucumberBom            : '7.8.1'
+        restAssured            : '4.5.1',
+        guice                  : '5.1.0',
+        reflections            : '0.10.2',
+        snakeyaml              : '1.33',
+        javaFaker              : '1.0.2'
+
     ]
 
     libs = [
@@ -55,8 +60,10 @@ ext {
         jpamodelgen                     : 'org.hibernate:hibernate-jpamodelgen',
         cucumberGroovy                  : "io.cucumber:cucumber-groovy:${versions.cucumber}",
         cucumberJunit                   : "io.cucumber:cucumber-junit:${versions.cucumber}",
-        cucumberJunitPlatform           : 'io.cucumber:cucumber-junit-platform-engine',
-        junitPlatformSuite              : 'org.junit.platform:junit-platform-suite',
-        cucumberBom                     : "io.cucumber:cucumber-bom:${versions.cucumberBom}"
+        restAssured                     : "io.rest-assured:rest-assured:${versions.restAssured}",
+        guice                           : "com.google.inject:guice:${versions.guice}",
+        reflections                     : "org.reflections:reflections:${versions.reflections}",
+        snakeyaml                       : "org.yaml:snakeyaml:${versions.snakeyaml}",
+        javaFaker                       : "com.github.javafaker:javafaker:${versions.javaFaker}"
     ]
 }
