@@ -21,10 +21,6 @@ class PostponeServiceSpec extends AbstractSpec {
     @Subject
     PostponeService postponeService = new PostponeService(loanService, config)
 
-    void setup() {
-        postponeService.loanNotOpen = loanNotOpen
-    }
-
     void 'should postpone loan when it is first postpone'() {
         given:
             loanService.getLoan(loanId) >> loan

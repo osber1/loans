@@ -7,7 +7,6 @@ import static java.time.ZoneId.of
 import java.time.Clock
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -35,24 +34,6 @@ abstract class AbstractControllerSpec extends AbstractSpec {
 
     @Shared
     static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.11-management-alpine')
-
-    @Value('${exceptionMessages.clientNotFound:}')
-    String clientNotFound
-
-    @Value('${exceptionMessages.loanNotFound:}')
-    String loanNotFound
-
-    @Value('${exceptionMessages.riskTooHigh:}')
-    String riskTooHigh
-
-    @Value('${exceptionMessages.amountExceeds:}')
-    String amountExceeds
-
-    @Value('${exceptionMessages.loanLimitExceeds:}')
-    String loanLimitExceeds
-
-    @Value('${exceptionMessages.clientNotActive:}')
-    String clientNotActive
 
     @Autowired
     MockMvc mockMvc

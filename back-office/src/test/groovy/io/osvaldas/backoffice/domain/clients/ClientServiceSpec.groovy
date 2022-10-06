@@ -44,17 +44,12 @@ class ClientServiceSpec extends AbstractSpec {
     @Subject
     ClientService clientService = new ClientService(clientRepository, messageProducer, rabbitProperties)
 
-    void setup() {
-        clientService.clientNotFound = clientNotFound
-        clientService.clientAlreadyExist = clientAlreadyExist
-    }
-
     void 'should throw exception when registering client with existing personal code'() {
         when:
             clientService.registerClient(registeredClientWithoutId)
         then:
             BadRequestException e = thrown()
-            e.message == 'Client with personal code already exists.'
+            e.message == clientAlreadyExist
         and:
             1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> true
             0 * messageProducer.publish(_ as EmailMessage, _ as String, _ as String)

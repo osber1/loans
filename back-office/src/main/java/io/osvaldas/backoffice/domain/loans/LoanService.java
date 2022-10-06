@@ -4,6 +4,9 @@ import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.loans.Status.OPEN;
 import static io.osvaldas.api.loans.Status.PENDING;
 import static io.osvaldas.api.loans.Status.REJECTED;
+import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_ACTIVE;
+import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_FOUND;
+import static io.osvaldas.api.util.ExceptionMessages.VALIDATION_REQUEST_FAILED;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.clientIdIs;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreationDateIsAfter;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs;
@@ -15,7 +18,6 @@ import static org.springframework.data.jpa.domain.Specification.where;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,15 +53,6 @@ public class LoanService {
 
     private final RiskCheckerClient riskCheckerClient;
 
-    @Value("${exceptionMessages.loanNotFound:}")
-    private String loanNotFound;
-
-    @Value("${exceptionMessages.clientNotActive:}")
-    private String clientNotActive;
-
-    @Value("${exceptionMessages.validationRequestFailed:}")
-    private String validationRequestFailed;
-
     @Transactional
     public Loan save(Loan loan) {
         return loanRepository.save(loan);
@@ -68,7 +61,7 @@ public class LoanService {
     @Transactional(readOnly = true)
     public Loan getLoan(long id) {
         return loanRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(format(loanNotFound, id)));
+            .orElseThrow(() -> new NotFoundException(format(LOAN_NOT_FOUND, id)));
     }
 
     @Transactional(readOnly = true)
@@ -102,7 +95,7 @@ public class LoanService {
     private Client getActiveClient(String clientId) {
         return of(getClient(clientId))
             .filter(c -> ACTIVE == c.getStatus())
-            .orElseThrow(() -> new ClientNotActiveException(clientNotActive));
+            .orElseThrow(() -> new ClientNotActiveException(CLIENT_NOT_ACTIVE));
     }
 
     private RiskValidationResponse sendValidationRequest(Loan loan, String clientId) {
@@ -114,7 +107,7 @@ public class LoanService {
         } catch (Exception e) {
             log.error("Error validating loan: {}", loan.getId(), e);
         }
-        return new RiskValidationResponse(false, validationRequestFailed);
+        return new RiskValidationResponse(false, VALIDATION_REQUEST_FAILED);
     }
 
     private int getLoanTakenTodayCount(String clientId, ZonedDateTime date) {

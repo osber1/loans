@@ -19,10 +19,6 @@ class LoanLimitValidatorSpec extends AbstractSpec {
     @Subject
     LoanLimitValidator loanLimitValidator = new LoanLimitValidator(config, client)
 
-    void setup() {
-        loanLimitValidator.loanLimitExceeds = loanLimitExceeds
-    }
-
     void 'should pass validation when loans per day limit not exceeded'() {
         given:
             client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(1)

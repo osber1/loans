@@ -68,11 +68,3 @@ application:
   interestRate: 10
   interestIncrementFactor: 1.5
   postponeDays: 7
-
-exceptionMessages:
-  clientNotFound: Client with id %s does not exist.
-  loanNotFound: Loan with id %s does not exist.
-  loanNotOpen: Loan with id %s is not open.
-  clientNotActive: Client is not active.
-  clientAlreadyExist: Client with personal code already exists.
-  validationRequestFailed: Failed to send validation request.

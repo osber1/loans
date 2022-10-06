@@ -49,12 +49,6 @@ class LoanServiceSpec extends AbstractSpec {
     @Subject
     LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient)
 
-    void setup() {
-        loanService.loanNotFound = loanNotFound
-        loanService.clientNotActive = clientNotActive
-        loanService.validationRequestFailed = validationRequestFailed
-    }
-
     void 'should save loan'() {
         when:
             loanService.save(loan)
@@ -96,7 +90,7 @@ class LoanServiceSpec extends AbstractSpec {
             loanService.getLoan(loanId)
         then:
             NotFoundException e = thrown()
-            e.message == loanNotFound
+            e.message == "Loan with id ${loanId} does not exist."
         and:
             1 * loanRepository.findById(loanId) >> empty()
     }

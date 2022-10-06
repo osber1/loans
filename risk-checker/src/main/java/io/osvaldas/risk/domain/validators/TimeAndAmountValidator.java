@@ -1,8 +1,10 @@
 package io.osvaldas.risk.domain.validators;
 
+import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS;
+import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH;
+
 import java.math.BigDecimal;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException;
@@ -21,12 +23,6 @@ public class TimeAndAmountValidator implements ValidationRule {
 
     private final TimeUtils timeUtils;
 
-    @Value("${exceptionMessages.amountExceeds:}")
-    private String amountExceeds;
-
-    @Value("${exceptionMessages.riskTooHigh:}")
-    private String riskTooHigh;
-
     @Override
     public void validate(RiskValidationTarget target) {
         checkTimeAndAmount(target.getLoanAmount());
@@ -36,13 +32,13 @@ public class TimeAndAmountValidator implements ValidationRule {
     private void checkTimeAndAmount(BigDecimal amount) {
         int currentHour = timeUtils.getHourOfDay();
         if (config.getForbiddenHourFrom() <= currentHour && currentHour <= config.getForbiddenHourTo() && amount.compareTo(config.getMaxAmount()) == 0) {
-            throw new TimeException(riskTooHigh);
+            throw new TimeException(RISK_TOO_HIGH);
         }
     }
 
     private void checkIfAmountIsNotToHigh(BigDecimal clientAmount) {
         if (clientAmount.compareTo(config.getMaxAmount()) > 0) {
-            throw new AmountException(amountExceeds);
+            throw new AmountException(AMOUNT_EXCEEDS);
         }
     }
 

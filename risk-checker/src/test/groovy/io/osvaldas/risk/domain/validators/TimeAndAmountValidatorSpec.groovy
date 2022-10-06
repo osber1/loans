@@ -24,11 +24,6 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
     @Subject
     TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
 
-    void setup() {
-        timeAndAmountValidator.riskTooHigh = riskTooHigh
-        timeAndAmountValidator.amountExceeds = amountExceeds
-    }
-
     void 'should validate when amount is not to high and correct time'() {
         when:
             timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: 100.00))
