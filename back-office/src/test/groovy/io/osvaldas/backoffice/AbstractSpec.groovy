@@ -51,7 +51,7 @@ abstract class AbstractSpec extends Specification {
     String clientAlreadyExist = 'Client with personal code already exists.'
 
     @Shared
-    String loanNotFound = "Loan with id ${loanId} does not exist."
+    String loanNotFound = 'Loan with id %s does not exist.'
 
     @Shared
     String riskTooHigh = 'Risk is too high, because you are trying ' +
@@ -69,7 +69,7 @@ abstract class AbstractSpec extends Specification {
     @Shared
     String validationRequestFailed = 'Failed to send validation request.'
 
-    String loanNotOpen = "Loan ${loanId} is not open."
+    String loanNotOpen = "Loan with id ${loanId} is not open."
 
     @Shared
     LoanPostpone firstPostpone = buildPostpone(1, 15.00, date.plusMonths(loanTermInMonths).plusWeeks(1))

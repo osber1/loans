@@ -90,7 +90,7 @@ class LoanServiceSpec extends AbstractSpec {
             loanService.getLoan(loanId)
         then:
             NotFoundException e = thrown()
-            e.message == loanNotFound
+            e.message == "Loan with id ${loanId} does not exist."
         and:
             1 * loanRepository.findById(loanId) >> empty()
     }
