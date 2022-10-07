@@ -97,19 +97,19 @@ services:
 
   back-office:
     container_name: back-office
-    image: loans-back-office:1.0-SNAPSHOT
+    image: back-office:1.0-SNAPSHOT
     network_mode: "host"
     restart: unless-stopped
 
   risk-checker:
     container_name: risk-checker
-    image: loans-risk-checker:1.0-SNAPSHOT
+    image: risk-checker:1.0-SNAPSHOT
     network_mode: "host"
     restart: unless-stopped
 
   notification-service:
     container_name: notification-service
-    image: loans-notification-service:1.0-SNAPSHOT
+    image: notification-service:1.0-SNAPSHOT
     network_mode: "host"
     restart: unless-stopped
 

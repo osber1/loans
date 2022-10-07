@@ -28,7 +28,7 @@ Before {
 
 baseURI = 'http://localhost:8080'
 
-Given(~/^client is created$/) { ->
+Given(~/^client is registered$/) { ->
     Response response = request()
         .body(new JsonBuilder(operations.buildRegisterClientRequest()) as String)
         .post('/api/v1/clients')
@@ -39,7 +39,7 @@ Given(~/^client is created$/) { ->
     clientId = jsonSlurper.parseText(jsonString)['id']
 }
 
-Then(~/^client is active$/) { ->
+Then(~/^client is activated$/) { ->
     Response response = request()
         .get("/api/v1/clients/${clientId}/active")
 
