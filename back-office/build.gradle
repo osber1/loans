@@ -1,7 +1,10 @@
 plugins {
     id 'org.springframework.boot' version '2.7.4'
     id 'jacoco'
+    id 'com.google.cloud.tools.jib' version '3.3.0'
 }
+
+tasks.build.dependsOn tasks.jibDockerBuild
 
 dependencies {
     implementation(
