@@ -20,7 +20,7 @@ public interface ClientRepository extends JpaRepository<Client, String>, JpaSpec
     boolean existsByPersonalCode(String personalCode);
 
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE Client c SET c.status = ?2 WHERE c.id = ?1")
+    @Query("UPDATE Client c SET c.status = :status WHERE c.id = :id")
     void changeClientStatus(String id, Status status);
 
 }

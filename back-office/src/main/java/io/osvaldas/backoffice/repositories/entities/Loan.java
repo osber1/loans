@@ -31,7 +31,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.envers.Audited;
 
 import io.osvaldas.api.loans.Status;
-import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -87,16 +86,17 @@ public class Loan {
         setReturnDate(currentDateTime.plusMonths(getTermInMonths()));
     }
 
-    public void postponeLoan(PropertiesConfig config) {
+    public void postponeLoan(int postponeDays, BigDecimal factor) {
         getLoanPostpones().stream()
             .max(comparing(LoanPostpone::getReturnDate))
-            .ifPresentOrElse(postpone -> setNewInterestAndReturnDay(new LoanPostpone(), postpone.getInterestRate(), postpone.getReturnDate(), config),
-                () -> setNewInterestAndReturnDay(new LoanPostpone(), getInterestRate(), getReturnDate(), config));
+            .ifPresentOrElse(postpone -> setNewInterestAndReturnDay(postpone.getInterestRate(), postpone.getReturnDate(), postponeDays, factor),
+                () -> setNewInterestAndReturnDay(getInterestRate(), getReturnDate(), postponeDays, factor));
     }
 
-    private void setNewInterestAndReturnDay(LoanPostpone loanPostpone, BigDecimal interestRate, ZonedDateTime returnDate, PropertiesConfig config) {
-        loanPostpone.setNewInterestRate(interestRate, config.getInterestIncrementFactor());
-        loanPostpone.setNewReturnDay(returnDate, config.getPostponeDays());
+    private void setNewInterestAndReturnDay(BigDecimal interestRate, ZonedDateTime returnDate, int postponeDays, BigDecimal factor) {
+        LoanPostpone loanPostpone = new LoanPostpone();
+        loanPostpone.incrementAndSetInterestRate(interestRate, factor);
+        loanPostpone.incrementAndSetReturnDay(returnDate, postponeDays);
         addLoanPostpone(loanPostpone);
         loanPostpone.setLoan(this);
     }

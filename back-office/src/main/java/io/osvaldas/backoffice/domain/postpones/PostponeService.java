@@ -29,7 +29,7 @@ public class PostponeService {
     public LoanPostpone postponeLoan(long id) {
         log.info("Postponing loan: {}", id);
         Loan loan = getOpenLoan(id);
-        loan.postponeLoan(config);
+        loan.postponeLoan(config.getPostponeDays(), config.getInterestIncrementFactor());
         return loanService.save(loan).getLastLoanPostpone();
     }
 

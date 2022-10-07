@@ -22,7 +22,7 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
         when:
             Optional<Client> client = repository.findById(clientId)
         then:
-            client.isPresent() == result
+            client.present == result
         where:
             clientId        || result
             validClientId   || true

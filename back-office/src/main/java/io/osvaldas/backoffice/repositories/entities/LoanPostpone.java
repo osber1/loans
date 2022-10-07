@@ -43,12 +43,12 @@ public class LoanPostpone {
     @ManyToOne(cascade = { PERSIST, MERGE, DETACH, REFRESH })
     private Loan loan;
 
-    public void setNewInterestRate(BigDecimal interestRate, BigDecimal interestIncrementFactor) {
+    public void incrementAndSetInterestRate(BigDecimal interestRate, BigDecimal interestIncrementFactor) {
         BigDecimal newInterestRate = interestRate.multiply(interestIncrementFactor).setScale(2, HALF_UP);
         setInterestRate(newInterestRate);
     }
 
-    public void setNewReturnDay(ZonedDateTime returnDate, int postponeDays) {
+    public void incrementAndSetReturnDay(ZonedDateTime returnDate, int postponeDays) {
         ZonedDateTime newReturnDay = returnDate.plusDays(postponeDays);
         setReturnDate(newReturnDay);
     }
