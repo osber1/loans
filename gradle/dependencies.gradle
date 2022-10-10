@@ -8,7 +8,7 @@ ext {
         mapstruct              : '1.5.2.Final',
         spock                  : '2.1-groovy-3.0',
         lombokMapstructBindings: '0.2.0',
-        testContainers         : '1.17.4',
+        testContainers         : '1.17.5',
         awaitility             : '4.2.0',
         greenmail              : '1.6.10',
         feign                  : '3.1.4',
