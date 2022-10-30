@@ -1,0 +1,21 @@
+version: '3.5'
+
+services:
+  back-office:
+    container_name: back-office
+    image: back-office:1.0-SNAPSHOT
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/loans
+    restart: unless-stopped
+
+  risk-checker:
+    container_name: risk-checker
+    image: risk-checker:1.0-SNAPSHOT
+    restart: unless-stopped
+
+  notification-service:
+    container_name: notification-service
+    image: notification-service:1.0-SNAPSHOT
+    restart: unless-stopped

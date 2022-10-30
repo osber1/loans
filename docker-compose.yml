@@ -6,8 +6,6 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
-    networks:
-      - postgres
     restart: unless-stopped
 
   redis-commander:
@@ -17,8 +15,6 @@ services:
     restart: unless-stopped
     environment:
       - REDIS_HOSTS=local:redis:6379
-    networks:
-      - postgres
     ports:
       - "5123:8081"
 
@@ -34,8 +30,6 @@ services:
       - postgres:/data/postgres
     ports:
       - "5432:5432"
-    networks:
-      - postgres
     restart: unless-stopped
 
   pgadmin:
@@ -48,8 +42,6 @@ services:
       - pgadmin:/var/lib/pgadmin
     ports:
       - "5050:80"
-    networks:
-      - postgres
     restart: unless-stopped
 
   maildev:
@@ -58,8 +50,6 @@ services:
     ports:
       - "1080:1080"
       - "1025:1025"
-    networks:
-      - postgres
     restart: unless-stopped
 
   rabbitmq:
@@ -75,8 +65,6 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-    networks:
-      - postgres
     restart: unless-stopped
 
   vault:
@@ -91,13 +79,28 @@ services:
       - vault:/etc/vault/logs
     ports:
       - "8200:8200"
-    networks:
-      - postgres
     restart: unless-stopped
 
-networks:
-  postgres:
-    driver: bridge
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.39.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss:9.2.2
+    ports:
+      - "3000:3000"
+    links:
+      - prometheus:prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: unless-stopped
 
 volumes:
   postgres:

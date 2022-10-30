@@ -20,6 +20,7 @@ dependencies {
         libs.mapstruct,
         libs.postgresql,
         libs.feign,
+        libs.prometheus,
         libs.jacksonDatatypeJsr310,
         libs.vault
     )
