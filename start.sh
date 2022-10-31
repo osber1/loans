@@ -5,7 +5,7 @@ VERSION="1.0-SNAPSHOT"
 # Need to have JAVA 17 installed.
 ./gradlew clean build --parallel
 
-docker-compose -f docker-compose-full.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose-applications.yml up -d
 
 sleep 1
 

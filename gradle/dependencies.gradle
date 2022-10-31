@@ -41,6 +41,7 @@ ext {
         springBootConfigurationProcessor: 'org.springframework.boot:spring-boot-configuration-processor',
         feign                           : "org.springframework.cloud:spring-cloud-starter-openfeign:${versions.feign}",
         openApi                         : "org.springdoc:springdoc-openapi-ui:${versions.openApi}",
+        prometheus                      : 'io.micrometer:micrometer-registry-prometheus',
         liquibaseCore                   : 'org.liquibase:liquibase-core',
         postgresql                      : 'org.postgresql:postgresql',
         vault                           : 'org.springframework.cloud:spring-cloud-starter-vault-config',
