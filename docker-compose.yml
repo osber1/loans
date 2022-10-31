@@ -95,6 +95,34 @@ services:
       - postgres
     restart: unless-stopped
 
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.39.1
+    ports:
+      - "9090:9090"
+    networks:
+      - postgres
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss:9.2.2
+    ports:
+      - "3000:3000"
+    networks:
+      - postgres
+    volumes:
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+    links:
+      - prometheus:prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: unless-stopped
+
 networks:
   postgres:
     driver: bridge

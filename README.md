@@ -14,6 +14,8 @@
 - [pgAdmin](http://localhost:5050)
 - [Redis Commander](http://localhost:5123)
 - [Vault](http://localhost:8200)
+- [Prometheus](http://localhost:9090)
+- [Grafana](http://localhost:3000)
 
 ## Startup
 
@@ -51,6 +53,11 @@ Run `./start.sh` to start everything.
 * Username: guest
 * Password: guest
 
+## Grafana
+
+* Username: admin
+* Password: admin
+
 ## Flow
 
 1) Register user and confirm email in email service.
@@ -59,14 +66,18 @@ Run `./start.sh` to start everything.
 
 ## Features
 
-* Swagger
 * Lombok
 * MapStruct
+* Swagger
 * Actuator
-* RabbitMQ
-* Redis
-* PostgreSQL
 * Liquibase
 * Testcontainers
 * JavaMailSender
 * WireMock
+
+* RabbitMQ
+* Redis
+* PostgreSQL
+* Prometheus
+* Grafana
+* Vault
