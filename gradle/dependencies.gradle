@@ -1,7 +1,7 @@
 ext {
     versions = [
         springBoot             : '2.7.4',
-        springCloud            : '2021.0.4',
+        springCloud            : '2021.0.5',
         groovy                 : '3.0.13',
         lombok                 : '1.18.24',
         openApi                : '1.6.11',
@@ -11,8 +11,8 @@ ext {
         testContainers         : '1.17.4',
         awaitility             : '4.2.0',
         greenmail              : '1.6.11',
-        feign                  : '3.1.4',
         wiremock               : '3.1.5',
+        feign                  : '3.1.5',
         cucumber               : '6.10.4',
         restAssured            : '4.5.1',
         guice                  : '5.1.0',
