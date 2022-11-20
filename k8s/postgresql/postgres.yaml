@@ -17,7 +17,6 @@ metadata:
     app: postgres
 data:
   postgres_db: loans
-  pgdata: /data/postgres
 
 ---
 
@@ -35,8 +34,10 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/data/postgres"
+    path: "/mnt/data"
+
 ---
+
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -89,11 +90,6 @@ spec:
                 configMapKeyRef:
                   name: postgres-config
                   key: postgres_db
-            - name: PGDATA
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-config
-                  key: pgdata
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgredb

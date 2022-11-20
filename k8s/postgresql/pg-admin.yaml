@@ -9,6 +9,40 @@ data:
 
 ---
 
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pgadmin-pv-volume
+  labels:
+    type: local
+    app: pgadmin
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/var/lib/pgadmin"
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pgadmin-pv-claim
+  labels:
+    app: pgadmin
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -40,10 +74,24 @@ spec:
                 secretKeyRef:
                   name: pgadmin-secret
                   key: pgadmin_password
+          volumeMounts:
+            - mountPath: /var/lib/pgadmin
+              name: pgadmin-storage
           ports:
             - containerPort: 80
               name: http
               protocol: TCP
+      initContainers:
+        - name: volume-mount-hack
+          image: busybox
+          command: [ "sh", "-c", "chown -R 5050:5050 /var/lib/pgadmin" ]
+          volumeMounts:
+            - name: pgadmin-storage
+              mountPath: /var/lib/pgadmin
+      volumes:
+        - name: pgadmin-storage
+          persistentVolumeClaim:
+            claimName: pgadmin-pv-claim
 
 ---
 
