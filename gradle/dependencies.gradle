@@ -14,7 +14,7 @@ ext {
         feign                  : '3.1.5',
         wiremock               : '3.1.5',
         cucumber               : '6.10.4',
-        restAssured            : '4.5.1',
+        restAssured            : '5.3.0',
         guice                  : '5.1.0',
         reflections            : '0.10.2',
         snakeyaml              : '1.33',
