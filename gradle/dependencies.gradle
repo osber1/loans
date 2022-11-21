@@ -4,7 +4,7 @@ ext {
         springCloud            : '2021.0.5',
         groovy                 : '3.0.13',
         lombok                 : '1.18.24',
-        openApi                : '1.6.11',
+        openApi                : '1.6.13',
         mapstruct              : '1.5.2.Final',
         spock                  : '2.1-groovy-3.0',
         lombokMapstructBindings: '0.2.0',
