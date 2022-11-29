@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
+  namespace: loans
   name: pgadmin-secret
 type: Opaque
 data:
@@ -12,6 +13,7 @@ data:
 kind: PersistentVolume
 apiVersion: v1
 metadata:
+  namespace: loans
   name: pgadmin-pv-volume
   labels:
     type: local
@@ -30,6 +32,7 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
+  namespace: loans
   name: pgadmin-pv-claim
   labels:
     app: pgadmin
@@ -46,6 +49,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: loans
   labels:
     app: pgadmin
   name: pgadmin
@@ -98,6 +102,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: loans
   labels:
     app: pgadmin
   name: pgadmin
