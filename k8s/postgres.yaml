@@ -19,6 +19,7 @@ metadata:
     app: postgres
 data:
   postgres_db: loans
+  pgdata: /data/postgres
 
 ---
 
@@ -95,9 +96,22 @@ spec:
                 configMapKeyRef:
                   name: postgres-config
                   key: postgres_db
+            - name: PGDATA
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: pgdata
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgredb
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      restartPolicy: Always
       volumes:
         - name: postgredb
           persistentVolumeClaim:

@@ -4,7 +4,7 @@ spring:
   redis:
     host: redis
   rabbitmq:
-    addresses: rabbitmq:5672
+    host: rabbitmq
 
 risk:
   checker:
