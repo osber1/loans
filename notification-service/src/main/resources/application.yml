@@ -15,12 +15,5 @@ email:
   senderAddress: hello@osber.com
   subject: Confirm your email
   activationLink: http://localhost:8080/api/v1/client/%s/active
+  host: localhost
   port: 1025
-
-rabbitmq:
-  exchanges:
-    internal: internal.exchange
-  queues:
-    notification: notification.queue
-  routing-keys:
-    internal-notification: internal.notification.routing-key

@@ -69,14 +69,6 @@ application:
   interestIncrementFactor: 1.5
   postponeDays: 7
 
-rabbitmq:
-  exchanges:
-    internal: internal.exchange
-  queues:
-    notification: notification.queue
-  routing-keys:
-    internal-notification: internal.notification.routing-key
-
 risk:
   checker:
     url: http://localhost:8081
