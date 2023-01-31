@@ -10,10 +10,10 @@ risk:
   checker:
     url: http://risk-checker.loans.svc.cluster.local:8081
 
-#rabbitmq:
-#  exchanges:
-#    internal: internal.exchange
-#  queues:
-#    notification: notification.queue
-#  routing-keys:
-#    internal-notification: internal.notification.routing-key
+rabbitmq:
+  exchanges:
+    internal: internal.exchange
+  queues:
+    notification: notification.queue
+  routing-keys:
+    internal-notification: internal.notification.routing-key
