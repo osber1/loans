@@ -2,8 +2,6 @@ package io.osvaldas.backoffice.infra.rest.loans;
 
 import java.util.Collection;
 
-import javax.validation.Valid;
-
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +18,7 @@ import io.osvaldas.api.loans.TodayTakenLoansCount;
 import io.osvaldas.backoffice.domain.loans.LoanService;
 import io.osvaldas.backoffice.repositories.entities.Loan;
 import io.osvaldas.backoffice.repositories.mapper.LoanMapper;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @RestController

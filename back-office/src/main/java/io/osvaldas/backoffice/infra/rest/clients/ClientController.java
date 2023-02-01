@@ -2,8 +2,6 @@ package io.osvaldas.backoffice.infra.rest.clients;
 
 import java.util.Collection;
 
-import javax.validation.Valid;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +19,7 @@ import io.osvaldas.api.clients.Status;
 import io.osvaldas.backoffice.domain.clients.ClientService;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.mapper.ClientMapper;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @RestController

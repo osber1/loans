@@ -28,6 +28,7 @@ subprojects {
     apply plugin: 'codenarc'
     apply plugin: 'com.github.spotbugs'
     apply plugin: 'org.sonarqube'
+    apply plugin: 'project-report'
 
     dependencyManagement {
         imports {

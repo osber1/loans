@@ -1,10 +1,10 @@
 package io.osvaldas.backoffice.repositories.entities;
 
 import static io.osvaldas.api.clients.Status.REGISTERED;
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.LAZY;
 import static java.util.Comparator.comparing;
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.EnumType.STRING;
-import static javax.persistence.FetchType.LAZY;
 
 import java.time.ZonedDateTime;
 import java.util.HashSet;
@@ -12,20 +12,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.envers.Audited;
 
 import io.osvaldas.api.clients.Status;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
