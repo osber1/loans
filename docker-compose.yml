@@ -6,21 +6,17 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
-    networks:
-      - postgres
     restart: unless-stopped
 
   redis-commander:
     container_name: redis-commander
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
-    restart: unless-stopped
     environment:
       - REDIS_HOSTS=local:redis:6379
-    networks:
-      - postgres
     ports:
       - "5123:8081"
+    restart: unless-stopped
 
   postgres:
     container_name: postgres
@@ -34,8 +30,6 @@ services:
       - postgres:/data/postgres
     ports:
       - "5432:5432"
-    networks:
-      - postgres
     restart: unless-stopped
 
   pgadmin:
@@ -48,8 +42,6 @@ services:
       - pgadmin:/var/lib/pgadmin
     ports:
       - "5050:80"
-    networks:
-      - postgres
     restart: unless-stopped
 
   maildev:
@@ -58,8 +50,6 @@ services:
     ports:
       - "1080:1080"
       - "1025:1025"
-    networks:
-      - postgres
     restart: unless-stopped
 
   rabbitmq:
@@ -75,8 +65,6 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-    networks:
-      - postgres
     restart: unless-stopped
 
   vault:
@@ -91,8 +79,6 @@ services:
       - vault:/etc/vault/logs
     ports:
       - "8200:8200"
-    networks:
-      - postgres
     restart: unless-stopped
 
   prometheus:
@@ -100,8 +86,6 @@ services:
     image: prom/prometheus:v2.39.1
     ports:
       - "9090:9090"
-    networks:
-      - postgres
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     restart: unless-stopped
@@ -111,8 +95,6 @@ services:
     image: grafana/grafana-oss:9.2.2
     ports:
       - "3000:3000"
-    networks:
-      - postgres
     volumes:
       - ./grafana/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
@@ -122,10 +104,6 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
     restart: unless-stopped
-
-networks:
-  postgres:
-    driver: bridge
 
 volumes:
   postgres:

@@ -23,5 +23,8 @@ public class PropertiesConfig {
     private String activationLink;
 
     @NotNull
+    private String host;
+
+    @NotNull
     private int port;
 }
