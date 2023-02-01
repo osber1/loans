@@ -14,3 +14,6 @@ application:
   maxAmount: 100
   forbiddenHourFrom: 0
   forbiddenHourTo: 6
+
+back-office:
+  url: http://localhost:8080

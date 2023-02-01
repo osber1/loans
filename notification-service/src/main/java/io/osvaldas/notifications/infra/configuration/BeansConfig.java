@@ -16,6 +16,7 @@ public class BeansConfig {
     @Bean
     public JavaMailSenderImpl mailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        javaMailSender.setHost(config.getHost());
         javaMailSender.setPort(config.getPort());
         return javaMailSender;
     }

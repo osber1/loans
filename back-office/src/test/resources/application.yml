@@ -31,3 +31,7 @@ rabbitmq:
     notification: notification.queue
   routing-keys:
     internal-notification: internal.notification.routing-key
+
+risk:
+  checker:
+    url: http://localhost:8081

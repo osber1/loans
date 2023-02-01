@@ -4,7 +4,9 @@ plugins {
     id 'com.google.cloud.tools.jib' version '3.3.1'
 }
 
-tasks.build.dependsOn tasks.jibDockerBuild
+build {
+    dependsOn(tasks.jibDockerBuild)
+}
 
 dependencies {
     implementation(
@@ -39,6 +41,22 @@ dependencies {
         libs.springTestRedis,
         libs.wiremock
     )
+}
+
+check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = '0.9'.toBigDecimal()
+            }
+        }
+    }
 }
 
 jacocoTestReport {
