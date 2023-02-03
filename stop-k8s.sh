@@ -3,8 +3,9 @@
 VERSION="1.0-SNAPSHOT"
 
 kubectl delete -f k8s
-kubectl delete -f k8s/istio
-#minikube delete
+kubectl delete -f k8s/services
+#kubectl delete -f k8s/istio
+minikube delete
 
 docker rmi back-office:$VERSION
 docker rmi risk-checker:$VERSION
