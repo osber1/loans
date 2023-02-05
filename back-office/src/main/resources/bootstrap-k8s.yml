@@ -1,0 +1,4 @@
+spring:
+  cloud:
+    vault:
+      host: vault.loans.svc.cluster.local

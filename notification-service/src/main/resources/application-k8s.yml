@@ -1,0 +1,6 @@
+spring:
+  rabbitmq:
+    host: rabbitmq.loans.svc.cluster.local
+
+email:
+  host: maildev.loans.svc.cluster.local
