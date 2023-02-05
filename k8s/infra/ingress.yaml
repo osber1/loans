@@ -1,0 +1,16 @@
+#apiVersion: extensions/v1beta1
+#kind: Ingress
+#metadata:
+#  name: gateway-ingress
+#spec:
+#  backend:
+#    serviceName: default-http-backend
+#    servicePort: 80
+#  rules:
+#    - host: loans.io
+#      http:
+#        paths:
+#          - path: /loans
+#            backend:
+#              serviceName: back-office
+#              servicePort: 8080

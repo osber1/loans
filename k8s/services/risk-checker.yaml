@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: loans
+  name: risk-checker
+  labels:
+    app: risk-checker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: risk-checker
+  template:
+    metadata:
+      labels:
+        app: risk-checker
+    spec:
+      containers:
+        - name: risk-checker
+          image: osvasldas97/risk-checker:1.0-SNAPSHOT
+          imagePullPolicy: Always
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: k8s
+          ports:
+            - containerPort: 8081
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: loans
+  name: risk-checker
+  labels:
+    app: risk-checker
+spec:
+  selector:
+    app: risk-checker
+  ports:
+    - protocol: "TCP"
+      port: 8081
+      targetPort: 8081
+  type: NodePort
