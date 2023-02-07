@@ -10,7 +10,7 @@ ext {
         lombokMapstructBindings: '0.2.0',
         testContainers         : '1.17.6',
         awaitility             : '4.2.0',
-        greenmail              : '1.6.11',
+        greenmail              : '1.6.13',
         feign                  : '3.1.5',
         wiremock               : '3.1.5',
         cucumber               : '6.10.4',
