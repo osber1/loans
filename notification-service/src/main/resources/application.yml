@@ -4,6 +4,10 @@ server:
     include-binding-errors: always
   port: 8082
 
+logging:
+  file:
+    name: logs/notification-service.log
+
 spring:
   output:
     ansi:

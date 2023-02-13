@@ -99,16 +99,8 @@ TODO:
 
 - [ ] Vault Test containers.
 
-- [ ] Add monitoring.
-
 - [ ] Argo CD.
 
 - [ ] Istio. (Zipkin, Sleuth; Elasticsearch, Logstash, Kibana), Kiali
 
-- [ ] k8s
-
 - [ ] Add Spring Security with JWT tokens on every request (okta or keycloak).
-
-- [ ] FE nextjs.
-
-- [ ] Cucumber tests.

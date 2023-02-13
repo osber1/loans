@@ -4,6 +4,10 @@ server:
     include-message: always
     include-binding-errors: always
 
+logging:
+  file:
+    name: logs/back-office.log
+
 spring:
   output:
     ansi:
