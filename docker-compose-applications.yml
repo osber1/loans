@@ -4,26 +4,32 @@ services:
   back-office:
     container_name: back-office
     image: back-office:1.0-SNAPSHOT
-    ports:
-      - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - ./logs:/logs
+    ports:
+      - "8080:8080"
     restart: unless-stopped
 
   risk-checker:
     container_name: risk-checker
     image: risk-checker:1.0-SNAPSHOT
-    ports:
-      - "8081:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - ./logs:/logs
+    ports:
+      - "8081:8081"
     restart: unless-stopped
 
   notification-service:
     container_name: notification-service
     image: notification-service:1.0-SNAPSHOT
-    ports:
-      - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - ./logs:/logs
+    ports:
+      - "8082:8082"
     restart: unless-stopped

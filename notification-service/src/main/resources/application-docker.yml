@@ -4,3 +4,7 @@ spring:
 
 email:
   host: maildev
+
+logging:
+  file:
+    name: /logs/notification-service.log

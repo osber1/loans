@@ -3,15 +3,15 @@ version: '3.5'
 services:
   redis:
     container_name: redis
-    image: redis:alpine
+    image: redis:7.0.8-alpine
     ports:
       - "6379:6379"
     restart: unless-stopped
 
   redis-commander:
     container_name: redis-commander
-    hostname: redis-commander
     image: rediscommander/redis-commander:latest
+    hostname: redis-commander
     environment:
       REDIS_HOSTS: local:redis:6379
     ports:
@@ -22,7 +22,7 @@ services:
 
   postgres:
     container_name: postgres
-    image: postgres:14.1-alpine
+    image: postgres:15.2-alpine
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
@@ -36,7 +36,7 @@ services:
 
   pgadmin:
     container_name: pgadmin
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:6.20
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -50,7 +50,7 @@ services:
 
   maildev:
     container_name: mail-service
-    image: maildev/maildev
+    image: maildev/maildev:2.0.5
     ports:
       - "1080:1080"
       - "1025:1025"
@@ -73,7 +73,7 @@ services:
 
   vault:
     container_name: vault
-    image: hashicorp/vault:latest
+    image: hashicorp/vault:1.12
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: 'super-secret-token'
     cap_add:
@@ -87,26 +87,26 @@ services:
 
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:v2.39.1
-    ports:
-      - "9090:9090"
+    image: prom/prometheus:v2.42.0
     volumes:
       - ./infra_config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
     restart: unless-stopped
 
   grafana:
     container_name: grafana
-    image: grafana/grafana-oss:9.2.2
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./infra_config/grafana/datasources:/etc/grafana/provisioning/datasources
-      - ./infra_config/grafana/dashboards:/etc/grafana/provisioning/dashboards
-    links:
-      - prometheus:prometheus
+    image: grafana/grafana-oss:9.3.6
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./infra_config/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./infra_config/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    ports:
+      - "3000:3000"
+    links:
+      - prometheus:prometheus
     depends_on:
       - prometheus
     restart: unless-stopped
@@ -114,10 +114,10 @@ services:
   kibana:
     container_name: kibana
     image: docker.elastic.co/kibana/kibana:8.6.1
-    ports:
-      - "5601:5601"
     volumes:
       - ./infra_config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
     depends_on:
       - elasticsearch
     restart: unless-stopped
@@ -125,15 +125,15 @@ services:
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.1
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    volumes:
-      - ./infra_config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - esdata:/usr/share/elasticsearch/data
     environment:
       node.name: elasticsearch
       discovery.type: single-node
+    volumes:
+      - ./infra_config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
     restart: unless-stopped
 
   logstash:
@@ -144,9 +144,6 @@ services:
       - ./infra_config/logstash/pipeline:/usr/share/logstash/pipeline
       - ./logs:/logs
     ports:
-      - "5044:5044"
-      - "50000:50000/tcp"
-      - "50000:50000/udp"
       - "9600:9600"
     depends_on:
       - elasticsearch

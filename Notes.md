@@ -94,13 +94,3 @@
 - [x] @Transactional on class level (this will put wrap all methods in transactional state, and some of them do not need to be wrapped, e.g., getClientHistory).
 
 - [x] (int) client.getLoan().getAmount() > config.getMaxAmount() there is an error somewhere in here related to casting double to int.
-
-TODO:
-
-- [ ] Vault Test containers.
-
-- [ ] Argo CD.
-
-- [ ] Istio. (Zipkin, Sleuth; Elasticsearch, Logstash, Kibana), Kiali
-
-- [ ] Add Spring Security with JWT tokens on every request (okta or keycloak).

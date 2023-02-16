@@ -1,2 +1,6 @@
 back-office:
   url: http://back-office:8080
+
+logging:
+  file:
+    name: /logs/risk-checker.log
