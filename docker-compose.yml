@@ -58,7 +58,7 @@ services:
 
   rabbitmq:
     container_name: rabbitmq
-    image: rabbitmq:3.9.11-management-alpine
+    image: rabbitmq:3.11.9-management-alpine
     environment:
       RABBITMQ_NODENAME: "rabbit@staticrabbit"
     extra_hosts:
