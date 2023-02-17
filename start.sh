@@ -1,4 +1,4 @@
-#!/bin/bash    
+#!/bin/bash
 
 VERSION="1.0-SNAPSHOT"
 
@@ -7,7 +7,5 @@ VERSION="1.0-SNAPSHOT"
 
 docker-compose -f docker-compose.yml -f docker-compose-applications.yml up -d
 
-sleep 1
-
-# Seed Vault
-curl -H "X-Vault-Token: super-secret-token" -H "Content-Type: application/json" -X POST -d @infra_config/vault/application.json http://127.0.0.1:8200/v1/secret/data/application
+./infra_config/vault/seed_vault.sh
+./infra_config/kibana/seed_kibana.sh
