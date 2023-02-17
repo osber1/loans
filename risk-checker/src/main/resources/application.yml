@@ -4,6 +4,10 @@ server:
     include-binding-errors: always
   port: 8081
 
+logging:
+  file:
+    name: logs/risk-checker.log
+
 spring:
   output:
     ansi:

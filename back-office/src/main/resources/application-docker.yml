@@ -6,6 +6,10 @@ spring:
   rabbitmq:
     host: rabbitmq
 
+logging:
+  file:
+    name: /logs/back-office.log
+
 risk:
   checker:
     url: http://risk-checker:8081

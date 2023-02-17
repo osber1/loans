@@ -16,6 +16,7 @@
 - [Vault](http://localhost:8200)
 - [Prometheus](http://localhost:9090)
 - [Grafana](http://localhost:3000)
+- [Kibana](http://localhost:5601)
 
 ## Startup
 
