@@ -12,8 +12,6 @@ public final class ExceptionMessages {
 
     public static final String CLIENT_ALREADY_EXIST = "Client with personal code already exists.";
 
-    public static final String VALIDATION_REQUEST_FAILED = "Failed to send validation request.";
-
     public static final String RISK_TOO_HIGH = "Risk is too high, because you are trying to get loan between 00:00 and 6:00 and you want to borrow the max amount!";
 
     public static final String AMOUNT_EXCEEDS = "The amount you are trying to borrow exceeds the max amount!";

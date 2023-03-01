@@ -1,8 +1,11 @@
 package io.osvaldas.backoffice.domain.loans
 
 import static io.osvaldas.api.clients.Status.ACTIVE
+import static io.osvaldas.api.loans.Status.NOT_EVALUATED
+import static io.osvaldas.api.loans.Status.OPEN
 import static io.osvaldas.api.loans.Status.PENDING
 import static io.osvaldas.api.loans.Status.REJECTED
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs
 import static java.util.Collections.emptySet
 import static java.util.Optional.empty
 import static java.util.Optional.of
@@ -148,8 +151,10 @@ class LoanServiceSpec extends AbstractSpec {
         when:
             loanService.validate(addedLoan, clientId)
         then:
-            ValidationRuleException e = thrown()
-            e.message == validationRequestFailed
+            addedLoan.status == NOT_EVALUATED
+        and:
+            BadRequestException e = thrown()
+            e.message == ''
     }
 
     void 'should take loan when validation pass'() {
@@ -196,6 +201,21 @@ class LoanServiceSpec extends AbstractSpec {
             todayTakenLoansCount.takenLoansCount == 1
         and:
             1 * loanRepository.findAll(_ as Specification) >> [loan]
+    }
+
+    void 'should return #result.size() loans when status is #status'() {
+        given:
+            1 * loanRepository.findAll { Specification s ->
+                with(s) {
+                    where(loanStatusIs(status))
+                }
+            } >> result
+        expect:
+            loanService.getLoansByStatus(status) == result
+        where:
+            result | status
+            []     | NOT_EVALUATED
+            [loan] | OPEN
     }
 
 }
