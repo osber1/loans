@@ -205,11 +205,11 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should return #result.size() loans when status is #status'() {
         given:
-            1 * loanRepository.findAll({ Specification s ->
+            1 * loanRepository.findAll { Specification s ->
                 with(s) {
                     where(loanStatusIs(status))
                 }
-            }) >> result
+            } >> result
         expect:
             loanService.getLoansByStatus(status) == result
         where:
