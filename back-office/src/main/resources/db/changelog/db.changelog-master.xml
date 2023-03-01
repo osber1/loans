@@ -6,7 +6,7 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd"
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
 
-    <changeSet id="1" author="osvaldas">
+    <changeSet id="loans-init" author="osvaldas">
         <createSequence incrementBy="1" sequenceName="loans_seq" startValue="1"/>
         <createSequence incrementBy="1" sequenceName="postpone_seq" startValue="1"/>
         <createSequence incrementBy="1" sequenceName="hibernate_sequence" startValue="1"/>

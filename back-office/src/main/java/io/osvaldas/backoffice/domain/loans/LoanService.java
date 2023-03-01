@@ -1,12 +1,12 @@
 package io.osvaldas.backoffice.domain.loans;
 
 import static io.osvaldas.api.clients.Status.ACTIVE;
+import static io.osvaldas.api.loans.Status.NOT_EVALUATED;
 import static io.osvaldas.api.loans.Status.OPEN;
 import static io.osvaldas.api.loans.Status.PENDING;
 import static io.osvaldas.api.loans.Status.REJECTED;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_ACTIVE;
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_FOUND;
-import static io.osvaldas.api.util.ExceptionMessages.VALIDATION_REQUEST_FAILED;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.clientIdIs;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreationDateIsAfter;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs;
@@ -17,6 +17,7 @@ import static org.springframework.data.jpa.domain.Specification.where;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -83,13 +84,17 @@ public class LoanService {
         return new TodayTakenLoansCount(loansTakenToday);
     }
 
-    @Transactional(noRollbackForClassName = { "ValidationRuleException" })
     public void validate(Loan loan, String clientId) {
+        setStatusAndSave(loan, NOT_EVALUATED);
         RiskValidationResponse response = sendValidationRequest(loan, clientId);
         of(response)
             .filter(RiskValidationResponse::isSuccess)
             .ifPresentOrElse(r -> approveAndSave(loan),
                 () -> rejectLoanAndThrow(loan, response.getMessage()));
+    }
+
+    public List<Loan> getLoansByStatus(Status status) {
+        return loanRepository.findAll(where(loanStatusIs(status)));
     }
 
     private Client getActiveClient(String clientId) {
@@ -104,10 +109,10 @@ public class LoanService {
             RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId));
             log.info("Risk validation response: {}", response);
             return response;
-        } catch (Exception e) {
-            log.error("Error validating loan: {}", loan.getId(), e);
+        } catch (RuntimeException e) {
+            log.error("Error validating loan: {}", loan.getId());
+            throw e;
         }
-        return new RiskValidationResponse(false, VALIDATION_REQUEST_FAILED);
     }
 
     private int getLoanTakenTodayCount(String clientId, ZonedDateTime date) {
