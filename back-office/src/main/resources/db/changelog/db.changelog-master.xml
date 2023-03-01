@@ -124,4 +124,23 @@
                                  referencedTableName="revinfo"/>
         <rollback/>
     </changeSet>
+
+    <changeSet id="shedlock-init" author="osvaldas">
+        <createTable tableName="shedlock">
+            <column name="name" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="lock_until" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>

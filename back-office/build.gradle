@@ -24,7 +24,9 @@ dependencies {
         libs.feign,
         libs.prometheus,
         libs.jacksonDatatypeJsr310,
-        libs.vault
+        libs.vault,
+        libs.shedlockSpring,
+        libs.shedlockProvider
     )
 
     annotationProcessor(

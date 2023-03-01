@@ -18,7 +18,8 @@ ext {
         guice                  : '5.1.0',
         reflections            : '0.10.2',
         snakeyaml              : '1.33',
-        javaFaker              : '1.0.2'
+        javaFaker              : '1.0.2',
+        shedlock               : '5.1.0'
     ]
 
     libs = [
@@ -64,6 +65,8 @@ ext {
         guice                           : "com.google.inject:guice:${versions.guice}",
         reflections                     : "org.reflections:reflections:${versions.reflections}",
         snakeyaml                       : "org.yaml:snakeyaml:${versions.snakeyaml}",
-        javaFaker                       : "com.github.javafaker:javafaker:${versions.javaFaker}"
+        javaFaker                       : "com.github.javafaker:javafaker:${versions.javaFaker}",
+        shedlockSpring                  : "net.javacrumbs.shedlock:shedlock-spring:${versions.shedlock}",
+        shedlockProvider                : "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:${versions.shedlock}"
     ]
 }
