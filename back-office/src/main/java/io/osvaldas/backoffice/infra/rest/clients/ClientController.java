@@ -3,6 +3,8 @@ package io.osvaldas.backoffice.infra.rest.clients;
 import java.util.Collection;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +41,8 @@ public class ClientController {
     }
 
     @GetMapping("clients")
-    public Collection<ClientResponse> getClients(@RequestParam int page, @RequestParam int size) {
+    public Collection<ClientResponse> getClients(@RequestParam(defaultValue = "0") @Min(0) int page,
+                                                 @RequestParam(defaultValue = "20") @Min(1) @Max(1000) int size) {
         return clientMapper.clientsToDTOs(service.getClients(page, size));
     }
 
@@ -62,11 +65,6 @@ public class ClientController {
     @DeleteMapping("clients/{id}")
     public void deleteClient(@PathVariable String id) {
         service.deleteClient(id);
-    }
-
-    @PostMapping("clients/{id}/inactive")
-    public void inactivateClient(@PathVariable String id) {
-        service.inactivateClient(id);
     }
 
     @GetMapping("clients/{id}/active")

@@ -86,5 +86,4 @@
         </rule-config>
     </ruleset-ref>
 
-    <ruleset-ref path="rulesets/enhanced.xml"/>
 </ruleset>

@@ -2,11 +2,11 @@ ext {
     versions = [
         springBoot             : '2.7.4',
         springCloud            : '2021.0.5',
-        groovy                 : '3.0.15',
+        groovy                 : '4.0.10',
         lombok                 : '1.18.26',
-        openApi                : '1.6.13',
+        openApi                : '1.6.15',
         mapstruct              : '1.5.2.Final',
-        spock                  : '2.1-groovy-3.0',
+        spock                  : '2.3-groovy-4.0',
         lombokMapstructBindings: '0.2.0',
         testContainers         : '1.17.6',
         awaitility             : '4.2.0',
@@ -19,13 +19,13 @@ ext {
         reflections            : '0.10.2',
         snakeyaml              : '1.33',
         javaFaker              : '1.0.2',
-        shedlock               : '5.1.0'
+        shedlock               : '5.2.0'
     ]
 
     libs = [
         springBootDependencies          : "org.springframework.boot:spring-boot-dependencies:${versions.springBoot}",
         springBootCloud                 : "org.springframework.cloud:spring-cloud-dependencies:${versions.springCloud}",
-        groovy                          : "org.codehaus.groovy:groovy-all:${versions.groovy}",
+        groovy                          : "org.apache.groovy:groovy-all:${versions.groovy}",
         spockCore                       : "org.spockframework:spock-core:${versions.spock}",
         spockSpring                     : "org.spockframework:spock-spring:${versions.spock}",
         springBootStarterWeb            : 'org.springframework.boot:spring-boot-starter-web',

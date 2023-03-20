@@ -36,7 +36,6 @@ metadata:
   labels:
     app: maildev
 spec:
-  type: NodePort
   selector:
     app: maildev
   ports:

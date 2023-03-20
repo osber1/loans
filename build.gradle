@@ -43,7 +43,6 @@ subprojects {
     dependencies {
         implementation(
             libs.lombok,
-            libs.groovy,
             libs.springBootStarterWeb,
             libs.springBootStarterBootstrap,
             libs.springBootStarterValidation
@@ -59,8 +58,6 @@ subprojects {
         )
 
         testImplementation(
-            libs.spockCore,
-            libs.spockSpring,
             libs.springBootStarterTest
         )
     }

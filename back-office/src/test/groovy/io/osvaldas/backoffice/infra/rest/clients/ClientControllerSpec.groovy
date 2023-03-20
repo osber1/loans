@@ -2,9 +2,7 @@ package io.osvaldas.backoffice.infra.rest.clients
 
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.DELETED
-import static io.osvaldas.api.clients.Status.INACTIVE
 import static java.lang.String.format
-import static java.util.List.of
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
@@ -144,7 +142,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == 2
+            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == 2
     }
 
     void 'should get list of clients by status'() {
@@ -158,7 +156,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == listSize
+            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == listSize
         where:
             status  || listSize
             ACTIVE  || 1
@@ -175,24 +173,9 @@ class ClientControllerSpec extends AbstractControllerSpec {
         and:
             response.contentAsString.contains(format(clientNotFound, clientId))
         where:
-            method << [get('/api/v1/clients/{id}', clientId), delete('/api/v1/clients/{id}', clientId),
+            method << [get('/api/v1/clients/{id}', clientId),
+                       delete('/api/v1/clients/{id}', clientId),
                        put('/api/v1/clients').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
-    }
-
-    void 'should inactivate client when it exists'() {
-        given:
-            clientRepository.save(registeredClientWithId)
-        when:
-            MockHttpServletResponse response = mockMvc
-                .perform(post('/api/v1/clients/{id}/inactive', registeredClientWithId.id)
-                    .contentType(APPLICATION_JSON))
-                .andReturn().response
-        then:
-            response.status == OK.value()
-        and:
-            with(clientRepository.findById(registeredClientWithId.id).get()) {
-                status == INACTIVE
-            }
     }
 
     void 'should activate client when it exists'() {

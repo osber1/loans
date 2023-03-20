@@ -1,16 +1,20 @@
-#apiVersion: extensions/v1beta1
-#kind: Ingress
-#metadata:
-#  name: gateway-ingress
-#spec:
-#  backend:
-#    serviceName: default-http-backend
-#    servicePort: 80
-#  rules:
-#    - host: loans.io
-#      http:
-#        paths:
-#          - path: /loans
-#            backend:
-#              serviceName: back-office
-#              servicePort: 8080
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: osber-ingress
+  namespace: loans
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - host: osber.io
+      http:
+        paths:
+          - path: /loans(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: back-office
+                port:
+                  number: 8080
