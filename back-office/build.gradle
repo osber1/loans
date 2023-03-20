@@ -35,6 +35,9 @@ dependencies {
     )
 
     testImplementation(
+        libs.groovy,
+        libs.spockCore,
+        libs.spockSpring,
         libs.testcontainers,
         libs.testcontainersSpock,
         libs.testcontainersPostgresql,

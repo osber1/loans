@@ -18,6 +18,9 @@ dependencies {
     )
 
     testImplementation(
+        libs.groovy,
+        libs.spockCore,
+        libs.spockSpring,
         libs.testcontainersRabbitmq,
         libs.testcontainersVault,
         libs.greenmail,

@@ -15,6 +15,9 @@ dependencies {
     )
 
     testImplementation(
+        libs.groovy,
+        libs.spockCore,
+        libs.spockSpring,
         libs.wiremock
     )
 }
