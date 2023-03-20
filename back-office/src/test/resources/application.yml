@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:tc:postgresql:14.1-alpine:///databasename
+    url: jdbc:tc:postgresql:15.2-alpine:///databasename
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml

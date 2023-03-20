@@ -36,30 +36,30 @@ public class ClientController {
 
     @PostMapping("clients")
     public ClientResponse registerClient(@Valid @RequestBody ClientRegisterRequest request) {
-        Client client = clientMapper.clientRegisterToEntity(request);
-        return clientMapper.clientToDTO(service.registerClient(client));
+        Client client = clientMapper.map(request);
+        return clientMapper.map(service.registerClient(client));
     }
 
     @GetMapping("clients")
     public Collection<ClientResponse> getClients(@RequestParam(defaultValue = "0") @Min(0) int page,
                                                  @RequestParam(defaultValue = "20") @Min(1) @Max(1000) int size) {
-        return clientMapper.clientsToDTOs(service.getClients(page, size));
+        return clientMapper.map(service.getClients(page, size));
     }
 
     @GetMapping("clients/status")
     public Collection<ClientResponse> getClientsByStatus(@RequestParam Status status) {
-        return clientMapper.clientsToDTOs(service.getClientsByStatus(status));
+        return clientMapper.map(service.getClientsByStatus(status));
     }
 
     @GetMapping("clients/{id}")
     public ClientResponse getClient(@PathVariable String id) {
-        return clientMapper.clientToDTO(service.getClient(id));
+        return clientMapper.map(service.getClient(id));
     }
 
     @PutMapping("clients")
     public ClientResponse updateClient(@Valid @RequestBody ClientUpdateRequest request) {
-        Client client = clientMapper.clientUpdateToEntity(request);
-        return clientMapper.clientToDTO(service.updateClient(client));
+        Client client = clientMapper.mapToEntity(request);
+        return clientMapper.map(service.updateClient(client));
     }
 
     @DeleteMapping("clients/{id}")

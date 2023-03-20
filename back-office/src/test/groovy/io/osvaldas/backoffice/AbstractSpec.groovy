@@ -3,7 +3,6 @@ package io.osvaldas.backoffice
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.REGISTERED
 import static io.osvaldas.api.loans.Status.OPEN
-import static java.util.Set.of
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -67,8 +66,6 @@ abstract class AbstractSpec extends Specification {
     String clientNotActive = 'Client is not active.'
 
     @Shared
-    String validationRequestFailed = 'Failed to send validation request.'
-
     String loanNotOpen = "Loan with id ${loanId} is not open."
 
     @Shared
@@ -87,13 +84,13 @@ abstract class AbstractSpec extends Specification {
     Client registeredClientWithId = buildClient(clientId, [] as Set, REGISTERED)
 
     @Shared
-    Client registeredClientWithLoan = buildClient(clientId, of(loan), REGISTERED)
+    Client registeredClientWithLoan = buildClient(clientId, Set.of(loan), REGISTERED)
 
     @Shared
     Client activeClientWithId = buildClient(clientId, [] as Set, ACTIVE)
 
     @Shared
-    Client activeClientWithLoan = buildClient(clientId, of(loan), ACTIVE)
+    Client activeClientWithLoan = buildClient(clientId, Set.of(loan), ACTIVE)
 
     LoanPostpone buildPostpone(long loanId, BigDecimal newRate, ZonedDateTime newDate) {
         new LoanPostpone().tap {

@@ -12,11 +12,12 @@ import io.osvaldas.backoffice.repositories.entities.Client;
 @Mapper(componentModel = "spring")
 public interface ClientMapper {
 
-    ClientResponse clientToDTO(Client client);
+    ClientResponse map(Client client);
 
-    Client clientRegisterToEntity(ClientRegisterRequest clientDto);
+    Client map(ClientRegisterRequest clientDto);
 
-    Client clientUpdateToEntity(ClientUpdateRequest clientDto);
+    Collection<ClientResponse> map(Collection<Client> all);
 
-    Collection<ClientResponse> clientsToDTOs(Collection<Client> all);
+    Client mapToEntity(ClientUpdateRequest clientDto);
+
 }

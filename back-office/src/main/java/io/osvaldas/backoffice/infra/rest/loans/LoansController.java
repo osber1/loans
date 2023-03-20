@@ -34,12 +34,12 @@ public class LoansController {
     @Cacheable(value = "LoanResponse", key = "#loanId")
     @GetMapping("loans/{loanId}")
     public LoanResponse getLoan(@PathVariable long loanId) {
-        return loanMapper.loanToDTO(service.getLoan(loanId));
+        return loanMapper.map(service.getLoan(loanId));
     }
 
     @GetMapping("loans")
     public Collection<LoanResponse> getClientHistory(@RequestParam String clientId) {
-        return loanMapper.loanToDTOs(service.getLoans(clientId));
+        return loanMapper.map(service.getLoans(clientId));
     }
 
     @GetMapping("loans/today")
@@ -50,9 +50,9 @@ public class LoansController {
     @CacheEvict(value = "LoanResponse", allEntries = true)
     @PostMapping("loans")
     public LoanResponse takeLoan(@RequestParam String clientId, @Valid @RequestBody LoanRequest request) {
-        Loan loan = loanMapper.loanToEntity(request);
+        Loan loan = loanMapper.map(request);
         Loan takenLoan = service.addLoan(loan, clientId);
         service.validate(takenLoan, clientId);
-        return loanMapper.loanToDTO(takenLoan);
+        return loanMapper.map(takenLoan);
     }
 }

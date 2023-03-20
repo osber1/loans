@@ -21,6 +21,6 @@ public class PostponeController {
 
     @PostMapping("loans/extensions")
     public LoanPostponeResponse postponeLoan(@RequestParam long loanId) {
-        return postponeMapper.loanPostponeToDTO(service.postponeLoan(loanId));
+        return postponeMapper.map(service.postponeLoan(loanId));
     }
 }

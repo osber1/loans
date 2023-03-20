@@ -11,9 +11,9 @@ import io.osvaldas.backoffice.repositories.entities.Loan;
 @Mapper(componentModel = "spring")
 public interface LoanMapper {
 
-    Collection<LoanResponse> loanToDTOs(Collection<Loan> all);
+    Collection<LoanResponse> map(Collection<Loan> all);
 
-    Loan loanToEntity(LoanRequest request);
+    Loan map(LoanRequest request);
 
-    LoanResponse loanToDTO(Loan takeLoan);
+    LoanResponse map(Loan takeLoan);
 }
