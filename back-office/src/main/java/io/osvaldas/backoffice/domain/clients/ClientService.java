@@ -2,7 +2,6 @@ package io.osvaldas.backoffice.domain.clients;
 
 import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.clients.Status.DELETED;
-import static io.osvaldas.api.clients.Status.INACTIVE;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_ALREADY_EXIST;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
@@ -79,11 +78,6 @@ public class ClientService {
     @Transactional
     public void deleteClient(String id) {
         changeClientStatusIfExists(id, DELETED);
-    }
-
-    @Transactional
-    public void inactivateClient(String id) {
-        changeClientStatusIfExists(id, INACTIVE);
     }
 
     @Transactional

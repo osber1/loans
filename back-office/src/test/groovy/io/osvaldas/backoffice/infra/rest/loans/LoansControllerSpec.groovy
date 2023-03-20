@@ -7,7 +7,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.loans.Status.REJECTED
 import static java.lang.String.format
-import static java.util.Set.of
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -74,7 +73,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loans when client exists'() {
         given:
-            Client savedClient = clientRepository.save(buildClient(clientId, of(loan), ACTIVE))
+            Client savedClient = clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
                 .param('clientId', savedClient.id)
@@ -83,7 +82,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            of(objectMapper.readValue(response.contentAsString, LoanResponse[])).size() == 1
+            Set.of(objectMapper.readValue(response.contentAsString, LoanResponse[])).size() == 1
     }
 
     void 'should throw an exception when client not found'() {
@@ -181,7 +180,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loans taken today count'() {
         given:
-            clientRepository.save(buildClient(clientId, of(loan), ACTIVE))
+            clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
                 .param('clientId', clientId)

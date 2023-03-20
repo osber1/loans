@@ -2,7 +2,6 @@ package io.osvaldas.backoffice.infra.rest.postpones
 
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static java.lang.String.format
-import static java.util.Set.of
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.MediaType.APPLICATION_JSON
@@ -20,7 +19,7 @@ class PostponeControllerSpec extends AbstractControllerSpec {
 
     void 'should postpone loan when it exists'() {
         given:
-            Client savedClient = clientRepository.save(buildClient(clientId, of(loan), ACTIVE))
+            Client savedClient = clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc
                 .perform(post('/api/v1/loans/extensions')
@@ -54,7 +53,7 @@ class PostponeControllerSpec extends AbstractControllerSpec {
 
     void 'should return loan postpone when loan is postponed'() {
         given:
-            Client savedClient = clientRepository.save(buildClient(clientId, of(loan), ACTIVE))
+            Client savedClient = clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
         and:
             mockMvc
                 .perform(post('/api/v1/loans/extensions')

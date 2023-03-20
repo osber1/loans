@@ -2,10 +2,8 @@ package io.osvaldas.backoffice.domain.clients
 
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.DELETED
-import static io.osvaldas.api.clients.Status.INACTIVE
 import static java.util.Optional.empty
 import static java.util.Optional.of
-import static org.springframework.data.domain.Pageable.unpaged
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -75,7 +73,7 @@ class ClientServiceSpec extends AbstractSpec {
             clients == [registeredClientWithId, registeredClientWithId]
         and:
             1 * clientRepository.findAll(_ as Pageable)
-                >> new PageImpl<>([registeredClientWithId, registeredClientWithId], unpaged(), 1)
+                >> new PageImpl<>([registeredClientWithId, registeredClientWithId], Pageable.unpaged(), 1)
     }
 
     void 'should return empty list when there are no clients'() {
@@ -111,15 +109,6 @@ class ClientServiceSpec extends AbstractSpec {
             clientService.deleteClient(clientId)
         then:
             1 * clientRepository.changeClientStatus(clientId, DELETED)
-        and:
-            1 * clientRepository.existsById(clientId) >> true
-    }
-
-    void 'should change client status to inactive when it exists'() {
-        when:
-            clientService.inactivateClient(clientId)
-        then:
-            1 * clientRepository.changeClientStatus(clientId, INACTIVE)
         and:
             1 * clientRepository.existsById(clientId) >> true
     }

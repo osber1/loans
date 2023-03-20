@@ -5,7 +5,6 @@ import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
 import static io.osvaldas.api.loans.Status.PENDING
 import static io.osvaldas.api.loans.Status.REJECTED
-import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs
 import static java.util.Collections.emptySet
 import static java.util.Optional.empty
 import static java.util.Optional.of
@@ -26,6 +25,7 @@ import io.osvaldas.backoffice.infra.configuration.PropertiesConfig
 import io.osvaldas.backoffice.repositories.LoanRepository
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
+import io.osvaldas.backoffice.repositories.specifications.LoanSpecifications
 import spock.lang.Subject
 
 class LoanServiceSpec extends AbstractSpec {
@@ -181,7 +181,7 @@ class LoanServiceSpec extends AbstractSpec {
         when:
             loanService.addLoan(loan, clientId)
         then:
-            REJECTED == client.loans.findAll { it.id = 1 }.first().status
+            REJECTED == client.loans.findAll { it.id == 1 }.first().status
     }
 
     void 'should throw exception when client is not active'() {
@@ -207,7 +207,7 @@ class LoanServiceSpec extends AbstractSpec {
         given:
             1 * loanRepository.findAll { Specification s ->
                 with(s) {
-                    where(loanStatusIs(status))
+                    Specification.where(LoanSpecifications.loanStatusIs(status))
                 }
             } >> result
         expect:
