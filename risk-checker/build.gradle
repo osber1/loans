@@ -6,6 +6,15 @@ plugins {
 
 build {
     dependsOn(tasks.jibDockerBuild)
+    dependsOn(tasks.jib)
+}
+
+jib {
+    to {
+        image = "osvasldas97/${name}"
+        tags = [version, "${version}"]
+    }
+    jib.to.image "osvasldas97/${name}:${version}"
 }
 
 dependencies {

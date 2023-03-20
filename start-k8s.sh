@@ -3,7 +3,7 @@
 VERSION="1.0-SNAPSHOT"
 
 # Need to have JAVA 17 installed.
-./gradlew clean build -x test --parallel
+./gradlew clean build
 docker tag risk-checker:$VERSION osvasldas97/risk-checker:$VERSION
 docker tag back-office:$VERSION osvasldas97/back-office:$VERSION
 docker tag notification-service:$VERSION osvasldas97/notification-service:$VERSION

@@ -3,7 +3,7 @@
 VERSION="1.0-SNAPSHOT"
 
 # Need to have JAVA 17 installed.
-./gradlew clean build --parallel
+./gradlew clean build
 
 docker-compose up -d
 
