@@ -78,3 +78,6 @@ application:
 risk:
   checker:
     url: http://localhost:8081
+
+scheduler:
+  evaluateNotEvaluatedLoans: "* */10 * * * *"
