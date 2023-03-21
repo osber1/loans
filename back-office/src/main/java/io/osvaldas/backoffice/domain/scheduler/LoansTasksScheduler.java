@@ -15,8 +15,8 @@ public class LoansTasksScheduler {
 
     private final LoanService loanService;
 
-    @Scheduled(cron = "* */10 * * * *")
-    @SchedulerLock(name = "evaluateNotEvaluatedLoans", lockAtLeastFor = "PT30S", lockAtMostFor = "PT30S")
+    @Scheduled(cron = "${scheduler.evaluateNotEvaluatedLoans}")
+    @SchedulerLock(name = "evaluateNotEvaluatedLoans", lockAtLeastFor = "PT5S", lockAtMostFor = "PT30S")
     public void evaluateNotEvaluatedLoans() {
         loanService.getLoansByStatus(NOT_EVALUATED)
             .forEach(loan -> loanService.validate(loan, loan.getClient().getId()));

@@ -8,13 +8,12 @@ import static com.fasterxml.jackson.databind.json.JsonMapper.builder;
 import static java.time.Duration.ofMinutes;
 import static org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer;
 
-import javax.sql.DataSource;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -42,13 +41,21 @@ public class BeansConfig {
     }
 
     @Bean
-    public LockProvider lockProvider(DataSource dataSource) {
+    public LockProvider lockProvider(JdbcTemplate jdbcTemplate) {
         return new JdbcTemplateLockProvider(
             JdbcTemplateLockProvider.Configuration.builder()
-                .withJdbcTemplate(new JdbcTemplate(dataSource))
+                .withJdbcTemplate(jdbcTemplate)
                 .usingDbTime()
                 .build()
         );
+    }
+
+    @Bean
+    public ThreadPoolTaskScheduler cronJobThreadPoolTaskScheduler() {
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(3);
+        threadPoolTaskScheduler.setThreadNamePrefix("cronJobThreadPoolTaskScheduler");
+        return threadPoolTaskScheduler;
     }
 
 }
