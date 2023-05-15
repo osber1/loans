@@ -5,7 +5,7 @@ ext {
         groovy                 : '4.0.10',
         lombok                 : '1.18.26',
         openApi                : '1.6.15',
-        mapstruct              : '1.5.2.Final',
+        mapstruct              : '1.5.5.Final',
         spock                  : '2.3-groovy-4.0',
         lombokMapstructBindings: '0.2.0',
         testContainers         : '1.17.6',
