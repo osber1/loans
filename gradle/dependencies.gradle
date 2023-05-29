@@ -19,7 +19,7 @@ ext {
             reflections            : '0.10.2',
             snakeyaml              : '1.33',
             javaFaker              : '1.0.2',
-            shedlock               : '5.2.0'
+            shedlock               : '5.3.0'
     ]
 
     libs = [
