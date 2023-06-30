@@ -10,7 +10,7 @@ minikube start --memory 16384 --cpus=4 --driver=kvm2
 minikube addons enable ingress
 #istioctl install -y
 
-sleep 5
+sleep 10
 
 kubectl apply -f k8s/infra
 #kubectl apply -f k8s/istio
