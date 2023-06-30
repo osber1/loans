@@ -34,7 +34,7 @@ public class EmailService implements EmailSender {
             mailSender.send(mimeMessage);
             log.info("Email sent to: {}", receiverEmail);
         } catch (MessagingException e) {
-            log.error("Failed to send email to " + receiverEmail, e);
+            log.error("Failed to send email to {}", receiverEmail, e);
             throw new IllegalStateException("Failed to send email.");
         }
     }

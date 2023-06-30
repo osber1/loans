@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.7.4'
     id 'jacoco'
     id 'com.google.cloud.tools.jib' version '3.3.2'
+    id 'net.ltgt.errorprone' version '3.1.0'
 }
 
 build {
@@ -18,6 +19,12 @@ jib {
 }
 
 dependencies {
+    errorprone(
+        'com.google.errorprone:error_prone_core:2.20.0',
+        'tech.picnic.error-prone-support:error-prone-contrib:0.12.0',
+        'tech.picnic.error-prone-support:refaster-runner:0.12.0'
+    )
+
     implementation(
         project(':api'),
         libs.feign
@@ -60,4 +67,8 @@ jacocoTestReport {
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone.disableWarningsInGeneratedCode = true
 }

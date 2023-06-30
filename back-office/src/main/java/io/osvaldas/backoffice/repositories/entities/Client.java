@@ -2,6 +2,7 @@ package io.osvaldas.backoffice.repositories.entities;
 
 import static io.osvaldas.api.clients.Status.REGISTERED;
 import static java.util.Comparator.comparing;
+import static java.util.UUID.randomUUID;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -10,7 +11,6 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -78,7 +78,7 @@ public class Client {
     }
 
     public void setRandomId() {
-        setId(UUID.randomUUID().toString());
+        setId(randomUUID().toString());
     }
 
     public String getFullName() {
@@ -86,7 +86,7 @@ public class Client {
     }
 
     public Optional<Loan> getLastLoan() {
-        return this.getLoans().stream()
+        return getLoans().stream()
             .max(comparing(Loan::getId));
     }
 }

@@ -6,8 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication(
     scanBasePackages = {
-        "io.osvaldas.notifications",
         "io.osvaldas.messages",
+        "io.osvaldas.notifications"
     }
 )
 @ConfigurationPropertiesScan

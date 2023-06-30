@@ -19,17 +19,17 @@ import lombok.Setter;
 public class PropertiesConfig {
 
     @NotNull
-    @Min(value = 0)
+    @Min(0)
     private BigDecimal maxAmount;
 
     @NotNull
-    @Min(value = 0)
-    @Max(value = 24)
+    @Min(0)
+    @Max(24)
     private int forbiddenHourFrom;
 
     @NotNull
-    @Min(value = 0)
-    @Max(value = 24)
+    @Min(0)
+    @Max(24)
     private int forbiddenHourTo;
 
     @NotNull

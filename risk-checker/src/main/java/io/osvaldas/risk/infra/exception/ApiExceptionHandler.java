@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler(value = { ValidationRuleException.class })
+    @ExceptionHandler(ValidationRuleException.class)
     public ResponseEntity<Object> handleApiRequestException(ApiRequestException e) {
         log.error(e.getMessage(), e);
         return new ResponseEntity<>(e.toResource(), e.getHttpStatus());
