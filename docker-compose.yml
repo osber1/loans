@@ -48,11 +48,11 @@ services:
       - postgres
     restart: unless-stopped
 
-  maildev:
-    container_name: mail-service
-    image: maildev/maildev:2.0.5
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog:v1.0.1
     ports:
-      - "1080:1080"
+      - "8025:8025"
       - "1025:1025"
     restart: unless-stopped
 

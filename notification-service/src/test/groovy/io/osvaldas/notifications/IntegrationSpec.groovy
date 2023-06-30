@@ -2,8 +2,6 @@ package io.osvaldas.notifications
 
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await
 
-import javax.mail.internet.InternetAddress
-
 import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -24,13 +22,11 @@ class IntegrationSpec extends AbstractIntegrationSpec {
         when:
             amqpTemplate.convertAndSend(exchangeName, routingKeys, message)
         then:
-            await().until { greenMail.receivedMessages.size() == 1 }
-        and:
-            with(greenMail.receivedMessages[0]) {
-                from == [new InternetAddress(emailSender)]
-                allRecipients.contains(new InternetAddress(receiverEmail))
-                subject == emailSubject
-                (content as String).contains(fullName)
+            await().until {
+                mailhogContainer.logs.contains(emailSender)
+                mailhogContainer.logs.contains(receiverEmail)
+                mailhogContainer.logs.contains(emailSubject)
+                mailhogContainer.logs.contains(fullName)
             }
     }
 
