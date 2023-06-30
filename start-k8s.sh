@@ -4,12 +4,6 @@ VERSION="1.0-SNAPSHOT"
 
 # Need to have JAVA 17 installed.
 ./gradlew clean build
-docker tag risk-checker:$VERSION osvasldas97/risk-checker:$VERSION
-docker tag back-office:$VERSION osvasldas97/back-office:$VERSION
-docker tag notification-service:$VERSION osvasldas97/notification-service:$VERSION
-docker push osvasldas97/risk-checker:$VERSION
-docker push osvasldas97/back-office:$VERSION
-docker push osvasldas97/notification-service:$VERSION
 
 # Uncomment only running for the first time
 minikube start --memory 16384 --cpus=4 --driver=kvm2

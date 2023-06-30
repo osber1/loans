@@ -10,7 +10,7 @@
 - [Swagger documentation](http://localhost:8080/swagger-ui.html)
 - [Actuator](http://localhost:8080/actuator)
 - [RabbitMQ](http://localhost:15672)
-- [Email service](http://localhost:1080)
+- [Email service](http://localhost:8025)
 - [pgAdmin](http://localhost:5050)
 - [Redis Commander](http://localhost:5123)
 - [Vault](http://localhost:8200)
@@ -67,18 +67,26 @@ Run `./start.sh` to start everything.
 
 ## Features
 
-* Lombok
-* MapStruct
-* Swagger
-* Actuator
-* Liquibase
-* Testcontainers
-* JavaMailSender
-* WireMock
+- Code:
+    * Lombok
+    * MapStruct
+    * Swagger
+    * Actuator
+    * Liquibase
+    * Testcontainers
+    * JavaMailSender
+    * WireMock
 
-* RabbitMQ
-* Redis
-* PostgreSQL
-* Prometheus
-* Grafana
-* Vault
+
+- Infra:
+    * RabbitMQ
+    * Redis
+    * PostgreSQL
+    * Prometheus
+    * Grafana
+    * Vault
+
+
+- DevOps:
+    * Docker
+    * Kubernetes

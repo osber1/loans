@@ -1,6 +1,5 @@
 spring:
   rabbitmq:
     host: rabbitmq.loans.svc.cluster.local
-
-email:
-  host: maildev.loans.svc.cluster.local
+  mail:
+    host: mailhog.loans.svc.cluster.local

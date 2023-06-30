@@ -28,18 +28,25 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
         .withExchange(exchangeName, 'direct')
         .withBinding(exchangeName, queueName, emptyMap(), routingKeys, 'queue')
 
+    static {
+        mailhogContainer.start()
+        rabbitMQContainer.start()
+    }
+
     @DynamicPropertySource
     static void rabbitMqProperties(DynamicPropertyRegistry registry) {
-        greenMail.start()
-        rabbitMQContainer.start()
         registry.add('spring.rabbitmq.host') { rabbitMQContainer.host }
         registry.add('spring.rabbitmq.port') { rabbitMQContainer.getMappedPort(5672) }
         registry.add('email.port') { SMTP.port }
+
+        Integer mailHogSMTPPort = mailhogContainer.getMappedPort(1025)
+        registry.add('spring.mail.host', mailhogContainer::getHost)
+        registry.add('spring.mail.port', mailHogSMTPPort::toString)
     }
 
     void cleanupSpec() {
         rabbitMQContainer.stop()
-        greenMail.stop()
+        mailhogContainer.stop()
     }
 
 }

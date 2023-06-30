@@ -1,9 +1,8 @@
 spring:
   rabbitmq:
     host: rabbitmq
-
-email:
-  host: maildev
+  mail:
+    host: mailhog
 
 logging:
   file:
