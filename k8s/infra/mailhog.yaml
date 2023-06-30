@@ -2,25 +2,25 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: loans
-  name: maildev
+  name: mailhog
   labels:
-    app: maildev
+    app: mailhog
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: maildev
+      app: mailhog
   template:
     metadata:
       labels:
-        app: maildev
+        app: mailhog
     spec:
       containers:
-        - name: maildev
-          image: maildev/maildev:latest
+        - name: mailhog
+          image: mailhog/mailhog:v1.0.1
           ports:
             - name: http
-              containerPort: 1080
+              containerPort: 8025
               protocol: TCP
             - name: client
               containerPort: 1025
@@ -32,18 +32,18 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: loans
-  name: maildev
+  name: mailhog
   labels:
-    app: maildev
+    app: mailhog
 spec:
   selector:
-    app: maildev
+    app: mailhog
   ports:
     - name: http
       protocol: TCP
-      port: 1080
+      port: 8025
       targetPort: http
-    - name: client
+    - name: tcp-mail
       protocol: TCP
       port: 1025
-      targetPort: client
+      targetPort: 1025

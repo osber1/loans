@@ -21,6 +21,12 @@ import spock.lang.Specification
 abstract class AbstractDatabaseSpec extends Specification {
 
     @Shared
+    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:15.2-alpine')
+        .withDatabaseName('loans')
+        .withUsername('root')
+        .withPassword('root')
+
+    @Shared
     ZonedDateTime date = generateDate(2022)
 
     @Shared
@@ -47,11 +53,9 @@ abstract class AbstractDatabaseSpec extends Specification {
     @Shared
     Loan loan = createLoan()
 
-    @Shared
-    PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:15.2-alpine')
-        .withDatabaseName('loans')
-        .withUsername('root')
-        .withPassword('root')
+    static {
+        postgreSQLContainer.start()
+    }
 
     ZonedDateTime generateDate(int year) {
         ZonedDateTime.of(
