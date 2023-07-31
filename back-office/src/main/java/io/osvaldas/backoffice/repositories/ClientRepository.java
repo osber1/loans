@@ -15,6 +15,7 @@ import io.osvaldas.backoffice.repositories.entities.Client;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, String>, JpaSpecificationExecutor<Client>, RevisionRepository<Client, String, Long> {
 
+    @Override
     Optional<Client> findById(String id);
 
     boolean existsByPersonalCode(String personalCode);
