@@ -15,7 +15,7 @@ ext {
             wiremock               : '3.1.5',
             cucumber               : '6.10.4',
             restAssured            : '4.5.1',
-            guice                  : '5.1.0',
+            guice                  : '7.0.0',
             reflections            : '0.10.2',
             snakeyaml              : '1.33',
             javaFaker              : '1.0.2',
