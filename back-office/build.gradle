@@ -99,10 +99,11 @@ tasks.withType(JavaCompile).configureEach {
     options.errorprone.disableWarningsInGeneratedCode = true
     options.errorprone {
         disableWarningsInGeneratedCode = true
+        String rules = error_prone_rules.join(',')
         errorproneArgs.addAll(
-            '-XepPatchChecks:Refaster,StaticImport,AutowiredConstructor,CanonicalAnnotationSyntax,DirectReturn,IsInstanceLambdaUsage,MethodReferenceUsage,NestedOptionals,' +
-                'PrimitiveComparison,RedundantStringConversion,RequestMappingAnnotation,Slf4jLogStatement,SpringMvcAnnotation',
-            '-XepPatchLocation:IN_PLACE'
+            "-XepPatchChecks:Refaster,$rules",
+            '-XepPatchLocation:IN_PLACE',
+            '-XepOpt:Refaster:NamePattern=(ImmutableListOf2|ImmutableMapOf1)'
         )
     }
 }

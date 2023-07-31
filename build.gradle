@@ -8,13 +8,13 @@ plugins {
 }
 
 apply from: 'gradle/dependencies.gradle'
+apply from: 'config/error-prone/rules.gradle'
 
 allprojects {
     group = 'io.osvaldas'
     version = '1.0-SNAPSHOT'
 
     sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
 
     repositories {
         mavenCentral()
