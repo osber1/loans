@@ -1,6 +1,6 @@
 package io.osvaldas.notifications.domain.emails;
 
-public class EmailBuilder {
+public final class EmailBuilder {
 
     public static String buildEmailMessage() {
         return """
@@ -86,5 +86,8 @@ public class EmailBuilder {
                                 </div>
                              </div>
             """;
+    }
+
+    private EmailBuilder() {
     }
 }

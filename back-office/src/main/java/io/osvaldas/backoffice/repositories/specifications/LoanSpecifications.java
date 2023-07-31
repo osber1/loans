@@ -6,6 +6,7 @@ import javax.persistence.criteria.Join;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import io.osvaldas.api.loans.Status;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.entities.Client_;
 import io.osvaldas.backoffice.repositories.entities.Loan;
@@ -24,7 +25,7 @@ public interface LoanSpecifications {
         return (root, query, cb) -> cb.greaterThan(root.get(Loan_.CREATED_AT), date);
     }
 
-    static Specification<Loan> loanStatusIs(io.osvaldas.api.loans.Status status) {
+    static Specification<Loan> loanStatusIs(Status status) {
         return (root, query, cb) -> cb.equal(root.get(Loan_.STATUS), status);
     }
 
