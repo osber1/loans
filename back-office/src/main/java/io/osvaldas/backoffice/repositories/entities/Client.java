@@ -1,7 +1,7 @@
 package io.osvaldas.backoffice.repositories.entities;
 
 import static io.osvaldas.api.clients.Status.REGISTERED;
-import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingLong;
 import static java.util.UUID.randomUUID;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.STRING;
@@ -87,6 +87,6 @@ public class Client {
 
     public Optional<Loan> getLastLoan() {
         return getLoans().stream()
-            .max(comparing(Loan::getId));
+            .max(comparingLong(Loan::getId));
     }
 }

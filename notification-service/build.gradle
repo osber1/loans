@@ -77,4 +77,12 @@ test {
 
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.disableWarningsInGeneratedCode = true
+    options.errorprone {
+        disableWarningsInGeneratedCode = true
+        errorproneArgs.addAll(
+            '-XepPatchChecks:Refaster,StaticImport,AutowiredConstructor,CanonicalAnnotationSyntax,DirectReturn,IsInstanceLambdaUsage,MethodReferenceUsage,NestedOptionals,' +
+                'PrimitiveComparison,RedundantStringConversion,RequestMappingAnnotation,Slf4jLogStatement,SpringMvcAnnotation',
+            '-XepPatchLocation:IN_PLACE'
+        )
+    }
 }
