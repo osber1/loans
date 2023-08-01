@@ -2,6 +2,9 @@ package io.osvaldas.notifications.domain.emails;
 
 public final class EmailBuilder {
 
+    private EmailBuilder() {
+    }
+
     public static String buildEmailMessage() {
         return """
             <div style="font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c">
@@ -88,6 +91,4 @@ public final class EmailBuilder {
             """;
     }
 
-    private EmailBuilder() {
-    }
 }
