@@ -10,6 +10,7 @@ public class ClientNotActiveException extends ApiRequestException {
         super(message);
     }
 
+    @Override
     public HttpStatus getHttpStatus() {
         return BAD_REQUEST;
     }

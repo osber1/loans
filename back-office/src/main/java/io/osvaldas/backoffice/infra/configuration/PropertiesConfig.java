@@ -18,15 +18,15 @@ import lombok.Setter;
 public class PropertiesConfig {
 
     @NotNull
-    @Min(value = 0)
+    @Min(0)
     private BigDecimal interestRate;
 
     @NotNull
-    @Min(value = 0)
+    @Min(0)
     private int postponeDays;
 
     @NotNull
-    @Min(value = 0)
+    @Min(0)
     private BigDecimal interestIncrementFactor;
 
 }

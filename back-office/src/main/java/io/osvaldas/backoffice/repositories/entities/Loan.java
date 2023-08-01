@@ -68,7 +68,7 @@ public class Loan {
     private Set<LoanPostpone> loanPostpones = new HashSet<>();
 
     @JoinColumn(name = "client_id")
-    @ManyToOne(cascade = { PERSIST, MERGE, DETACH, REFRESH })
+    @ManyToOne(cascade = { DETACH, MERGE, PERSIST, REFRESH })
     private Client client;
 
     public void addLoanPostpone(LoanPostpone loanPostpone) {

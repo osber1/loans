@@ -17,9 +17,9 @@ import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 @EnableFeignClients
 @SpringBootApplication(
     scanBasePackages = {
+        "io.osvaldas.api",
         "io.osvaldas.backoffice",
-        "io.osvaldas.messages",
-        "io.osvaldas.api"
+        "io.osvaldas.messages"
     }
 )
 @ConfigurationPropertiesScan(
