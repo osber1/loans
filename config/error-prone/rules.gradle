@@ -68,6 +68,7 @@ ext {
         'UnusedMethod',
         'CatchingUnchecked',
         'InterfaceWithOnlyStatics',
+//        'MemberName', https://github.com/google/error-prone/pull/3976
         'RedundantOverride',
         'RedundantThrows',
         'StatementSwitchToExpressionSwitch',
