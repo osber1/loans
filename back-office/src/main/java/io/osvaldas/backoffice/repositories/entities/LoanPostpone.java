@@ -40,7 +40,7 @@ public class LoanPostpone {
     private BigDecimal interestRate;
 
     @JoinColumn(name = "loan_id")
-    @ManyToOne(cascade = { PERSIST, MERGE, DETACH, REFRESH })
+    @ManyToOne(cascade = { DETACH, MERGE, PERSIST, REFRESH })
     private Loan loan;
 
     public void incrementAndSetInterestRate(BigDecimal interestRate, BigDecimal interestIncrementFactor) {

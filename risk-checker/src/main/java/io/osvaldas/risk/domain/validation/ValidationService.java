@@ -28,7 +28,7 @@ public class ValidationService {
             validator.validate(riskValidationTarget);
             log.info("Client {} request successful.", clientId);
             return new RiskValidationResponse(true, "Risk validation passed.");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Risk validation failed for client {} with loan {}", clientId, loanId, e);
             return new RiskValidationResponse(false, e.getMessage());
         }
