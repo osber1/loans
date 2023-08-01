@@ -76,8 +76,7 @@ tasks.withType(JavaCompile).configureEach {
         String rules = error_prone_rules.join(',')
         errorproneArgs.addAll(
             "-XepPatchChecks:Refaster,$rules",
-            '-XepPatchLocation:IN_PLACE',
-            '-XepOpt:Refaster:NamePattern=(ImmutableListOf2|ImmutableMapOf1)'
+            '-XepPatchLocation:IN_PLACE'
         )
     }
 }

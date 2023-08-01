@@ -6,6 +6,7 @@ import io.osvaldas.api.clients.Status;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.entities.Client_;
 
+@SuppressWarnings("InterfaceWithOnlyStatics")
 public interface ClientSpecifications {
 
     static Specification<Client> clientStatusIs(Status status) {

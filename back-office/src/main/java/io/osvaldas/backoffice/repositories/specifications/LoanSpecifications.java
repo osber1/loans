@@ -12,6 +12,7 @@ import io.osvaldas.backoffice.repositories.entities.Client_;
 import io.osvaldas.backoffice.repositories.entities.Loan;
 import io.osvaldas.backoffice.repositories.entities.Loan_;
 
+@SuppressWarnings("InterfaceWithOnlyStatics")
 public interface LoanSpecifications {
 
     static Specification<Loan> clientIdIs(String clientId) {
