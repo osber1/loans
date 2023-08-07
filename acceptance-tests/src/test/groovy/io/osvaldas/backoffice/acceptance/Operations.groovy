@@ -1,20 +1,14 @@
 package io.osvaldas.backoffice.acceptance
 
-import com.github.javafaker.Faker
-import com.github.javafaker.service.FakeValuesService
-import com.github.javafaker.service.RandomService
-
 import io.osvaldas.api.clients.ClientRegisterRequest
 import io.osvaldas.api.loans.LoanRequest
+import net.datafaker.Faker
 import spock.lang.Shared
 
 class Operations {
 
     @Shared
     Faker faker = new Faker()
-
-    @Shared
-    FakeValuesService fakeValuesService = new FakeValuesService(new Locale('lt-LT'), new RandomService())
 
     static LoanRequest buildLoanRequest(BigDecimal loanAmount) {
         new LoanRequest().tap {
@@ -27,9 +21,9 @@ class Operations {
         new ClientRegisterRequest().tap {
             firstName = faker.name().firstName()
             lastName = faker.name().lastName()
-            personalCode = fakeValuesService.numerify('###########')
-            email = fakeValuesService.bothify('???????????####@gmail.com')
-            phoneNumber = fakeValuesService.numerify('###########')
+            personalCode = faker.expression("#{numerify '###########'}")
+            email = faker.expression("#{bothify '???????????####@gmail.com'}")
+            phoneNumber = faker.expression("#{numerify '###########'}")
         }
     }
 

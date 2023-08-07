@@ -70,7 +70,7 @@ spec:
     spec:
       containers:
         - name: rabbitmq
-          image: rabbitmq:3.9.11-management-alpine
+          image: rabbitmq:3.12.2-management-alpine
           ports:
             - containerPort: 15672
               name: http

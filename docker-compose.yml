@@ -36,7 +36,7 @@ services:
 
   pgadmin:
     container_name: pgadmin
-    image: dpage/pgadmin4:6.20
+    image: dpage/pgadmin4:7.5
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -58,7 +58,7 @@ services:
 
   rabbitmq:
     container_name: rabbitmq
-    image: rabbitmq:3.11.9-management-alpine
+    image: rabbitmq:3.12.2-management-alpine
     environment:
       RABBITMQ_NODENAME: "rabbit@staticrabbit"
     extra_hosts:
@@ -73,7 +73,7 @@ services:
 
   vault:
     container_name: vault
-    image: hashicorp/vault:1.12
+    image: hashicorp/vault:1.14.1
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: 'super-secret-token'
     cap_add:
@@ -87,7 +87,7 @@ services:
 
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:v2.42.0
+    image: prom/prometheus:v2.46.0
     volumes:
       - ./infra_config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
@@ -96,7 +96,7 @@ services:
 
   grafana:
     container_name: grafana
-    image: grafana/grafana-oss:9.3.6
+    image: grafana/grafana-oss:10.0.3
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
@@ -113,7 +113,7 @@ services:
 
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:8.6.1
+    image: docker.elastic.co/kibana/kibana:8.8.1
     volumes:
       - ./infra_config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
@@ -124,7 +124,7 @@ services:
 
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.1
     environment:
       node.name: elasticsearch
       discovery.type: single-node
@@ -138,7 +138,7 @@ services:
 
   logstash:
     container_name: logstash
-    image: docker.elastic.co/logstash/logstash:8.6.1
+    image: docker.elastic.co/logstash/logstash:8.8.1
     volumes:
       - ./infra_config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./infra_config/logstash/pipeline:/usr/share/logstash/pipeline
