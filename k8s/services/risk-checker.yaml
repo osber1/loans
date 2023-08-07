@@ -38,6 +38,6 @@ spec:
   selector:
     app: risk-checker
   ports:
-    - protocol: "TCP"
+    - protocol: TCP
       port: 8081
       targetPort: 8081

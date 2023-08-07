@@ -38,6 +38,6 @@ spec:
   selector:
     app: notification-service
   ports:
-    - protocol: "TCP"
+    - protocol: TCP
       port: 8082
       targetPort: 8082
