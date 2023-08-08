@@ -53,7 +53,8 @@ subprojects {
             libs.lombok,
             libs.springBootStarterWeb,
             libs.springBootStarterBootstrap,
-            libs.springBootStarterValidation
+            libs.springBootStarterValidation,
+            libs.logstash
         )
 
         compileOnly(

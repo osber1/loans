@@ -15,6 +15,9 @@ kubectl apply -f k8s/istio
 MINIKUBE_IP=`minikube ip`
 VAULT_PORT=`kubectl get service vault -n loans -o jsonpath='{.spec.ports[0].nodePort}'`
 ./infra_config/vault/seed_vault.sh $MINIKUBE_IP $VAULT_PORT
+
+KIBANA_PORT=`kubectl get service kibana -n loans -o jsonpath='{.spec.ports[0].nodePort}'`
+./infra_config/kibana/seed_kibana.sh $MINIKUBE_IP $KIBANA_PORT
 kubectl apply -f k8s/services
 
 minikube service list

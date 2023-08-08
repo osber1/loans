@@ -11,7 +11,7 @@ data:
     datasources:
       - name: Prometheus
         type: prometheus
-        url: http://prometheus:9090
+        url: http://prometheus.loans.svc.cluster.local:9090
         uid: veryuniqueuid
 
 ---
