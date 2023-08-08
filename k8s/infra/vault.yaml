@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: vault
-          image: hashicorp/vault:latest
+          image: hashicorp/vault:1.14.1
           env:
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: 'super-secret-token'

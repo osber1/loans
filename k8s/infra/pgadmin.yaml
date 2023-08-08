@@ -64,7 +64,7 @@ spec:
         app: pgadmin
     spec:
       containers:
-        - image: dpage/pgadmin4:latest
+        - image: dpage/pgadmin4:7.5
           imagePullPolicy: Always
           name: pgadmin
           env:

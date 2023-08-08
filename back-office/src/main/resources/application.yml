@@ -80,4 +80,6 @@ risk:
     url: http://localhost:8081
 
 scheduler:
-  evaluateNotEvaluatedLoans: "* */10 * * * *"
+  evaluateNotEvaluatedLoans:
+    enabled: true
+    cron : "* */10 * * * *"

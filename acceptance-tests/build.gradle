@@ -8,12 +8,8 @@ dependencies {
         libs.restAssured,
         libs.guice,
         libs.reflections,
-        libs.snakeyaml
+        libs.javaFaker
     )
-
-    implementation(libs.javaFaker) {
-        exclude module: 'org.yaml'
-    }
 
     testImplementation(
         'org.codehaus.groovy:groovy-all:3.0.9',
