@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./gradlew clean build
+#./gradlew clean build
 
 docker-compose up -d
 
@@ -8,4 +8,4 @@ docker-compose up -d
 
 docker-compose -f docker-compose-applications.yml up -d
 
-./infra_config/kibana/seed_kibana.sh
+./infra_config/kibana/seed_kibana.sh localhost 5601
