@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: kibana
-          image: docker.elastic.co/kibana/kibana:7.9.3
+          image: docker.elastic.co/kibana/kibana:8.8.1
           resources:
             limits:
               cpu: 1000m
@@ -27,6 +27,10 @@ spec:
           env:
             - name: ELASTICSEARCH_URL
               value: http://elasticsearch.loans.svc.cluster.local:9200
+            - name: SERVER_NAME
+              value: kibana
+            - name: XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY
+              value: min-32-byte-long-NEW-encryption-key
           ports:
             - containerPort: 5601
 
@@ -40,7 +44,9 @@ metadata:
   labels:
     app: kibana
 spec:
+  type: NodePort
   selector:
     app: kibana
   ports:
-    - port: 5601
+    - name: http
+      port: 5601
