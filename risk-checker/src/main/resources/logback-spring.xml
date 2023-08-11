@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <springProfile name="dev">
+    <springProfile name="!k8s">
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
     </springProfile>
 
@@ -13,40 +13,6 @@
         <springProperty scope="context" name="profiles" source="spring.profiles.active"/>
 
         <timestamp key="log_date" datePattern="yyyy-MM-dd"/>
-
-        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-                <providers>
-                    <pattern>
-                        <pattern>
-                            {
-                            "hostname": "${HOSTNAME}",
-                            "app": "${appName}",
-                            "profiles": "${profiles}",
-                            "time": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
-                            "level": "%level",
-                            "class": "%logger",
-                            "method": "%method",
-                            "line": "%line",
-                            "message": "%message",
-                            "stack_trace": "%exception",
-                            "trace": "%X{traceId:-}",
-                            "span": "%X{spanId:-}"
-                            }
-                        </pattern>
-                    </pattern>
-                </providers>
-            </encoder>
-            <file>logs/${appName}.log</file>
-            <append>true</append>
-            <prudent>false</prudent>
-            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <fileNamePattern>logs/${appName}-%d{yyyy-MM-dd}.log.%i.gz</fileNamePattern>
-                <maxFileSize>20MB</maxFileSize>
-                <maxHistory>7</maxHistory>
-                <totalSizeCap>5GB</totalSizeCap>
-            </rollingPolicy>
-        </appender>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -75,7 +41,6 @@
 
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="FILE"/>
         </root>
     </springProfile>
 
