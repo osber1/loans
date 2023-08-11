@@ -29,8 +29,8 @@ spec:
               value: http://elasticsearch.loans.svc.cluster.local:9200
             - name: SERVER_NAME
               value: kibana
-            - name: XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY
-              value: min-32-byte-long-NEW-encryption-key
+            - name: ELASTICSEARCH_HOSTS
+              value: http://elasticsearch.loans.svc.cluster.local:9200
           ports:
             - containerPort: 5601
 

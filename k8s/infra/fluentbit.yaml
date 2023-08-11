@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: fluentd
+  name: fluent-bit
   namespace: loans
   labels:
-    app: fluentd
+    app: fluent-bit
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: fluentd
+  name: fluent-bit
   labels:
-    app: fluentd
+    app: fluent-bit
 rules:
   - apiGroups:
       - ""
@@ -30,14 +30,14 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: fluentd
+  name: fluent-bit
 roleRef:
   kind: ClusterRole
-  name: fluentd
+  name: fluent-bit
   apiGroup: rbac.authorization.k8s.io
 subjects:
   - kind: ServiceAccount
-    name: fluentd
+    name: fluent-bit
     namespace: loans
 
 ---
@@ -53,7 +53,7 @@ data:
         Flush         1
         Log_Level     info
         Daemon        off
-        Parsers_File  parsers.conf
+        Parsers_File  /fluent-bit/etc/parsers.conf
     @INCLUDE my-input.conf
     @INCLUDE filter.conf
     @INCLUDE output-elasticsearch.conf
@@ -62,8 +62,8 @@ data:
     [INPUT]
         Name              tail
         Tag               kube.*
-        Path              /var/log/containers/*_container-name*.log
-        Parser            docker
+        Path              /var/log/containers/*.log
+        multiline.parser  docker, cri
         DB                /var/log/flb_kube.db
         Mem_Buf_Limit     5MB
         Skip_Long_Lines   On
@@ -90,19 +90,10 @@ data:
         Host            ${FLUENT_ELASTICSEARCH_HOST}
         Port            ${FLUENT_ELASTICSEARCH_PORT}
         Logstash_Format On
-        Logstash_Prefix fluent-bit-spring
+        Logstash_Prefix fluent-bit
         Replace_Dots    On
         Retry_Limit     False
-
-    [OUTPUT]
-        Name            es
-        Match           kube.*
-        Host            ${FLUENT_ELASTICSEARCH_HOST}
-        Port            ${FLUENT_ELASTICSEARCH_PORT}
-        Logstash_Format On
-        Logstash_Prefix fluent-bit-kube
-        Replace_Dots    On
-        Retry_Limit     False
+        Suppress_Type_Name On
 
   parsers.conf: |
     [PARSER]
@@ -116,26 +107,25 @@ data:
         Time_Key    time
         Time_Format %Y-%m-%dT%H:%M:%S.%L
         Time_Keep   On
-
 ---
 
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: fluentd
+  name: fluent-bit
   namespace: loans
   labels:
-    app: fluentd
+    app: fluent-bit
 spec:
   selector:
     matchLabels:
-      app: fluentd
+      app: fluent-bit
   template:
     metadata:
       labels:
-        app: fluentd
+        app: fluent-bit
     spec:
-      serviceAccountName: fluentd
+      serviceAccountName: fluent-bit
       tolerations:
         - key: node-role.kubernetes.io/master
           operator: Exists
@@ -145,13 +135,16 @@ spec:
         - operator: "Exists"
           effect: "NoSchedule"
       containers:
-        - name: fluentd
-          image: fluent/fluent-bit:1.3.4
+        - name: fluent-bit
+          image: fluent/fluent-bit:2.1.8
           env:
             - name: FLUENT_ELASTICSEARCH_HOST
               value: "elasticsearch.loans.svc.cluster.local"
             - name: FLUENT_ELASTICSEARCH_PORT
               value: "9200"
+          args:
+            - --workdir=/fluent-bit/etc
+            - --config=/fluent-bit/etc/conf/fluent-bit.conf
           resources:
             limits:
               memory: 512Mi
@@ -165,7 +158,7 @@ spec:
               mountPath: /var/lib/docker/containers
               readOnly: true
             - name: fluent-bit-config
-              mountPath: /fluent-bit/etc/
+              mountPath: /fluent-bit/etc/conf
       terminationGracePeriodSeconds: 30
       volumes:
         - name: varlog

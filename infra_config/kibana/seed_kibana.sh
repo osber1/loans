@@ -1,7 +1,7 @@
 #!/bin/bash
 
 while true; do
-  RESPONSE=$(curl -sSLw "\n%{http_code}" -H "kbn-xsrf: ''" -H "Content-Type: application/json" -X POST -d @infra_config/kibana/create_data_view.json http://$1:$2/api/data_views/data_view)
+  RESPONSE=$(curl -sSLw "\n%{http_code}" -H "kbn-xsrf: ''" -H "Content-Type: application/json" -X POST -d @infra_config/kibana/$3 http://$1:$2/api/data_views/data_view)
   RESPONSE_BODY=$(echo "$RESPONSE" | awk 'NF{print $0}' | head -n -1)
   RESPONSE_CODE=$(echo "$RESPONSE" | awk 'END{print $NF}')
 

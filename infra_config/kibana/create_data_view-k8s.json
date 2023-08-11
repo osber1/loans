@@ -1,0 +1,7 @@
+{
+  "data_view": {
+    "title": "fluent-bit-*",
+    "name": "fluent-bit-*",
+    "timeFieldName": "@timestamp"
+  }
+}
