@@ -17,7 +17,9 @@ VAULT_PORT=`kubectl get service vault -n loans -o jsonpath='{.spec.ports[0].node
 ./infra_config/vault/seed_vault.sh $MINIKUBE_IP $VAULT_PORT
 
 KIBANA_PORT=`kubectl get service kibana -n loans -o jsonpath='{.spec.ports[0].nodePort}'`
-./infra_config/kibana/seed_kibana.sh $MINIKUBE_IP $KIBANA_PORT create_data_view-k8s.json
+./infra_config/kibana/seed_kibana.sh $MINIKUBE_IP $KIBANA_PORT create_data_view-k8s-1.json
+./infra_config/kibana/seed_kibana.sh $MINIKUBE_IP $KIBANA_PORT create_data_view-k8s-2.json
 kubectl apply -f k8s/services
 
 minikube service list
+minikube dashboard

@@ -61,18 +61,30 @@ data:
   my-input.conf: |
     [INPUT]
         Name              tail
-        Tag               kube.*
-        Path              /var/log/containers/*.log
+        Tag               services.*
+        Path              /var/log/containers/notification*.log,/var/log/containers/risk*.log,/var/log/containers/back*.log
         multiline.parser  docker, cri
-        DB                /var/log/flb_kube.db
+        DB                /fluent-bit/tail-services-state.db
         Mem_Buf_Limit     5MB
         Skip_Long_Lines   On
-        Refresh_Interval  10
+        Refresh_Interval  5
+        Buffer_Max_Size   256k
+    [INPUT]
+        Name              tail
+        Tag               kube.*
+        Path              /var/log/containers/*.log
+        Exclude_Path      /var/log/containers/notification*.log,/var/log/containers/risk*.log,/var/log/containers/back*.log
+        multiline.parser  docker, cri
+        DB                /fluent-bit/tail-containers-state.db
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+        Refresh_Interval  5
+        Buffer_Max_Size   256k
 
   filter.conf: |
     [FILTER]
         Name                kubernetes
-        Match               kube.*
+        Match               *
         Kube_URL            https://kubernetes.default.svc:443
         Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -85,28 +97,45 @@ data:
 
   output-elasticsearch.conf: |
     [OUTPUT]
-        Name            es
-        Match           *
-        Host            ${FLUENT_ELASTICSEARCH_HOST}
-        Port            ${FLUENT_ELASTICSEARCH_PORT}
-        Logstash_Format On
-        Logstash_Prefix fluent-bit
-        Replace_Dots    On
-        Retry_Limit     False
-        Suppress_Type_Name On
+        Name                es
+        Match               services.*
+        Host                ${FLUENT_ELASTICSEARCH_HOST}
+        Port                ${FLUENT_ELASTICSEARCH_PORT}
+        Logstash_Format     On
+        Logstash_Prefix     fluent-bit-services
+        Replace_Dots        On
+        Retry_Limit         False
+        Time_Key            @timestamp
+        Suppress_Type_Name  On
+
+    [OUTPUT]
+        Name                es
+        Match               kube.*
+        Host                ${FLUENT_ELASTICSEARCH_HOST}
+        Port                ${FLUENT_ELASTICSEARCH_PORT}
+        Logstash_Format     On
+        Logstash_Prefix     fluent-bit-infra
+        Replace_Dots        On
+        Retry_Limit         False
+        Time_Key            @timestamp
+        Suppress_Type_Name  On
 
   parsers.conf: |
     [PARSER]
-        Name   json
-        Format json
-        Time_Key time
-        Time_Format %d/%b/%Y:%H:%M:%S %z
+        Name        json
+        Format      json
+        Time_Keep   Off
+        Time_Key    @timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+        Decode_Field_As   escaped   message
+        Decode_Field_As   escaped   stack_trace
     [PARSER]
         Name        docker
         Format      json
         Time_Key    time
         Time_Format %Y-%m-%dT%H:%M:%S.%L
         Time_Keep   On
+
 ---
 
 apiVersion: apps/v1
