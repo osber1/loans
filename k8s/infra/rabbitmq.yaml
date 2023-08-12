@@ -2,12 +2,23 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: loans
-  name: rabbitmq
+  name: rabbitmq-conf
   labels:
-    name: rabbitmq
+    name: rabbitmq-conf
 data:
   rabbitmq.conf: |-
     management.load_definitions = /etc/rabbitmq/definitions.json
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: loans
+  name: rabbitmq-definitions
+  labels:
+    name: rabbitmq-definitions
+data:
   definitions.json: |-
     {
       "users": [
@@ -95,12 +106,19 @@ spec:
             - containerPort: 15692
               name: prometheus
           volumeMounts:
-            - name: rabbitmq-config-map
-              mountPath: /etc/rabbitmq/
+            - name: rabbitmq-definitions-config-map
+              mountPath: /etc/rabbitmq/definitions.json
+              subPath: definitions.json
+            - name: rabbitmq-conf-config-map
+              mountPath: /etc/rabbitmq/rabbitmq.conf
+              subPath: rabbitmq.conf
       volumes:
-        - name: rabbitmq-config-map
+        - name: rabbitmq-conf-config-map
           configMap:
-            name: rabbitmq
+            name: rabbitmq-conf
+        - name: rabbitmq-definitions-config-map
+          configMap:
+            name: rabbitmq-definitions
 
 ---
 
