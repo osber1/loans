@@ -98,6 +98,7 @@ ext {
         'UnnecessaryBoxedVariable',
         'UnnecessaryStaticImport',
         'UseEnumSwitch',
-        'WildcardImport'
+        'WildcardImport',
+        'OverridingMethodInconsistentArgumentNamesChecker'
     ]
 }

@@ -25,6 +25,21 @@ spring:
           starttls:
             enable: false
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "*"
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+
 email:
   senderAddress: hello@osber.com
   subject: Confirm your email

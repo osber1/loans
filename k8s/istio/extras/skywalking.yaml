@@ -13,7 +13,6 @@ spec:
     metadata:
       labels:
         app: skywalking-oap
-      annotations:
         sidecar.istio.io/inject: "false"
     spec:
       containers:
@@ -25,8 +24,8 @@ spec:
           readinessProbe:
             exec:
               command:
-              - /skywalking/bin/swctl
-              - health
+                - /skywalking/bin/swctl
+                - health
             initialDelaySeconds: 30
             periodSeconds: 5
 

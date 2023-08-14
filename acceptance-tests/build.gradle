@@ -12,7 +12,8 @@ dependencies {
     )
 
     testImplementation(
-        'org.codehaus.groovy:groovy-all:3.0.18',
+        'org.codehaus.groovy:groovy-all:3.0.9',
+//        'org.codehaus.groovy:groovy-all:3.0.18',
         'org.spockframework:spock-core:2.1-groovy-3.0',
         'org.spockframework:spock-spring:2.1-groovy-3.0',
         libs.cucumberGroovy,

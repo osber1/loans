@@ -1,3 +1,34 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus
+  namespace: loans
+rules:
+  - apiGroups: [""]
+    resources:
+      - services
+      - endpoints
+      - pods
+    verbs: ["get", "list", "watch"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+  namespace: loans
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: loans
+
+---
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -9,106 +40,41 @@ data:
   prometheus.yml: |-
     global:
       scrape_interval: 5s
+      scrape_timeout: 2s
       evaluation_interval: 5s
     scrape_configs:
-      - job_name: 'springboot'
+      - job_name: springboot
         metrics_path: /actuator/prometheus
-        scrape_interval: 5s
         kubernetes_sd_configs:
           - role: endpoints
             namespaces:
               names:
                 - loans
         relabel_configs:
-          - source_labels: [ __meta_kubernetes_service_label_app ]
-            separator: ;
-            regex: (producer|listener)
-            replacement: $1
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
             action: keep
-          - source_labels: [ __meta_kubernetes_endpoint_port_name ]
-            separator: ;
-            regex: http
-            replacement: $1
-            action: keep
-          - source_labels: [ __meta_kubernetes_namespace ]
-            separator: ;
-            regex: (.*)
-            target_label: namespace
-            replacement: $1
+            regex: true
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
             action: replace
-          - source_labels: [ __meta_kubernetes_pod_name ]
-            separator: ;
-            regex: (.*)
-            target_label: pod
-            replacement: $1
+            target_label: __scheme__
+            regex: (https?)
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
             action: replace
-          - source_labels: [ __meta_kubernetes_service_name ]
-            separator: ;
-            regex: (.*)
-            target_label: service
-            replacement: $1
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
             action: replace
-          - source_labels: [ __meta_kubernetes_service_name ]
-            separator: ;
-            regex: (.*)
-            target_label: job
-            replacement: ${1}
+            target_label: __address__
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+          - action: labelmap
+            regex: __meta_kubernetes_service_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
             action: replace
-          - separator: ;
-            regex: (.*)
-            target_label: endpoint
-            replacement: http
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_service_name]
             action: replace
-      - job_name: 'rabbitmq'
-        metrics_path: /metrics
-        scrape_interval: 5s
-        kubernetes_sd_configs:
-          - role: endpoints
-            namespaces:
-              names:
-                - loans
-
-        relabel_configs:
-          - source_labels: [ __meta_kubernetes_service_label_app ]
-            separator: ;
-            regex: rabbitmq
-            replacement: $1
-            action: keep
-          - source_labels: [ __meta_kubernetes_endpoint_port_name ]
-            separator: ;
-            regex: prometheus
-            replacement: $1
-            action: keep
-          - source_labels: [ __meta_kubernetes_namespace ]
-            separator: ;
-            regex: (.*)
-            target_label: namespace
-            replacement: $1
-            action: replace
-          - source_labels: [ __meta_kubernetes_pod_name ]
-            separator: ;
-            regex: (.*)
-            target_label: pod
-            replacement: $1
-            action: replace
-          - source_labels: [ __meta_kubernetes_service_name ]
-            separator: ;
-            regex: (.*)
-            target_label: service
-            replacement: $1
-            action: replace
-          - source_labels: [ __meta_kubernetes_service_name ]
-            separator: ;
-            regex: (.*)
-            target_label: job
-            replacement: ${1}
-            action: replace
-          - separator: ;
-            regex: (.*)
-            target_label: endpoint
-            replacement: http
-            action: replace
-            
+            target_label: application
 ---
 
 apiVersion: apps/v1
@@ -132,8 +98,9 @@ spec:
         - name: prometheus
           image: prom/prometheus:v2.46.0
           args:
-            - "--config.file=/prometheus2/prometheus.yml"
-            - "--storage.tsdb.path=/prometheus/"
+            - --config.file=/prometheus2/prometheus.yml
+            - --storage.tsdb.path=/prometheus/
+            - --web.enable-lifecycle
           ports:
             - containerPort: 9090
               name: http
