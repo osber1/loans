@@ -23,6 +23,7 @@ dependencies {
         project(':api'),
         libs.springBootStarterAmqp,
         libs.springBootStarterMail,
+        libs.springBootStarterActuator,
         libs.vault
     )
 

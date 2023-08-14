@@ -34,6 +34,10 @@ metadata:
   name: risk-checker
   labels:
     app: risk-checker
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/path: '/actuator/prometheus'
+    prometheus.io/port: '8081'
 spec:
   selector:
     app: risk-checker

@@ -20,7 +20,8 @@ jib {
 dependencies {
     implementation(
         project(':api'),
-        libs.feign
+        libs.feign,
+        libs.springBootStarterActuator
     )
 
     testImplementation(
