@@ -2,21 +2,48 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: loans
-  name: rabbitmq
+  name: rabbitmq-conf
   labels:
-    name: rabbitmq
+    name: rabbitmq-conf
 data:
   rabbitmq.conf: |-
-    loopback_users.guest = false
-    log.console = true
-    log.console.level = debug
-    log.exchange = true
-    log.exchange.level = debug
     management.load_definitions = /etc/rabbitmq/definitions.json
-  enabled_plugins: |-
-    [rabbitmq_management,rabbitmq_prometheus,rabbitmq_tracing].
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: loans
+  name: rabbitmq-definitions
+  labels:
+    name: rabbitmq-definitions
+data:
   definitions.json: |-
     {
+      "users": [
+        {
+          "hashing_algorithm": "rabbit_password_hashing_sha256",
+          "limits": {},
+          "name": "guest",
+          "password_hash": "bcUJV81RZ62Zy8MChFFWIwalB8LrXZZfkrBZb8kBVez6SLWM",
+          "tags": "administrator"
+        }
+      ],
+      "vhosts": [
+        {
+          "name": "/"
+        }
+      ],
+      "permissions": [
+        {
+          "user": "guest",
+          "vhost": "\/",
+          "configure": ".*",
+          "write": ".*",
+          "read": ".*"
+        }
+      ],
       "queues": [
         {
           "name": "notification.queue",
@@ -79,12 +106,19 @@ spec:
             - containerPort: 15692
               name: prometheus
           volumeMounts:
-            - name: rabbitmq-config-map
-              mountPath: /etc/rabbitmq/
+            - name: rabbitmq-definitions-config-map
+              mountPath: /etc/rabbitmq/definitions.json
+              subPath: definitions.json
+            - name: rabbitmq-conf-config-map
+              mountPath: /etc/rabbitmq/rabbitmq.conf
+              subPath: rabbitmq.conf
       volumes:
-        - name: rabbitmq-config-map
+        - name: rabbitmq-conf-config-map
           configMap:
-            name: rabbitmq
+            name: rabbitmq-conf
+        - name: rabbitmq-definitions-config-map
+          configMap:
+            name: rabbitmq-definitions
 
 ---
 

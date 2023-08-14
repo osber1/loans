@@ -23,7 +23,7 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
     static String routingKeys = 'internal.notification.routing-key'
 
     @Shared
-    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.9.11-management-alpine')
+    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.12.2-management-alpine')
         .withQueue(queueName)
         .withExchange(exchangeName, 'direct')
         .withBinding(exchangeName, queueName, emptyMap(), routingKeys, 'queue')

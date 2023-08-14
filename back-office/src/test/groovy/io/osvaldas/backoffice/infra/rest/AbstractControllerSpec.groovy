@@ -33,7 +33,7 @@ import spock.lang.Shared
 abstract class AbstractControllerSpec extends AbstractSpec {
 
     @Shared
-    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.9.11-management-alpine')
+    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.12.2-management-alpine')
 
     @Autowired
     MockMvc mockMvc

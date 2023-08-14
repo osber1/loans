@@ -3,7 +3,7 @@ plugins {
     id 'groovy'
     id 'checkstyle'
     id 'codenarc'
-    id 'com.github.spotbugs' version '5.1.1'
+    id 'com.github.spotbugs' version '5.1.2'
     id 'org.sonarqube' version '4.3.0.3225'
     id 'net.ltgt.errorprone' version '3.1.0'
 }
@@ -50,10 +50,14 @@ subprojects {
         )
 
         implementation(
+//            libs.errorProne,
+//            libs.errorPronePicnicSupport,
+//            libs.errorPronePicnicRefaster,
             libs.lombok,
             libs.springBootStarterWeb,
             libs.springBootStarterBootstrap,
-            libs.springBootStarterValidation
+            libs.springBootStarterValidation,
+            libs.logstash
         )
 
         compileOnly(
@@ -71,14 +75,14 @@ subprojects {
     }
 
     tasks.withType(JavaCompile).configureEach {
-        options.errorprone.disableWarningsInGeneratedCode = true
         options.errorprone {
             disableWarningsInGeneratedCode = true
-            String rules = error_prone_rules.join(',')
+            String enabledRules = enabled_error_prone_rules.join(',')
+            String disabledRules = disabled_error_prone_rules.join('|')
             errorproneArgs.addAll(
-                "-XepPatchChecks:Refaster,$rules",
+                "-XepPatchChecks:Refaster,$enabledRules",
                 '-XepPatchLocation:IN_PLACE',
-                '-XepOpt:Refaster:NamePattern=(ImmutableListOf2|ImmutableMapOf1)'
+                "-XepOpt:Refaster:NamePattern=^(?!.*(?:($disabledRules))).*\$"
             )
         }
     }
