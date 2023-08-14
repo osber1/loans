@@ -24,6 +24,7 @@ dependencies {
         libs.springBootStarterAmqp,
         libs.springBootStarterMail,
         libs.springBootStarterActuator,
+        libs.prometheus,
         libs.vault
     )
 

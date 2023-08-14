@@ -53,6 +53,7 @@ data:
       evaluation_interval: 5s
     scrape_configs:
       - job_name: 'springboot'
+        metrics_path: /actuator/prometheus
         kubernetes_sd_configs:
           - role: endpoints
             namespaces:

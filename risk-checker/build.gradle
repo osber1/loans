@@ -21,6 +21,7 @@ dependencies {
     implementation(
         project(':api'),
         libs.feign,
+        libs.prometheus,
         libs.springBootStarterActuator
     )
 
