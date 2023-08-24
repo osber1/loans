@@ -1,5 +1,5 @@
 ext {
-    error_prone_rules = [
+    enabled_error_prone_rules = [
         'StaticImport',
         'AutowiredConstructor',
         'CanonicalAnnotationSyntax',
@@ -68,7 +68,7 @@ ext {
         'UnusedMethod',
         'CatchingUnchecked',
         'InterfaceWithOnlyStatics',
-//        'MemberName', https://github.com/google/error-prone/pull/3976
+        'MemberName',
         'RedundantOverride',
         'RedundantThrows',
         'StatementSwitchToExpressionSwitch',
@@ -100,5 +100,10 @@ ext {
         'UseEnumSwitch',
         'WildcardImport',
         'OverridingMethodInconsistentArgumentNamesChecker'
+    ]
+
+    disabled_error_prone_rules = [
+        'ImmutableListOf2',
+        'ImmutableMapOf1'
     ]
 }

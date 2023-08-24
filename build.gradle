@@ -50,6 +50,9 @@ subprojects {
         )
 
         implementation(
+//            libs.errorProne,
+//            libs.errorPronePicnicSupport,
+//            libs.errorPronePicnicRefaster,
             libs.lombok,
             libs.springBootStarterWeb,
             libs.springBootStarterBootstrap,
@@ -74,11 +77,13 @@ subprojects {
     tasks.withType(JavaCompile).configureEach {
         options.errorprone {
             disableWarningsInGeneratedCode = true
-            String rules = error_prone_rules.join(',')
+            String enabledRules = enabled_error_prone_rules.join(',')
+            String disabledRules = disabled_error_prone_rules.join('|')
+            String rules = enabled_error_prone_rules.join(',')
             errorproneArgs.addAll(
-                "-XepPatchChecks:Refaster,$rules",
+                "-XepPatchChecks:Refaster,$enabledRules",
                 '-XepPatchLocation:IN_PLACE',
-                '-XepOpt:Refaster:NamePattern=^(?!.*(?:(ImmutableListOf2|ImmutableMapOf1))).*\$'
+                "-XepOpt:Refaster:NamePattern=^(?!.*(?:($disabledRules))).*\$"
             )
         }
     }
