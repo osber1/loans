@@ -130,7 +130,6 @@ metadata:
   labels:
     app: rabbitmq
 spec:
-  type: NodePort
   selector:
     app: rabbitmq
   ports:

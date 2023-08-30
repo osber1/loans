@@ -6554,7 +6554,6 @@ metadata:
   namespace: loans
   name: grafana
 spec:
-  type: NodePort
   selector:
     app: grafana
   ports:

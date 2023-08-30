@@ -7,8 +7,12 @@
 
 ## Links
 
-- [Swagger documentation](http://localhost:8080/swagger-ui.html)
-- [Actuator](http://localhost:8080/actuator)
+### Docker or local
+
+- [Back-office Swagger](http://localhost:8080/swagger-ui.html)
+- [Back-office Actuator](http://localhost:8080/actuator)
+- [Risk Checker Actuator](http://localhost:8081/actuator)
+- [Notifications Service Actuator](http://localhost:8082/actuator)
 - [RabbitMQ](http://localhost:15672)
 - [Email service](http://localhost:8025)
 - [pgAdmin](http://localhost:5050)
@@ -17,6 +21,20 @@
 - [Prometheus](http://localhost:9090)
 - [Grafana](http://localhost:3000)
 - [Kibana](http://localhost:5601)
+
+### Docker or local
+
+- http://loans.osber.io
+- http://risk.osber.io
+- http://notifications.osber.io
+- http://vault.osber.io
+- http://redis.osber.io
+- http://rabbitmq.osber.io
+- http://prometheus.osber.io
+- http://pgadmin.osber.io
+- http://mailhog.osber.io
+- http://kibana.osber.io
+- http://grafana.osber.io
 
 ## Startup
 

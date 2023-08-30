@@ -124,7 +124,6 @@ metadata:
   namespace: loans
   name: prometheus
 spec:
-  type: NodePort
   selector:
     app: prometheus
   ports:

@@ -44,7 +44,6 @@ metadata:
   labels:
     app: kibana
 spec:
-  type: NodePort
   selector:
     app: kibana
   ports:
