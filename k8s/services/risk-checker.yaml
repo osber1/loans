@@ -23,7 +23,26 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: k8s
           ports:
-            - containerPort: 8081
+            - name: service-port
+              containerPort: 8081
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: service-port
+            failureThreshold: 1
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: service-port
+            failureThreshold: 1
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: service-port
+            failureThreshold: 30
+            periodSeconds: 10
 
 ---
 
