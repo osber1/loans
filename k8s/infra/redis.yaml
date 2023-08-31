@@ -40,7 +40,6 @@ metadata:
   labels:
     app: redis
 spec:
-  type: NodePort
   selector:
     app: redis
   ports:
