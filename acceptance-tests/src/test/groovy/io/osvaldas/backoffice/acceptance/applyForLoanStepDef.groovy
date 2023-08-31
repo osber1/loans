@@ -27,6 +27,7 @@ Before {
 }
 
 baseURI = 'http://localhost:8080'
+//baseURI = 'http://back-office.osber.io'
 
 Given(~/^client is registered$/) { ->
     Response response = request()

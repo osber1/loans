@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: loans.osber.io
+    - host: back-office.osber.io
       http:
         paths:
           - path: /

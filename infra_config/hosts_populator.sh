@@ -9,7 +9,7 @@ filename="$1"
 minikube_ip="$2"
 
 services=(
-"loans.osber.io"
+"back-office.osber.io"
 "risk.osber.io"
 "notifications.osber.io"
 "vault.osber.io"

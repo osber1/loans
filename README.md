@@ -9,7 +9,7 @@
 
 | Docker/Local                                                     | Kubernetes                                                               |
 |------------------------------------------------------------------|--------------------------------------------------------------------------|
-| [Back-office Actuator](http://localhost:8080/actuator)           | [Back-office Actuator](http://loans.osber.io/actuator)                   |
+| [Back-office Actuator](http://localhost:8080/actuator)           | [Back-office Actuator](http://back-office.osber.io/actuator)             |
 | [Risk Checker Actuator](http://localhost:8081/actuator)          | [Risk Checker Actuator](http://risk.osber.io/actuator)                   |
 | [Notifications Service Actuator](http://localhost:8082/actuator) | [Notifications Service Actuator](http://notifications.osber.io/actuator) |
 | [RabbitMQ](http://localhost:15672)                               | [RabbitMQ](http://rabbitmq.osber.io)                                     |
