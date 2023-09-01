@@ -1,7 +1,7 @@
 #!/bin/bash
 
 while true; do
-  RESPONSE=$(curl -sSLw "\n%{http_code}" -H "X-Vault-Token: super-secret-token" -H "Content-Type: application/json" -X POST -d @docker/infra_config/vault/application.json http://$1/v1/secret/data/application)
+  RESPONSE=$(curl -sSLw "\n%{http_code}" -H "X-Vault-Token: super-secret-token" -H "Content-Type: application/json" -X POST -d @../docker/vault/application.json http://$1/v1/secret/data/application)
   RESPONSE_BODY=$(echo "$RESPONSE" | awk 'NF{print $0}' | head -n -1)
   RESPONSE_CODE=$(echo "$RESPONSE" | awk 'END{print $NF}')
 

@@ -1,8 +1,11 @@
-#!/bin/bash    
+#!/bin/bash
 
 VERSION="1.0-SNAPSHOT"
 
-docker-compose -f docker/docker-compose.yml -f docker/docker-compose-applications.yml down
+minikube delete
+
+sudo ./hosts_remover.sh /etc/hosts
+#kill $(ps aux | grep minikube | awk '{print $2}')
 
 docker rmi osvasldas97/back-office:$VERSION
 docker rmi osvasldas97/risk-checker:$VERSION

@@ -64,8 +64,8 @@ services:
     extra_hosts:
       - "staticrabbit:127.0.0.1"
     volumes:
-      - ./infra_config/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
-      - ./infra_config/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -89,7 +89,7 @@ services:
     container_name: prometheus
     image: prom/prometheus:v2.46.0
     volumes:
-      - ./infra_config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     restart: unless-stopped
@@ -101,8 +101,8 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
-      - ./infra_config/grafana/datasources:/etc/grafana/provisioning/datasources
-      - ./infra_config/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
     ports:
       - "3000:3000"
     links:
@@ -115,7 +115,7 @@ services:
     container_name: kibana
     image: docker.elastic.co/kibana/kibana:8.8.1
     volumes:
-      - ./infra_config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - "5601:5601"
     depends_on:
@@ -129,7 +129,7 @@ services:
       node.name: elasticsearch
       discovery.type: single-node
     volumes:
-      - ./infra_config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - esdata:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
@@ -140,8 +140,8 @@ services:
     container_name: logstash
     image: docker.elastic.co/logstash/logstash:8.8.1
     volumes:
-      - ./infra_config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./infra_config/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
       - ../logs:/logs
     ports:
       - "9600:9600"
