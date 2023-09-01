@@ -1,7 +1,5 @@
 #!/bin/bash
 
-./gradlew clean build
-
 minikube start --memory 20000 --cpus=6 --driver=kvm2 --addons ingress
 istioctl install -y
 
