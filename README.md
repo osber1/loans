@@ -93,3 +93,5 @@ Run `./start.sh` to start everything.
 - DevOps:
     * Docker
     * Kubernetes
+    * Istio
+    * Argo CD

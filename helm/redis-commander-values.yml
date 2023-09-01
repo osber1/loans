@@ -1,0 +1,10 @@
+# https://github.com/joeferner/redis-commander/tree/master/k8s/helm-chart/redis-commander
+redis:
+  host: redis-master
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: redis.osber.io
+      paths: ["/"]

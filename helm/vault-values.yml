@@ -1,0 +1,11 @@
+server:
+  dev:
+    enabled: true
+    devRootToken: super-secret-token
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    hosts:
+      - host: vault.osber.io
+        paths: ["/"]
