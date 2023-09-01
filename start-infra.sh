@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker-compose up -d
+docker-compose -f docker/docker-compose.yml up -d
 
-./infra_config/vault/seed_vault.sh localhost:8200
-./infra_config/kibana/seed_kibana.sh localhost:5601 create_data_view.json
+./docker/infra_config/vault/seed_vault.sh localhost:8200
+./docker/infra_config/kibana/seed_kibana.sh localhost:5601 create_data_view.json

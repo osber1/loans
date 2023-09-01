@@ -142,7 +142,7 @@ services:
     volumes:
       - ./infra_config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./infra_config/logstash/pipeline:/usr/share/logstash/pipeline
-      - ./logs:/logs
+      - ../logs:/logs
     ports:
       - "9600:9600"
     depends_on:

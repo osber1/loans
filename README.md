@@ -5,6 +5,10 @@
 ![loans workflow](https://github.com/osber1/loans/actions/workflows/docker-push.yml/badge.svg)
 [![codecov](https://codecov.io/gh/osber1/loans/branch/master/graph/badge.svg?token=2KOECLUD4M)](https://codecov.io/gh/osber1/loans)
 
+## Config Repository
+
+Config and Argo CD Repository can be found [here](https://github.com/osber1/loans-config).
+
 ## Links
 
 | Docker/Local                                                     | Kubernetes                                                               |
