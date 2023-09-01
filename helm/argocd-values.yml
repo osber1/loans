@@ -1,0 +1,8 @@
+server:
+  ingress:
+    enabled: true
+    hosts:
+      - argocd.osber.io
+configs:
+  params:
+    server.insecure: true

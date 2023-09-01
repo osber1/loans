@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-commander
+  namespace: loans
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/osber1/loans-config
+    targetRevision: HEAD
+    path: dev/redis-commander
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: loans
+
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+
+    automated:
+      selfHeal: true
+      prune: true

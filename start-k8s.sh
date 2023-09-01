@@ -10,7 +10,6 @@ sudo ./infra_config/hosts_populator.sh /etc/hosts $(minikube ip)
 $(minikube dashboard) &
 
 kubectl apply -f k8s/infra
-kubectl apply -f k8s/ingress.yaml
 
 ./infra_config/vault/seed_vault.sh vault.osber.io
 ./infra_config/kibana/seed_kibana.sh kibana.osber.io create_data_view-k8s-1.json

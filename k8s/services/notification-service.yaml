@@ -64,3 +64,24 @@ spec:
     - protocol: TCP
       port: 8082
       targetPort: 8082
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: notification-service-ingress
+  namespace: loans
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: notifications.osber.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: notification-service
+                port:
+                  number: 8082

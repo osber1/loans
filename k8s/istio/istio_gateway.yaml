@@ -1,265 +1,266 @@
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: osber-gateway
-  namespace: loans
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-    - port:
-        number: 80
-        name: back-office
-        protocol: HTTP
-      hosts:
-        - "back-office.osber.io"
-    - port:
-        number: 80
-        name: risk
-        protocol: HTTP
-      hosts:
-        - "risk.osber.io"
-    - port:
-        number: 80
-        name: notifications
-        protocol: HTTP
-      hosts:
-        - "notifications.osber.io"
-    - port:
-        number: 80
-        name: vault
-        protocol: HTTP
-      hosts:
-        - "vault.osber.io"
-    - port:
-        number: 80
-        name: redis
-        protocol: HTTP
-      hosts:
-        - "redis.osber.io"
-    - port:
-        number: 80
-        name: rabbitmq
-        protocol: HTTP
-      hosts:
-        - "rabbitmq.osber.io"
-    - port:
-        number: 80
-        name: prometheus
-        protocol: HTTP
-      hosts:
-        - "prometheus.osber.io"
-    - port:
-        number: 80
-        name: pgadmin
-        protocol: HTTP
-      hosts:
-        - "pgadmin.osber.io"
-    - port:
-        number: 80
-        name: mailhog
-        protocol: HTTP
-      hosts:
-        - "mailhog.osber.io"
-    - port:
-        number: 80
-        name: kibana
-        protocol: HTTP
-      hosts:
-        - "kibana.osber.io"
-    - port:
-        number: 80
-        name: grafana
-        protocol: HTTP
-      hosts:
-        - "grafana.osber.io"
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: back-office-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "back-office.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: back-office.loans.svc.cluster.local
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: risk-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "risk.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: risk-checker.loans.svc.cluster.local
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: notifications-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "notifications.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: notification-service.loans.svc.cluster.local
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: vault-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "vault.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: vault.loans.svc.cluster.local
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: redis-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "redis.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: redis-commander.loans.svc.cluster.local
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: rabbitmq-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "rabbitmq.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: rabbitmq.loans.svc.cluster.local
-            port:
-              number: 15672
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: prometheus-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "prometheus.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: prometheus.loans.svc.cluster.local
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: pgadmin-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "pgadmin.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: pgadmin.loans.svc.cluster.local
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: mailhog-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "mailhog.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: mailhog.loans.svc.cluster.local
-            port:
-              number: 8025
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: kibana-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "kibana.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: kibana.loans.svc.cluster.local
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: grafana-gateway-route
-  namespace: loans
-spec:
-  hosts:
-    - "grafana.osber.io"
-  gateways:
-    - osber-gateway
-  http:
-    - route:
-        - destination:
-            host: grafana.loans.svc.cluster.local
+# Working, but using kubernetes ingress
+#apiVersion: networking.istio.io/v1alpha3
+#kind: Gateway
+#metadata:
+#  name: osber-gateway
+#  namespace: loans
+#spec:
+#  selector:
+#    istio: ingressgateway
+#  servers:
+#    - port:
+#        number: 80
+#        name: back-office
+#        protocol: HTTP
+#      hosts:
+#        - "back-office.osber.io"
+#    - port:
+#        number: 80
+#        name: risk
+#        protocol: HTTP
+#      hosts:
+#        - "risk.osber.io"
+#    - port:
+#        number: 80
+#        name: notifications
+#        protocol: HTTP
+#      hosts:
+#        - "notifications.osber.io"
+#    - port:
+#        number: 80
+#        name: vault
+#        protocol: HTTP
+#      hosts:
+#        - "vault.osber.io"
+#    - port:
+#        number: 80
+#        name: redis
+#        protocol: HTTP
+#      hosts:
+#        - "redis.osber.io"
+#    - port:
+#        number: 80
+#        name: rabbitmq
+#        protocol: HTTP
+#      hosts:
+#        - "rabbitmq.osber.io"
+#    - port:
+#        number: 80
+#        name: prometheus
+#        protocol: HTTP
+#      hosts:
+#        - "prometheus.osber.io"
+#    - port:
+#        number: 80
+#        name: pgadmin
+#        protocol: HTTP
+#      hosts:
+#        - "pgadmin.osber.io"
+#    - port:
+#        number: 80
+#        name: mailhog
+#        protocol: HTTP
+#      hosts:
+#        - "mailhog.osber.io"
+#    - port:
+#        number: 80
+#        name: kibana
+#        protocol: HTTP
+#      hosts:
+#        - "kibana.osber.io"
+#    - port:
+#        number: 80
+#        name: grafana
+#        protocol: HTTP
+#      hosts:
+#        - "grafana.osber.io"
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: back-office-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "back-office.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: back-office.loans.svc.cluster.local
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: risk-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "risk.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: risk-checker.loans.svc.cluster.local
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: notifications-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "notifications.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: notification-service.loans.svc.cluster.local
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: vault-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "vault.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: vault.loans.svc.cluster.local
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: redis-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "redis.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: redis-commander.loans.svc.cluster.local
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: rabbitmq-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "rabbitmq.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: rabbitmq.loans.svc.cluster.local
+#            port:
+#              number: 15672
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: prometheus-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "prometheus.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: prometheus.loans.svc.cluster.local
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: pgadmin-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "pgadmin.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: pgadmin.loans.svc.cluster.local
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: mailhog-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "mailhog.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: mailhog.loans.svc.cluster.local
+#            port:
+#              number: 8025
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: kibana-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "kibana.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: kibana.loans.svc.cluster.local
+#
+#---
+#
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: grafana-gateway-route
+#  namespace: loans
+#spec:
+#  hosts:
+#    - "grafana.osber.io"
+#  gateways:
+#    - osber-gateway
+#  http:
+#    - route:
+#        - destination:
+#            host: grafana.loans.svc.cluster.local

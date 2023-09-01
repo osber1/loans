@@ -49,3 +49,24 @@ spec:
   ports:
     - name: http
       port: 5601
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kibana-ingress
+  namespace: loans
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: kibana.osber.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kibana
+                port:
+                  number: 5601

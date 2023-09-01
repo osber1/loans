@@ -20,6 +20,7 @@ services=(
 "mailhog.osber.io"
 "kibana.osber.io"
 "grafana.osber.io"
+"argocd.osber.io"
 )
 
 for service in "${services[@]}"; do

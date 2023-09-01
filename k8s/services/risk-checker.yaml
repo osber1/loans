@@ -64,3 +64,24 @@ spec:
     - protocol: TCP
       port: 8081
       targetPort: 8081
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: risk-checker-ingress
+  namespace: loans
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: risk.osber.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: risk-checker
+                port:
+                  number: 8081

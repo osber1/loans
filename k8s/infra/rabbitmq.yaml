@@ -139,3 +139,24 @@ spec:
       name: amqp
     - port: 15692
       name: prometheus
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rabbitmq-ingress
+  namespace: loans
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: rabbitmq.osber.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rabbitmq
+                port:
+                  number: 15672
