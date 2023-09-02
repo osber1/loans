@@ -6,30 +6,33 @@ services:
     image: osvasldas97/back-office:1.0-SNAPSHOT
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    volumes:
-      - ../logs:/logs
     ports:
       - "8080:8080"
     restart: unless-stopped
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
 
   risk-checker:
     container_name: risk-checker
     image: osvasldas97/risk-checker:1.0-SNAPSHOT
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    volumes:
-      - ../logs:/logs
     ports:
       - "8081:8081"
     restart: unless-stopped
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
 
   notification-service:
     container_name: notification-service
     image: osvasldas97/notification-service:1.0-SNAPSHOT
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    volumes:
-      - ../logs:/logs
     ports:
       - "8082:8082"
     restart: unless-stopped
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
