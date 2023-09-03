@@ -5,6 +5,8 @@
 ![loans workflow](https://github.com/osber1/loans/actions/workflows/docker-push.yml/badge.svg)
 [![codecov](https://codecov.io/gh/osber1/loans/branch/master/graph/badge.svg?token=2KOECLUD4M)](https://codecov.io/gh/osber1/loans)
 
+## [Infra Repository](https://github.com/osber1/loans-infra)
+
 ## Links
 
 | Docker/Local                                                     | Kubernetes                                                               |
@@ -93,3 +95,5 @@ Run `./start.sh` to start everything.
 - DevOps:
     * Docker
     * Kubernetes
+    * Istio
+    * Argo CD
