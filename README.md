@@ -31,38 +31,8 @@ To start the application you need to have Docker ant Java 17 installed.
 
 ### Intellij IDEA
 
-1) Use command `./start-infra.sh` to start all dependencies.
+1) From infra repository scripts folder run `./start-infra.sh` to start all dependencies.
 2) In Intellij IDEA run `gradle clean bootRun --parallel`
-
-### Command Line
-
-Run `./start.sh` to start everything.
-
-## pgAdmin
-
-* Username: admin@admin.com
-* Password: admin
-
-### Add new server connection
-
-- url: postgres,
-- username: root,
-- password: root.
-
-## Vault
-
-* Method: Token
-* Token: super-secret-token
-
-## RabbitMQ
-
-* Username: guest
-* Password: guest
-
-## Grafana
-
-* Username: admin
-* Password: admin
 
 ## Flow
 
