@@ -8,7 +8,6 @@ ext {
         'MethodReferenceUsage',
         'NestedOptionals',
         'PrimitiveComparison',
-        'RedundantStringConversion',
         'RequestMappingAnnotation',
         'Slf4jLogStatement',
         'SpringMvcAnnotation',

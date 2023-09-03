@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://postgres.loans.svc.cluster.local:5432/loans
   redis:
-    host: redis.loans.svc.cluster.local
+    host: ${REDIS_HOST:redis.loans.svc.cluster.local}
   rabbitmq:
     host: rabbitmq.loans.svc.cluster.local
 
