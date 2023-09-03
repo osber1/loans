@@ -5,9 +5,11 @@
 ![loans workflow](https://github.com/osber1/loans/actions/workflows/docker-push.yml/badge.svg)
 [![codecov](https://codecov.io/gh/osber1/loans/branch/master/graph/badge.svg?token=2KOECLUD4M)](https://codecov.io/gh/osber1/loans)
 
+## [Infra Repository](https://github.com/osber1/loans-infra)
+
 ## Links
 
-| Docker/Local                                                     | Kubernetes                                                               |
+| Docker                                                           | Kubernetes                                                               |
 |------------------------------------------------------------------|--------------------------------------------------------------------------|
 | [Back-office Actuator](http://localhost:8080/actuator)           | [Back-office Actuator](http://back-office.osber.io/actuator)             |
 | [Risk Checker Actuator](http://localhost:8081/actuator)          | [Risk Checker Actuator](http://risk.osber.io/actuator)                   |
@@ -29,38 +31,8 @@ To start the application you need to have Docker ant Java 17 installed.
 
 ### Intellij IDEA
 
-1) Use command `./start-infra.sh` to start all dependencies.
+1) From infra repository scripts folder run `./start-infra.sh` to start all dependencies.
 2) In Intellij IDEA run `gradle clean bootRun --parallel`
-
-### Command Line
-
-Run `./start.sh` to start everything.
-
-## pgAdmin
-
-* Username: admin@admin.com
-* Password: admin
-
-### Add new server connection
-
-- url: postgres,
-- username: root,
-- password: root.
-
-## Vault
-
-* Method: Token
-* Token: super-secret-token
-
-## RabbitMQ
-
-* Username: guest
-* Password: guest
-
-## Grafana
-
-* Username: admin
-* Password: admin
 
 ## Flow
 
@@ -93,3 +65,5 @@ Run `./start.sh` to start everything.
 - DevOps:
     * Docker
     * Kubernetes
+    * Istio
+    * Argo CD

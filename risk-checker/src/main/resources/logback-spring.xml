@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <springProfile name="!k8s">
+    <springProfile name="!k8s &amp;&amp; !docker">
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
     </springProfile>
 
-    <springProfile name="k8s">
+    <springProfile name="k8s, docker">
         <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
