@@ -83,3 +83,8 @@ scheduler:
   evaluateNotEvaluatedLoans:
     enabled: true
     cron : "* */10 * * * *"
+
+validation:
+  mobilePhone:
+    countryCode: "370"
+    numberLength: 11

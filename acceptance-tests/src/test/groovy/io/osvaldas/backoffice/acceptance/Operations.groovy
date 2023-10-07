@@ -23,7 +23,7 @@ class Operations {
             lastName = faker.name().lastName()
             personalCode = faker.expression("#{numerify '###########'}")
             email = faker.expression("#{bothify '???????????####@gmail.com'}")
-            phoneNumber = faker.expression("#{numerify '###########'}")
+            phoneNumber = faker.expression("370#{numerify '########'}")
         }
     }
 

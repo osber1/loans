@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import io.osvaldas.api.annotations.MobilePhone;
 import lombok.Data;
 
 @Data
@@ -21,7 +22,7 @@ public class ClientRegisterRequest {
     private String email;
 
     @NotBlank(message = "Phone number must be not empty.")
-    @Size(message = "Phone number must be 11 digits length and start with country code.", min = 11, max = 11)
+    @MobilePhone(message = "Phone number must be 11 digits length and start with +370.")
     private String phoneNumber;
 
     @Pattern(regexp = "^\\d+$", message = "Personal code must contain only digits.")
