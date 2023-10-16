@@ -18,7 +18,7 @@ ext {
         restAssured            : '4.5.1',
         guice                  : '7.0.0',
         reflections            : '0.10.2',
-        javaFaker              : '2.0.1',
+        javaFaker              : '2.0.2',
         shedlock               : '5.8.0',
         errorProne             : '2.22.0',
         errorPronePicnic       : '0.14.0'
