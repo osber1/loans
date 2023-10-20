@@ -13,11 +13,6 @@
     </Match>
 
     <Match>
-        <!-- https://github.com/spotbugs/spotbugs/issues/756 -->
-        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
-    </Match>
-
-    <Match>
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
     </Match>
 
@@ -36,6 +31,10 @@
     <!-- Can't specify path - https://github.com/spotbugs/spotbugs/issues/694 -->
     <Match>
         <Source name="~.*\_.java"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES"/>
     </Match>
 
 </FindBugsFilter>
