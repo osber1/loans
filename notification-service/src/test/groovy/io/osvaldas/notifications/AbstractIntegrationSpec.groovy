@@ -36,7 +36,6 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
     static GenericContainer mailhogContainer = new GenericContainer<>('mailhog/mailhog:v1.0.1')
         .withExposedPorts(1025, 8025)
 
-
     static {
         mailhogContainer.start()
         rabbitMQContainer.start()
@@ -45,7 +44,7 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
     @DynamicPropertySource
     static void rabbitMqProperties(DynamicPropertyRegistry registry) {
         registry.add('spring.mail.host', mailhogContainer::getHost)
-        registry.add('spring.mail.port', { mailhogContainer.getMappedPort(1025) })
+        registry.add('spring.mail.port') { mailhogContainer.getMappedPort(1025) }
     }
 
     void cleanupSpec() {

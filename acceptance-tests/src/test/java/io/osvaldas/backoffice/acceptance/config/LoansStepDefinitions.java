@@ -18,8 +18,7 @@ import io.restassured.specification.RequestSpecification;
 public class LoansStepDefinitions {
 
     private static final String BASE_URI = "http://localhost:8080";
-
-//    private static final String BASE_URI = "http://back-office.osber.io";
+    // private static final String BASE_URI = "http://back-office.osber.io";
 
     private String clientId;
 
