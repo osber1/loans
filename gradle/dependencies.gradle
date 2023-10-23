@@ -19,7 +19,7 @@ ext {
         guice                  : '7.0.0',
         reflections            : '0.10.2',
         javaFaker              : '2.0.2',
-        shedlock               : '5.9.0',
+        shedlock               : '5.9.1',
         errorProne             : '2.22.0',
         errorPronePicnic       : '0.14.0'
     ]
