@@ -10,7 +10,6 @@ import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.clientIdIs;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreationDateIsAfter;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs;
-import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Optional.of;
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -62,7 +61,7 @@ public class LoanService {
     @Transactional(readOnly = true)
     public Loan getLoan(long id) {
         return loanRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(format(LOAN_NOT_FOUND, id)));
+            .orElseThrow(() -> new NotFoundException(LOAN_NOT_FOUND.formatted(id)));
     }
 
     @Transactional(readOnly = true)

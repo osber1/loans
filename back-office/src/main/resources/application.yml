@@ -23,13 +23,13 @@ spring:
     hibernate.ddl-auto: none
     #    show-sql: true
     properties:
-      #      javax:
-      #        persistence:
-      #          schema-generation:
-      #            create-source: metadata
-      #            scripts:
-      #              action: create
-      #              create-target: create.sql
+#      javax:
+#        persistence:
+#          schema-generation:
+#            create-source: metadata
+#            scripts:
+#              action: create
+#              create-target: create.sql
       hibernate:
         #        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
@@ -68,7 +68,7 @@ info:
     version: v1.0
   techstack:
     java: Java 17
-    springBoot: 2.7.4
+    springBoot: 3.1.5
 
 application:
   interestRate: 10
@@ -82,4 +82,4 @@ risk:
 scheduler:
   evaluateNotEvaluatedLoans:
     enabled: true
-    cron : "* */10 * * * *"
+    cron: "* */10 * * * *"

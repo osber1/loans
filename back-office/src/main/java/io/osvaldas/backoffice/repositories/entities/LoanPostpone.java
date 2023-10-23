@@ -1,24 +1,23 @@
 package io.osvaldas.backoffice.repositories.entities;
 
+import static jakarta.persistence.CascadeType.DETACH;
+import static jakarta.persistence.CascadeType.MERGE;
+import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.CascadeType.REFRESH;
 import static java.math.RoundingMode.HALF_UP;
-import static javax.persistence.CascadeType.DETACH;
-import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.CascadeType.PERSIST;
-import static javax.persistence.CascadeType.REFRESH;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-
 import org.hibernate.envers.Audited;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

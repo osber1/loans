@@ -7,9 +7,13 @@ import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTest
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.cloud.openfeign.FeignAutoConfiguration
 import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.spock.Testcontainers
 
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
@@ -17,10 +21,13 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 @DataJpaTest
+@Testcontainers
 @AutoConfigureTestDatabase(replace = NONE)
+@ImportAutoConfiguration([FeignAutoConfiguration])
 abstract class AbstractDatabaseSpec extends Specification {
 
     @Shared
+    @ServiceConnection
     static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:15.2-alpine')
         .withDatabaseName('loans')
         .withUsername('root')

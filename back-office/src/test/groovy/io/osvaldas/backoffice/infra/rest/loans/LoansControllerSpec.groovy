@@ -6,7 +6,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.loans.Status.REJECTED
-import static java.lang.String.format
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -68,7 +67,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(format(loanNotFound, loanId))
+            response.contentAsString.contains(loanNotFound.formatted(loanId))
     }
 
     void 'should return loans when client exists'() {
@@ -94,7 +93,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(format(clientNotFound, clientId))
+            response.contentAsString.contains(clientNotFound.formatted(clientId))
     }
 
     void 'should take loan when request is correct'() {

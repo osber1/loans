@@ -9,7 +9,7 @@
     <changeSet id="loans-init" author="osvaldas">
         <createSequence incrementBy="1" sequenceName="loans_seq" startValue="1"/>
         <createSequence incrementBy="1" sequenceName="postpone_seq" startValue="1"/>
-        <createSequence incrementBy="1" sequenceName="hibernate_sequence" startValue="1"/>
+        <createSequence incrementBy="50" sequenceName="revinfo_seq" startValue="1"/>
 
         <createTable tableName="client">
             <column name="id" type="VARCHAR(255)">

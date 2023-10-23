@@ -5,7 +5,6 @@ import static io.osvaldas.api.clients.Status.DELETED;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_ALREADY_EXIST;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
-import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.springframework.data.jpa.domain.Specification.where;
 
@@ -63,7 +62,7 @@ public class ClientService {
     @Transactional(readOnly = true)
     public Client getClient(String id) {
         return clientRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(format(CLIENT_NOT_FOUND, id)));
+            .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND.formatted(id)));
     }
 
     @Transactional
@@ -72,7 +71,7 @@ public class ClientService {
         String id = client.getId();
         return clientExists(id)
             .map(s -> save(client))
-            .orElseThrow(() -> new NotFoundException(format(CLIENT_NOT_FOUND, id)));
+            .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND.formatted(id)));
     }
 
     @Transactional
@@ -111,7 +110,7 @@ public class ClientService {
         log.info("Changing client: {} status to: {}", id, status);
         clientExists(id)
             .ifPresentOrElse(s -> clientRepository.changeClientStatus(id, status), () -> {
-                throw new NotFoundException(format(CLIENT_NOT_FOUND, id));
+                throw new NotFoundException(CLIENT_NOT_FOUND.formatted(id));
             });
     }
 

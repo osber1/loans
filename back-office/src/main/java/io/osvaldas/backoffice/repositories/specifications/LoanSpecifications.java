@@ -2,8 +2,6 @@ package io.osvaldas.backoffice.repositories.specifications;
 
 import java.time.ZonedDateTime;
 
-import javax.persistence.criteria.Join;
-
 import org.springframework.data.jpa.domain.Specification;
 
 import io.osvaldas.api.loans.Status;
@@ -11,6 +9,7 @@ import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.entities.Client_;
 import io.osvaldas.backoffice.repositories.entities.Loan;
 import io.osvaldas.backoffice.repositories.entities.Loan_;
+import jakarta.persistence.criteria.Join;
 
 public final class LoanSpecifications {
 

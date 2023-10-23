@@ -2,16 +2,20 @@ package io.osvaldas.notifications.domain.emails
 
 import static com.icegreen.greenmail.util.ServerSetupTest.SMTP
 
-import javax.mail.internet.InternetAddress
-
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
+import com.icegreen.greenmail.util.GreenMail
+
 import io.osvaldas.notifications.infra.configuration.PropertiesConfig
+import jakarta.mail.internet.InternetAddress
 import spock.lang.Shared
 import spock.lang.Subject
 
 class EmailServiceSpec extends AbstractEmailSpec {
+
+    @Shared
+    static GreenMail greenMail = new GreenMail(SMTP)
 
     @Shared
     String emailContent = '<p>My first paragraph.</p>'
