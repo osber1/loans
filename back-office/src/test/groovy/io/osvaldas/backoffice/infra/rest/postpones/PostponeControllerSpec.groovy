@@ -1,7 +1,6 @@
 package io.osvaldas.backoffice.infra.rest.postpones
 
 import static io.osvaldas.api.clients.Status.ACTIVE
-import static java.lang.String.format
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.MediaType.APPLICATION_JSON
@@ -48,7 +47,7 @@ class PostponeControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(format(loanNotFound, nonExistingId))
+            response.contentAsString.contains(loanNotFound.formatted(nonExistingId))
     }
 
     void 'should return loan postpone when loan is postponed'() {

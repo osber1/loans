@@ -2,7 +2,6 @@ package io.osvaldas.backoffice.infra.rest.clients
 
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.DELETED
-import static java.lang.String.format
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
@@ -171,7 +170,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(format(clientNotFound, clientId))
+            response.contentAsString.contains(clientNotFound.formatted(clientId))
         where:
             method << [get('/api/v1/clients/{id}', clientId),
                        delete('/api/v1/clients/{id}', clientId),
