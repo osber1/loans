@@ -126,7 +126,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             sendUpdateRequest()
         then:
             Exception e = thrown()
-            e.message.contains('optimistic locking failed')
+            e.message.contains('Row was updated or deleted by another transaction')
     }
 
     void 'should get list of clients when they exists'() {

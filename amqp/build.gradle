@@ -1,5 +1,6 @@
 dependencies {
     implementation(
-        libs.springBootStarterAmqp
+        libs.springBootStarterAmqp,
+        libs.springBootStarterValidation
     )
 }

@@ -2,7 +2,6 @@ package io.osvaldas.backoffice.domain.postpones;
 
 import static io.osvaldas.api.loans.Status.OPEN;
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_OPEN;
-import static java.lang.String.format;
 import static java.util.Optional.of;
 
 import org.springframework.stereotype.Service;
@@ -36,6 +35,6 @@ public class PostponeService {
     private Loan getOpenLoan(long id) {
         return of(loanService.getLoan(id))
             .filter(savedLoan -> OPEN == savedLoan.getStatus())
-            .orElseThrow(() -> new BadRequestException(format(LOAN_NOT_OPEN, id)));
+            .orElseThrow(() -> new BadRequestException(LOAN_NOT_OPEN.formatted(id)));
     }
 }
