@@ -100,7 +100,11 @@ ext {
         'WildcardImport',
         'OverridingMethodInconsistentArgumentNamesChecker',
         'ReturnAtTheEndOfVoidFunction',
-        'MultimapKeys'
+        'MultimapKeys',
+        'StringFormatWithLiteral',
+        'StringCharset',
+        'NonFinalStaticField',
+        'DuplicateDateFormatField'
     ]
 
     disabled_error_prone_rules = [

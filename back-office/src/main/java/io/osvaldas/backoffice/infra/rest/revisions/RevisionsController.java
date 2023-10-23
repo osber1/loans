@@ -2,8 +2,6 @@ package io.osvaldas.backoffice.infra.rest.revisions;
 
 import java.util.List;
 
-import javax.persistence.EntityManagerFactory;
-
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
@@ -18,6 +16,7 @@ import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.entities.Loan;
 import io.osvaldas.backoffice.repositories.mapper.ClientMapper;
 import io.osvaldas.backoffice.repositories.mapper.LoanMapper;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.AllArgsConstructor;
 
 @RestController

@@ -2,10 +2,10 @@ package io.osvaldas.api.annotations;
 
 import java.util.regex.Pattern;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
 import org.springframework.beans.factory.annotation.Value;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class MobilePhoneValidator implements ConstraintValidator<MobilePhone, String> {
 

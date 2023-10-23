@@ -1,32 +1,16 @@
-plugins {
-    id 'se.thinkcode.cucumber-runner' version '0.0.11'
-}
-
 dependencies {
     implementation(
         project(':api'),
         libs.restAssured,
-        libs.guice,
-        libs.reflections,
         libs.javaFaker
     )
 
     testImplementation(
-        'org.codehaus.groovy:groovy-all:3.0.9',
-        'org.spockframework:spock-core:2.1-groovy-3.0',
-        'org.spockframework:spock-spring:2.1-groovy-3.0',
-        libs.cucumberGroovy,
+        libs.cucumberJava,
         libs.cucumberJunit
     )
 }
 
 codenarcTest {
     exclude 'io/osvaldas/backoffice/acceptance/*'
-}
-
-cucumber {
-    plugin = ['pretty']
-    glue = 'classpath:io.osvaldas.backoffice.acceptance'
-    threads = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-    main = 'io.cucumber.core.cli.Main'
 }

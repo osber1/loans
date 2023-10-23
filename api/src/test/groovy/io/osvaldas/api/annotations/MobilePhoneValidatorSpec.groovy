@@ -1,7 +1,6 @@
 package io.osvaldas.api.annotations
 
-import javax.validation.ConstraintValidatorContext
-
+import jakarta.validation.ConstraintValidatorContext
 import spock.lang.Specification
 import spock.lang.Subject
 

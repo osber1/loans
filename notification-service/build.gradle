@@ -1,8 +1,7 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.4'
+    id 'org.springframework.boot' version '3.1.5'
     id 'jacoco'
-    id 'com.google.cloud.tools.jib' version '3.3.2'
-    id 'org.owasp.dependencycheck' version '8.4.0'
+    id 'com.google.cloud.tools.jib' version '3.4.0'
 }
 
 build {
@@ -31,8 +30,11 @@ dependencies {
 
     testImplementation(
         libs.groovy,
+        libs.groovyJson,
         libs.spockCore,
         libs.spockSpring,
+        libs.springBootTestcontainers,
+        libs.testcontainersSpock,
         libs.testcontainersRabbitmq,
         libs.testcontainersVault,
         libs.greenmail,

@@ -10,15 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.cache.CacheManager
 import org.springframework.context.annotation.Bean
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.RabbitMQContainer
+import org.testcontainers.spock.Testcontainers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.jupitertools.springtestredis.RedisTestContainer
 
 import io.osvaldas.api.clients.ClientRegisterRequest
 import io.osvaldas.api.loans.LoanRequest
@@ -28,12 +28,17 @@ import io.osvaldas.backoffice.repositories.LoanRepository
 import spock.lang.Shared
 
 @SpringBootTest
-@RedisTestContainer
+@Testcontainers
 @AutoConfigureMockMvc
 abstract class AbstractControllerSpec extends AbstractSpec {
 
     @Shared
+    @ServiceConnection
     static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.12.2-management-alpine')
+
+    @Shared
+    @ServiceConnection
+    static GenericContainer redis = new GenericContainer<>('redis:7.0.8-alpine').withExposedPorts(6379)
 
     @Autowired
     MockMvc mockMvc
@@ -50,19 +55,16 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Autowired
     CacheManager cacheManager
 
-    @DynamicPropertySource
-    static void rabbitMqProperties(DynamicPropertyRegistry registry) {
+    static {
+        redis.start()
         rabbitMQContainer.start()
-        registry.add('spring.rabbitmq.host') { rabbitMQContainer.host }
-        registry.add('spring.rabbitmq.port') { rabbitMQContainer.getMappedPort(5672) }
     }
 
     void cleanup() {
         clientRepository.deleteAll()
         loanRepository.deleteAll()
-        rabbitMQContainer.stop()
         cacheManager.cacheNames
-            .parallelStream()
+            .stream()
             .each { cacheName -> cacheManager.getCache(cacheName).clear() }
     }
 
