@@ -18,7 +18,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a
+        uses: gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2
         with:
           arguments: clean build -x jib
 
@@ -35,6 +35,6 @@ jobs:
           severity: 'CRITICAL'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
