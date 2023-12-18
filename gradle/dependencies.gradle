@@ -12,7 +12,7 @@ ext {
         logstash                 : '7.4',
         cucumber                 : '7.14.0',
         javaFaker                : '2.0.2',
-        shedlock                 : '5.10.0',
+        shedlock                 : '5.10.2',
         errorProne               : '2.22.0',
         errorPronePicnic         : '0.14.0'
     ]
