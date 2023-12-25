@@ -10,7 +10,7 @@ ext {
         greenmail                : '2.0.1',
         feign                    : '4.1.0',
         logstash                 : '7.4',
-        cucumber                 : '7.14.0',
+        cucumber                 : '7.15.0',
         javaFaker                : '2.0.2',
         shedlock                 : '5.10.2',
         errorProne               : '2.22.0',
