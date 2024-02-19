@@ -13,7 +13,7 @@ ext {
         cucumber                 : '7.15.0',
         javaFaker                : '2.1.0',
         shedlock                 : '5.10.2',
-        errorProne               : '2.24.1',
+        errorProne               : '2.25.0',
         errorPronePicnic         : '0.14.0'
     ]
 
