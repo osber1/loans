@@ -14,7 +14,7 @@ ext {
         javaFaker                : '2.1.0',
         shedlock                 : '5.11.0',
         errorProne               : '2.24.1',
-        errorPronePicnic         : '0.15.0'
+        errorPronePicnic         : '0.16.1'
     ]
 
     libs = [
