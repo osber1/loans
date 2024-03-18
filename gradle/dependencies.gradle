@@ -5,7 +5,7 @@ ext {
         springBootCloudStubRunner: '4.1.1',
         openApi                  : '1.7.0',
         mapstruct                : '1.5.5.Final',
-        spock                    : '2.4-M1-groovy-4.0',
+        spock                    : '2.4-M2-groovy-4.0',
         lombokMapstructBindings  : '0.2.0',
         greenmail                : '2.0.1',
         feign                    : '4.1.0',
