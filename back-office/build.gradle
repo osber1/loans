@@ -1,7 +1,7 @@
 plugins {
-    id 'org.springframework.boot' version '3.2.3'
     id 'jacoco'
-    id 'com.google.cloud.tools.jib' version '3.4.0'
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.jib)
 }
 
 build {
@@ -21,39 +21,39 @@ dependencies {
     implementation(
         project(':amqp'),
         project(':api'),
-        libs.springBootStarterAmqp,
-        libs.springBootStarterDataJpa,
-        libs.springDataEnvers,
-        libs.springBootStarterActuator,
-        libs.springBootStarterDataRedis,
-        libs.liquibaseCore,
-        libs.openApi,
+        libs.spring.boot.starter.amqp,
+        libs.spring.boot.starter.data.jpa,
+        libs.spring.data.envers,
+        libs.spring.boot.starter.actuator,
+        libs.spring.boot.starter.data.redis,
+        libs.liquibase.core,
+        libs.open.api,
         libs.mapstruct,
         libs.postgresql,
         libs.feign,
         libs.prometheus,
-        libs.jacksonDatatypeJsr310,
+        libs.jackson.datatype.jsr310,
         libs.vault,
-        libs.shedlockSpring,
-        libs.shedlockProvider
+        libs.shedlock.spring,
+        libs.shedlock.provider
     )
 
     annotationProcessor(
-        libs.mapstructProcessor,
+        libs.mapstruct.processor,
         libs.jpamodelgen
     )
 
     testImplementation(
         libs.groovy,
-        libs.groovyJson,
-        libs.spockCore,
-        libs.spockSpring,
-        libs.springBootTestcontainers,
-        libs.testcontainersSpock,
-        libs.testcontainersPostgresql,
-        libs.testcontainersVault,
-        libs.testcontainersRabbitmq,
-        libs.springBootCloudStubRunner
+        libs.groovy.json,
+        libs.spock.core,
+        libs.spock.spring,
+        libs.spring.boot.testcontainers,
+        libs.testcontainers.spock,
+        libs.testcontainers.postgresql,
+        libs.testcontainers.vault,
+        libs.testcontainers.rabbitmq,
+        libs.spring.boot.cloud.stub.runner
     )
 }
 

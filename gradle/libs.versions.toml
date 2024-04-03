@@ -1,0 +1,83 @@
+[versions]
+spring_boot = "3.2.3"
+mapstruct = "1.5.5.Final"
+spock = "2.4-M2-groovy-4.0"
+cucumber = "7.15.0"
+shedlock = "5.12.0"
+error_prone_picnic = "0.15.0"
+
+[plugins]
+spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
+jib = { id = "com.google.cloud.tools.jib", version = "3.4.0" }
+spring_dependency = { id = "io.spring.dependency-management", version = "1.1.4" }
+spotbugs = { id = "com.github.spotbugs", version = "6.0.7" }
+sonarqube = { id = "org.sonarqube", version = "4.4.1.3373" }
+errorprone = { id = "net.ltgt.errorprone", version = "3.1.0" }
+dependency_check = { id = "org.owasp.dependencycheck", version = "9.0.9" }
+
+[libraries]
+spring_boot_starter_web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring_boot_starter_test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring_boot_starter_amqp = { module = "org.springframework.boot:spring-boot-starter-amqp" }
+spring_boot_starter_mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
+spring_boot_starter_data_jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring_boot_starter_validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring_boot_starter_actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring_boot_starter_data_redis = { module = "org.springframework.boot:spring-boot-starter-data-redis" }
+spring_data_envers = { module = "org.springframework.data:spring-data-envers" }
+spring_boot_starter_bootstrap = { module = "org.springframework.cloud:spring-cloud-starter-bootstrap" }
+spring_boot_cloud_stub_runner = { module = "org.springframework.cloud:spring-cloud-starter-contract-stub-runner", version = "4.1.1" }
+spring_boot_configuration_processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
+spring_boot_testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
+
+groovy = { module = "org.apache.groovy:groovy" }
+groovy_json = { module = "org.apache.groovy:groovy-json" }
+
+spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
+spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
+
+feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version = "4.1.0" }
+
+logstash = { module = "net.logstash.logback:logstash-logback-encoder", version = "7.4" }
+
+open_api = { module = "org.springdoc:springdoc-openapi-ui", version = "1.8.0" }
+
+prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
+
+liquibase_core = { module = "org.liquibase:liquibase-core" }
+
+postgresql = { module = "org.postgresql:postgresql" }
+
+vault = { module = "org.springframework.cloud:spring-cloud-starter-vault-config" }
+
+lombok = { module = "org.projectlombok:lombok" }
+
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstruct_processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+
+testcontainers_spock = { module = "org.testcontainers:spock" }
+testcontainers_postgresql = { module = "org.testcontainers:postgresql" }
+testcontainers_rabbitmq = { module = "org.testcontainers:rabbitmq" }
+testcontainers_vault = { module = "org.testcontainers:vault" }
+
+greenmail = { module = "com.icegreen:greenmail", version = "2.0.1" }
+
+awaitility = { module = "org.awaitility:awaitility" }
+
+jackson_datatype_jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+
+jpamodelgen = { module = "org.hibernate.orm:hibernate-jpamodelgen" }
+
+cucumber_java = { module = "io.cucumber:cucumber-java", version.ref = "cucumber" }
+cucumber_junit = { module = "io.cucumber:cucumber-junit", version.ref = "cucumber" }
+
+rest_assured = { module = "io.rest-assured:rest-assured" }
+
+java_faker = { module = "net.datafaker:datafaker", version = "2.1.0" }
+
+shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
+shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
+
+error_prone = { module = "com.google.errorprone:error_prone_core", version = "2.24.1" }
+error_prone_picnic_support = { module = "tech.picnic.error-prone-support:error-prone-contrib", version.ref = "error_prone_picnic" }
+error_prone_picnic_refaster = { module = "tech.picnic.error-prone-support:refaster-runner", version.ref = "error_prone_picnic" }
