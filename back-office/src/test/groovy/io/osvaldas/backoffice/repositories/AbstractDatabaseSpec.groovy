@@ -28,7 +28,7 @@ abstract class AbstractDatabaseSpec extends Specification {
 
     @Shared
     @ServiceConnection
-    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:15.2-alpine')
+    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:16.2-alpine')
         .withDatabaseName('loans')
         .withUsername('root')
         .withPassword('root')

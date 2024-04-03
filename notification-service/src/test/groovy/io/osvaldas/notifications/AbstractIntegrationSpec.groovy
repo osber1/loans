@@ -27,7 +27,7 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
 
     @Shared
     @ServiceConnection
-    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.12.2-management-alpine')
+    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.13.1-management-alpine')
         .withQueue(queueName)
         .withExchange(exchangeName, 'direct')
         .withBinding(exchangeName, queueName, emptyMap(), routingKeys, 'queue')
