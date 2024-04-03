@@ -1,11 +1,11 @@
 dependencies {
     implementation(
-        libs.springBootStarterValidation
+        libs.spring.boot.starter.validation
     )
 
     testImplementation(
         libs.groovy,
-        libs.spockCore,
-        libs.spockSpring
+        libs.spock.core,
+        libs.spock.spring
     )
 }
