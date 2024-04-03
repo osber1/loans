@@ -1,13 +1,13 @@
 dependencies {
     implementation(
         project(':api'),
-        libs.restAssured,
-        libs.javaFaker
+        libs.rest.assured,
+        libs.java.faker
     )
 
     testImplementation(
-        libs.cucumberJava,
-        libs.cucumberJunit
+        libs.cucumber.java,
+        libs.cucumber.junit
     )
 }
 
