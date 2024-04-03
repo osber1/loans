@@ -34,11 +34,11 @@ abstract class AbstractControllerSpec extends AbstractSpec {
 
     @Shared
     @ServiceConnection
-    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.12.2-management-alpine')
+    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.13.1-management-alpine')
 
     @Shared
     @ServiceConnection
-    static GenericContainer redis = new GenericContainer<>('redis:7.0.8-alpine').withExposedPorts(6379)
+    static GenericContainer redis = new GenericContainer<>('redis:7.2.4-alpine').withExposedPorts(6379)
 
     @Autowired
     MockMvc mockMvc

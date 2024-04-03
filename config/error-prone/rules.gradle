@@ -104,7 +104,8 @@ ext {
         'StringFormatWithLiteral',
         'StringCharset',
         'NonFinalStaticField',
-        'DuplicateDateFormatField'
+        'DuplicateDateFormatField',
+        'RedundantSetterCall'
     ]
 
     disabled_error_prone_rules = [

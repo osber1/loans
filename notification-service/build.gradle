@@ -1,7 +1,7 @@
 plugins {
-    id 'org.springframework.boot' version '3.2.3'
     id 'jacoco'
-    id 'com.google.cloud.tools.jib' version '3.4.0'
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.jib)
 }
 
 build {
@@ -21,22 +21,22 @@ dependencies {
     implementation(
         project(':amqp'),
         project(':api'),
-        libs.springBootStarterAmqp,
-        libs.springBootStarterMail,
-        libs.springBootStarterActuator,
+        libs.spring.boot.starter.amqp,
+        libs.spring.boot.starter.mail,
+        libs.spring.boot.starter.actuator,
         libs.prometheus,
         libs.vault
     )
 
     testImplementation(
         libs.groovy,
-        libs.groovyJson,
-        libs.spockCore,
-        libs.spockSpring,
-        libs.springBootTestcontainers,
-        libs.testcontainersSpock,
-        libs.testcontainersRabbitmq,
-        libs.testcontainersVault,
+        libs.groovy.json,
+        libs.spock.core,
+        libs.spock.spring,
+        libs.spring.boot.testcontainers,
+        libs.testcontainers.spock,
+        libs.testcontainers.rabbitmq,
+        libs.testcontainers.vault,
         libs.greenmail,
         libs.awaitility
     )
