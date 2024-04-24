@@ -47,7 +47,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    name: Build
+    if: github.ref == 'refs/heads/master'
+    name: Build and push to DockerHub
     needs: [ check ]
     steps:
       - name: Checkout code
@@ -59,23 +60,6 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'corretto'
-
-      - name: Compile project
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: clean build -x test -x jib
-
-  build-image:
-    name: Build Docker image
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    steps:
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
           distribution: 'corretto'
 
       - name: Login to DockerHub
