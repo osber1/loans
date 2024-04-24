@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  compile:
+  check:
     runs-on: ubuntu-latest
     name: Compile project
     steps:
@@ -45,7 +45,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Build backend
-    needs: [compile, unit-tests]
+    needs: [check]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
