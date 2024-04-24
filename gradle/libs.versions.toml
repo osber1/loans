@@ -1,5 +1,5 @@
 [versions]
-spring_boot = "3.2.4"
+spring_boot = "3.2.5"
 mapstruct = "1.5.5.Final"
 spock = "2.4-M4-groovy-4.0"
 cucumber = "7.17.0"
@@ -73,7 +73,7 @@ cucumber_junit = { module = "io.cucumber:cucumber-junit", version.ref = "cucumbe
 
 rest_assured = { module = "io.rest-assured:rest-assured" }
 
-java_faker = { module = "net.datafaker:datafaker", version = "2.1.0" }
+java_faker = { module = "net.datafaker:datafaker", version = "2.2.2" }
 
 shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
 shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
