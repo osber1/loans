@@ -23,27 +23,7 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: clean assemble
-
-  unit-tests:
-    runs-on: ubuntu-latest
-    name: Unit tests
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'corretto'
-
-      - name: Running tests
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: clean test
+          arguments: clean check dependencyCheckAnalyze
 
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v4
@@ -81,7 +61,7 @@ jobs:
       - name: Compile project
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: clean build
+          arguments: clean build -x test -x jib
 
 #  build-image:
 #    name: Build Docker image
