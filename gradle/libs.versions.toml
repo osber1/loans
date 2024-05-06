@@ -78,6 +78,6 @@ java_faker = { module = "net.datafaker:datafaker", version = "2.2.2" }
 shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
 shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
 
-error_prone = { module = "com.google.errorprone:error_prone_core", version = "2.24.1" }
+error_prone = { module = "com.google.errorprone:error_prone_core", version = "2.27.1" }
 error_prone_picnic_support = { module = "tech.picnic.error-prone-support:error-prone-contrib", version.ref = "error_prone_picnic" }
 error_prone_picnic_refaster = { module = "tech.picnic.error-prone-support:refaster-runner", version.ref = "error_prone_picnic" }
