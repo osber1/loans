@@ -26,7 +26,7 @@ spring_boot_starter_actuator = { module = "org.springframework.boot:spring-boot-
 spring_boot_starter_data_redis = { module = "org.springframework.boot:spring-boot-starter-data-redis" }
 spring_data_envers = { module = "org.springframework.data:spring-data-envers" }
 spring_boot_starter_bootstrap = { module = "org.springframework.cloud:spring-cloud-starter-bootstrap" }
-spring_boot_cloud_stub_runner = { module = "org.springframework.cloud:spring-cloud-starter-contract-stub-runner", version = "4.1.2" }
+spring_boot_cloud_stub_runner = { module = "org.springframework.cloud:spring-cloud-starter-contract-stub-runner", version = "4.1.3" }
 spring_boot_configuration_processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring_boot_testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 
