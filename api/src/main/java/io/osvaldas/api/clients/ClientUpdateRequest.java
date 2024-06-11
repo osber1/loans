@@ -13,7 +13,9 @@ public record ClientUpdateRequest(@NotBlank(message = "Id must be not empty.") S
                                   @Email @NotBlank(message = "Email must be not empty.") String email,
                                   @NotBlank(message = "Phone number must be not empty.")
                                   @Size(message = "Phone number must be 11 digits length and start with country code.", min = 11, max = 11) String phoneNumber,
-                                  @Pattern(regexp = "^\\d+$", message = "Personal code must contain only digits.") @NotBlank(message = "Personal code must be not empty.") @Size(message = "Personal code must be 11 digits length.", min = 11, max = 11) String personalCode,
+                                  @Pattern(regexp = "^\\d+$", message = "Personal code must contain only digits.")
+                                  @NotBlank(message = "Personal code must be not empty.")
+                                  @Size(message = "Personal code must be 11 digits length.", min = 11, max = 11) String personalCode,
                                   @NotNull(message = "Version must be not empty.") Long version) {
 
 }
