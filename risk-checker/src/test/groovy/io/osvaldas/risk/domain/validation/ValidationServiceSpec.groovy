@@ -25,7 +25,7 @@ class ValidationServiceSpec extends Specification {
         when:
             RiskValidationResponse response = validationService.validate(request)
         then:
-            response.success
+            response.success()
         and:
             1 * validator.validate(_ as RiskValidationTarget)
     }
@@ -36,7 +36,7 @@ class ValidationServiceSpec extends Specification {
         when:
             RiskValidationResponse response = validationService.validate(request)
         then:
-            !response.success
+            !response.success()
         and:
             1 * validator.validate(_ as RiskValidationTarget) >> { throw new BadRequestException('') }
     }

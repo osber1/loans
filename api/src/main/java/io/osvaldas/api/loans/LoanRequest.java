@@ -4,20 +4,8 @@ import java.math.BigDecimal;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class LoanRequest {
+public record LoanRequest(@Min(1) @NotNull(message = "Amount must be not empty.") BigDecimal amount,
+                          @Min(1) @NotNull(message = "Term in months must be not empty.") Integer termInMonths) {
 
-    @Min(1)
-    @NotNull(message = "Amount must be not empty.")
-    private BigDecimal amount;
-
-    @Min(1)
-    @NotNull(message = "Term in months must be not empty.")
-    private Integer termInMonths;
 }

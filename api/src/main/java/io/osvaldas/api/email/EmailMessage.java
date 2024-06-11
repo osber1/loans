@@ -1,17 +1,5 @@
 package io.osvaldas.api.email;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public record EmailMessage(String clientId, String fullName, String email) {
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class EmailMessage {
-
-    private String clientId;
-
-    private String fullName;
-
-    private String email;
 }

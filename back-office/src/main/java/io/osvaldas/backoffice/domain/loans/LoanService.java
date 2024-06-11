@@ -87,9 +87,9 @@ public class LoanService {
         setStatusAndSave(loan, NOT_EVALUATED);
         RiskValidationResponse response = sendValidationRequest(loan, clientId);
         of(response)
-            .filter(RiskValidationResponse::isSuccess)
+            .filter(RiskValidationResponse::success)
             .ifPresentOrElse(r -> approveAndSave(loan),
-                () -> rejectLoanAndThrow(loan, response.getMessage()));
+                () -> rejectLoanAndThrow(loan, response.message()));
     }
 
     public List<Loan> getLoansByStatus(Status status) {
@@ -151,7 +151,7 @@ public class LoanService {
 
     private void setStatusAndSave(Loan loan, Status status) {
         loan.setStatus(status);
-        save(loan);
+        loanRepository.save(loan);
     }
 
 }

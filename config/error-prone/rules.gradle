@@ -110,6 +110,7 @@ ext {
 
     disabled_error_prone_rules = [
         'ImmutableListOf2',
-        'ImmutableMapOf1'
+        'ImmutableMapOf1',
+        'ImmutableSetOf'
     ]
 }

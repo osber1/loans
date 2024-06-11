@@ -51,11 +51,11 @@ class LoansControllerSpec extends AbstractControllerSpec {
             response.status == OK.value()
         and:
             with(objectMapper.readValue(response.contentAsString, LoanResponse)) {
-                id == savedLoan.id
-                amount == savedLoan.amount
-                interestRate == savedLoan.interestRate
-                termInMonths == savedLoan.termInMonths
-                returnDate.toLocalDate() == savedLoan.returnDate.toLocalDate()
+                id() == savedLoan.id
+                amount() == savedLoan.amount
+                interestRate() == savedLoan.interestRate
+                termInMonths() == savedLoan.termInMonths
+                returnDate().toLocalDate() == savedLoan.returnDate.toLocalDate()
             }
     }
 
@@ -109,8 +109,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
         and:
             LoanResponse loanResponse = objectMapper.readValue(response.contentAsString, LoanResponse)
             with(loanResponse) {
-                amount == loanRequest.amount
-                termInMonths == loanRequest.termInMonths
+                amount() == loanRequest.amount()
+                termInMonths() == loanRequest.termInMonths()
             }
     }
 

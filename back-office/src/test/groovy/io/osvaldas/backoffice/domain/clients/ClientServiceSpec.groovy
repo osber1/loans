@@ -24,9 +24,7 @@ import spock.lang.Subject
 
 class ClientServiceSpec extends AbstractSpec {
 
-    ClientRepository clientRepository = Mock {
-        countByIdAndLoansCreatedAtAfter(clientId, date) >> 2
-    }
+    ClientRepository clientRepository = Mock()
 
     RabbitMQMessageProducer messageProducer = Mock()
 

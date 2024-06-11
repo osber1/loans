@@ -73,20 +73,11 @@ abstract class AbstractControllerSpec extends AbstractSpec {
                                              String clientCode,
                                              String clientEmail,
                                              String clientPhoneNumber) {
-        new ClientRegisterRequest().tap {
-            firstName = clientName
-            lastName = clientSurname
-            personalCode = clientCode
-            email = clientEmail
-            phoneNumber = clientPhoneNumber
-        }
+        new ClientRegisterRequest(clientName, clientSurname, clientEmail, clientPhoneNumber, clientCode)
     }
 
     LoanRequest buildLoanRequest(BigDecimal loanAmount) {
-        new LoanRequest().tap {
-            amount = loanAmount
-            termInMonths = 12
-        }
+        new LoanRequest(loanAmount, 12)
     }
 
     @TestConfiguration

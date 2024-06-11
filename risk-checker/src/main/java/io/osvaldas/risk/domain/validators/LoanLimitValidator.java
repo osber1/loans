@@ -24,7 +24,7 @@ public class LoanLimitValidator implements ValidationRule {
     @Override
     public void validate(RiskValidationTarget target) {
         of(client.getLoansTakenTodayCount(target.getClientId()))
-            .map(TodayTakenLoansCount::getTakenLoansCount)
+            .map(TodayTakenLoansCount::takenLoansCount)
             .filter(count -> count > config.getLoanLimitPerDay())
             .ifPresent(count -> {
                 throw new LoanLimitException(LOAN_LIMIT_EXCEEDS);

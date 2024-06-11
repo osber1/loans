@@ -65,7 +65,7 @@ class PostponeControllerSpec extends AbstractControllerSpec {
                     .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
-            objectMapper.readValue(response.contentAsString, LoanResponse).loanPostpones.size()
+            objectMapper.readValue(response.contentAsString, LoanResponse).loanPostpones().size()
     }
 
 }
