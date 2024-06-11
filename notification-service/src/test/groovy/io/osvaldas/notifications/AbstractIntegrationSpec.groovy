@@ -1,7 +1,5 @@
 package io.osvaldas.notifications
 
-import static java.util.Collections.emptyMap
-
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
@@ -28,9 +26,6 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
     @Shared
     @ServiceConnection
     static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.13.1-management-alpine')
-        .withQueue(queueName)
-        .withExchange(exchangeName, 'direct')
-        .withBinding(exchangeName, queueName, emptyMap(), routingKeys, 'queue')
 
     @Shared
     static GenericContainer mailhogContainer = new GenericContainer<>('mailhog/mailhog:v1.0.1')
@@ -39,6 +34,15 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
     static {
         mailhogContainer.start()
         rabbitMQContainer.start()
+
+        rabbitMQContainer.execInContainer("rabbitmqadmin", "declare", "queue", "name=" + queueName)
+        rabbitMQContainer.execInContainer("rabbitmqadmin", "declare", "exchange", "name=" + exchangeName, "type=direct")
+        rabbitMQContainer.execInContainer("rabbitmqadmin", "declare", "binding",
+            "source=" + exchangeName,
+            "destination=" + queueName,
+            "routing_key=" + routingKeys,
+            "destination_type=queue",
+            "arguments={}")
     }
 
     @DynamicPropertySource

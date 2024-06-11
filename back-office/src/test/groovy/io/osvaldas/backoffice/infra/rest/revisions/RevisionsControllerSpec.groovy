@@ -35,7 +35,7 @@ class RevisionsControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[]))*.status == [ACTIVE, INACTIVE]
+            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[]))*.status() == [ACTIVE, INACTIVE]
     }
 
     void 'should return loan revisions when they exist'() {
@@ -51,7 +51,7 @@ class RevisionsControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            List.of(objectMapper.readValue(response.contentAsString, LoanResponse[]))*.status == [OPEN, CLOSED]
+            List.of(objectMapper.readValue(response.contentAsString, LoanResponse[]))*.status() == [OPEN, CLOSED]
     }
 
 }

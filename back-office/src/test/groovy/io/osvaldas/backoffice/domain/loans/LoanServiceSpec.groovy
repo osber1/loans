@@ -37,11 +37,7 @@ class LoanServiceSpec extends AbstractSpec {
         hourOfDay >> 10
     }
 
-    PropertiesConfig config = Stub {
-        maxAmount >> 100.00
-        forbiddenHourFrom >> 0
-        forbiddenHourTo >> 6
-    }
+    PropertiesConfig config = Stub()
 
     RiskCheckerClient riskCheckerClient = Stub()
 
@@ -198,7 +194,7 @@ class LoanServiceSpec extends AbstractSpec {
         when:
             TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(clientId)
         then:
-            todayTakenLoansCount.takenLoansCount == 1
+            todayTakenLoansCount.takenLoansCount() == 1
         and:
             1 * loanRepository.findAll(_ as Specification) >> [loan]
     }

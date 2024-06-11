@@ -39,11 +39,11 @@ class ClientControllerSpec extends AbstractControllerSpec {
             result.response.status == OK.value()
         and:
             with(objectMapper.readValue(result.response.contentAsString, ClientResponse)) {
-                firstName == clientRequest.firstName
-                lastName == clientRequest.lastName
-                personalCode == "${clientRequest.personalCode}"
-                email == clientRequest.email
-                phoneNumber == clientRequest.phoneNumber
+                firstName() == clientRequest.firstName()
+                lastName() == clientRequest.lastName()
+                personalCode() == "${clientRequest.personalCode()}"
+                email() == clientRequest.email()
+                phoneNumber() == clientRequest.phoneNumber()
             }
     }
 
@@ -80,12 +80,12 @@ class ClientControllerSpec extends AbstractControllerSpec {
             response.status == OK.value()
         and:
             with(objectMapper.readValue(response.contentAsString, ClientResponse)) {
-                id == savedClient.id
-                firstName == savedClient.firstName
-                lastName == savedClient.lastName
-                personalCode == "${savedClient.personalCode}"
-                email == savedClient.email
-                phoneNumber == savedClient.phoneNumber
+                id() == savedClient.id
+                firstName() == savedClient.firstName
+                lastName() == savedClient.lastName
+                personalCode() == "${savedClient.personalCode}"
+                email() == savedClient.email
+                phoneNumber() == savedClient.phoneNumber
             }
     }
 
@@ -208,25 +208,11 @@ class ClientControllerSpec extends AbstractControllerSpec {
     }
 
     private ClientRegisterRequest buildRegisterClientRequest() {
-        new ClientRegisterRequest().tap {
-            firstName = name
-            lastName = surname
-            personalCode = clientPersonalCode
-            email = clientEmail
-            phoneNumber = clientPhoneNumber
-        }
+        new ClientRegisterRequest(name, surname, clientEmail, clientPhoneNumber, clientPersonalCode)
     }
 
     private ClientUpdateRequest buildUpdateClientRequest() {
-        new ClientUpdateRequest().tap {
-            id = clientId
-            firstName = editedName
-            lastName = editedSurname
-            personalCode = clientPersonalCode
-            email = clientEmail
-            phoneNumber = clientPhoneNumber
-            version = 0
-        }
+        new ClientUpdateRequest(clientId, editedName, editedSurname, ACTIVE, clientEmail, clientPhoneNumber, clientPersonalCode, 0)
     }
 
 }

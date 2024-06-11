@@ -32,7 +32,7 @@ public class LoansStepDefinitions {
 
         responseSuccess(response);
 
-        clientId = response.as(ClientResponse.class).getId();
+        clientId = response.as(ClientResponse.class).id();
     }
 
     @Given("client is activated")
@@ -61,8 +61,8 @@ public class LoansStepDefinitions {
 
         LoanResponse loanResponse = response.as(LoanResponse[].class)[0];
 
-        loanId = loanResponse.getId();
-        assertThat(loanResponse.getAmount()).isNotEqualTo(ZERO);
+        loanId = loanResponse.id();
+        assertThat(loanResponse.amount()).isNotEqualTo(ZERO);
     }
 
     @When("extension is taken")
@@ -81,7 +81,7 @@ public class LoansStepDefinitions {
 
         responseSuccess(response);
 
-        assertThat(response.as(LoanResponse[].class)[0].getLoanPostpones()).isNotEmpty();
+        assertThat(response.as(LoanResponse[].class)[0].loanPostpones()).isNotEmpty();
     }
 
     private static RequestSpecification request() {

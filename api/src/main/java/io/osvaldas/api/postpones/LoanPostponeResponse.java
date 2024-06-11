@@ -3,14 +3,6 @@ package io.osvaldas.api.postpones;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-import lombok.Data;
+public record LoanPostponeResponse(long id, ZonedDateTime returnDate, BigDecimal interestRate) {
 
-@Data
-public class LoanPostponeResponse {
-
-    private long id;
-
-    private ZonedDateTime returnDate;
-
-    private BigDecimal interestRate;
 }

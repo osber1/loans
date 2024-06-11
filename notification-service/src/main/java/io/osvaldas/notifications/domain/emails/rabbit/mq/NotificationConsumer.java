@@ -23,9 +23,9 @@ public class NotificationConsumer {
     @RabbitListener(queues = "${rabbitmq.queues.notification}")
     public void consume(EmailMessage message) {
         log.info("Received message: {}", message);
-        String activationLink = config.getActivationLink().formatted(message.getClientId());
-        String emailContent = buildEmailMessage().formatted(message.getFullName(), activationLink);
-        log.info("Sending email to: {}", message.getEmail());
-        emailSender.send(message.getEmail(), emailContent);
+        String activationLink = config.getActivationLink().formatted(message.clientId());
+        String emailContent = buildEmailMessage().formatted(message.fullName(), activationLink);
+        log.info("Sending email to: {}", message.email());
+        emailSender.send(message.email(), emailContent);
     }
 }
