@@ -35,14 +35,14 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
         mailhogContainer.start()
         rabbitMQContainer.start()
 
-        rabbitMQContainer.execInContainer("rabbitmqadmin", "declare", "queue", "name=" + queueName)
-        rabbitMQContainer.execInContainer("rabbitmqadmin", "declare", "exchange", "name=" + exchangeName, "type=direct")
-        rabbitMQContainer.execInContainer("rabbitmqadmin", "declare", "binding",
-            "source=" + exchangeName,
-            "destination=" + queueName,
-            "routing_key=" + routingKeys,
-            "destination_type=queue",
-            "arguments={}")
+        rabbitMQContainer.execInContainer('rabbitmqadmin', 'declare', 'queue', "name=$queueName")
+        rabbitMQContainer.execInContainer('rabbitmqadmin', 'declare', 'exchange', "name=$exchangeName", 'type=direct')
+        rabbitMQContainer.execInContainer('rabbitmqadmin', 'declare', 'binding',
+            "source=$exchangeName",
+            "destination=$queueName",
+            "routing_key=$routingKeys",
+            'destination_type=queue',
+            'arguments={}')
     }
 
     @DynamicPropertySource
