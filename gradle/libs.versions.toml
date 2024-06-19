@@ -1,19 +1,19 @@
 [versions]
-spring_boot = "3.3.0"
+spring_boot = "3.3.2"
 mapstruct = "1.5.5.Final"
 spock = "2.4-M4-groovy-4.0"
-cucumber = "7.18.0"
+cucumber = "7.18.1"
 shedlock = "5.13.0"
 error_prone_picnic = "0.16.1"
 
 [plugins]
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
-jib = { id = "com.google.cloud.tools.jib", version = "3.4.2" }
-spring_dependency = { id = "io.spring.dependency-management", version = "1.1.5" }
-spotbugs = { id = "com.github.spotbugs", version = "6.0.15" }
-sonarqube = { id = "org.sonarqube", version = "5.0.0.4638" }
-errorprone = { id = "net.ltgt.errorprone", version = "4.0.0" }
-dependency_check = { id = "org.owasp.dependencycheck", version = "9.2.0" }
+jib = { id = "com.google.cloud.tools.jib", version = "3.4.3" }
+spring_dependency = { id = "io.spring.dependency-management", version = "1.1.6" }
+spotbugs = { id = "com.github.spotbugs", version = "6.0.19" }
+sonarqube = { id = "org.sonarqube", version = "5.1.0.4882" }
+errorprone = { id = "net.ltgt.errorprone", version = "4.0.1" }
+dependency_check = { id = "org.owasp.dependencycheck", version = "10.0.2" }
 
 [libraries]
 spring_boot_starter_web = { module = "org.springframework.boot:spring-boot-starter-web" }
@@ -26,7 +26,7 @@ spring_boot_starter_actuator = { module = "org.springframework.boot:spring-boot-
 spring_boot_starter_data_redis = { module = "org.springframework.boot:spring-boot-starter-data-redis" }
 spring_data_envers = { module = "org.springframework.data:spring-data-envers" }
 spring_boot_starter_bootstrap = { module = "org.springframework.cloud:spring-cloud-starter-bootstrap" }
-spring_boot_cloud_stub_runner = { module = "org.springframework.cloud:spring-cloud-starter-contract-stub-runner", version = "4.1.3" }
+spring_boot_cloud_stub_runner = { module = "org.springframework.cloud:spring-cloud-starter-contract-stub-runner", version = "4.1.4" }
 spring_boot_configuration_processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring_boot_testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 
@@ -36,7 +36,7 @@ groovy_json = { module = "org.apache.groovy:groovy-json" }
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
 
-feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version = "4.1.2" }
+feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version = "4.1.3" }
 
 logstash = { module = "net.logstash.logback:logstash-logback-encoder", version = "7.4" }
 
@@ -73,7 +73,7 @@ cucumber_junit = { module = "io.cucumber:cucumber-junit", version.ref = "cucumbe
 
 rest_assured = { module = "io.rest-assured:rest-assured" }
 
-java_faker = { module = "net.datafaker:datafaker", version = "2.2.2" }
+java_faker = { module = "net.datafaker:datafaker", version = "2.3.1" }
 
 shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
 shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
