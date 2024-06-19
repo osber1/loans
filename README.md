@@ -4,7 +4,7 @@
 
 ![loans workflow](https://github.com/osber1/loans/actions/workflows/pipeline.yml/badge.svg)
 [![codecov](https://codecov.io/gh/osber1/loans/branch/master/graph/badge.svg?token=2KOECLUD4M)](https://codecov.io/gh/osber1/loans)
-
+[![sonarcloud](https://sonarcloud.io/api/project_badges/measure?project=osber1_loans&metric=sqale_rating)](https://sonarcloud.io/project/overview?id=osber1_loans)
 ## [Infra Repository](https://github.com/osber1/loans-infra)
 
 ## Links
