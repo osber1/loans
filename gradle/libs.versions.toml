@@ -3,7 +3,7 @@ spring_boot = "3.3.2"
 mapstruct = "1.5.5.Final"
 spock = "2.4-M4-groovy-4.0"
 cucumber = "7.18.1"
-shedlock = "5.14.0"
+shedlock = "5.15.0"
 error_prone_picnic = "0.16.1"
 
 [plugins]
