@@ -1,18 +1,18 @@
 [versions]
-spring_boot = "3.3.3"
-mapstruct = "1.6.0"
+spring_boot = "3.3.5"
+mapstruct = "1.6.2"
 spock = "2.4-M4-groovy-4.0"
-cucumber = "7.18.1"
+cucumber = "7.20.1"
 shedlock = "5.16.0"
 error_prone_picnic = "0.16.1"
 
 [plugins]
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
-jib = { id = "com.google.cloud.tools.jib", version = "3.4.3" }
+jib = { id = "com.google.cloud.tools.jib", version = "3.4.4" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.6" }
 spotbugs = { id = "com.github.spotbugs", version = "6.0.22" }
 sonarqube = { id = "org.sonarqube", version = "5.1.0.4882" }
-errorprone = { id = "net.ltgt.errorprone", version = "4.0.1" }
+errorprone = { id = "net.ltgt.errorprone", version = "4.1.0" }
 dependency_check = { id = "org.owasp.dependencycheck", version = "10.0.4" }
 
 [libraries]
@@ -60,7 +60,7 @@ testcontainers_postgresql = { module = "org.testcontainers:postgresql" }
 testcontainers_rabbitmq = { module = "org.testcontainers:rabbitmq" }
 testcontainers_vault = { module = "org.testcontainers:vault" }
 
-greenmail = { module = "com.icegreen:greenmail", version = "2.0.1" }
+greenmail = { module = "com.icegreen:greenmail", version = "2.1.0" }
 
 awaitility = { module = "org.awaitility:awaitility" }
 
@@ -73,7 +73,7 @@ cucumber_junit = { module = "io.cucumber:cucumber-junit", version.ref = "cucumbe
 
 rest_assured = { module = "io.rest-assured:rest-assured" }
 
-java_faker = { module = "net.datafaker:datafaker", version = "2.3.1" }
+java_faker = { module = "net.datafaker:datafaker", version = "2.4.1" }
 
 shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
 shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
