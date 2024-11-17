@@ -47,7 +47,7 @@ jobs:
         run: ./gradlew clean check jibDockerBuild sonar --info
 
       - name: Upload coverage reports to Codecov with GitHub Action
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 

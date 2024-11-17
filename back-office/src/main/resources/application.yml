@@ -18,10 +18,12 @@ spring:
     username: root
     password: root
     driverClassName: org.postgresql.Driver
+    hikari.auto-commit: false
 
   jpa:
+    open-in-view: false
     hibernate.ddl-auto: none
-    #    show-sql: true
+#    show-sql: true
     properties:
 #      javax:
 #        persistence:
