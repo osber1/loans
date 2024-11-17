@@ -24,9 +24,9 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
         then:
             client.present == result
         where:
-            clientId        || result
-            validClientId   || true
-            invalidClientId || false
+            clientId          || result
+            VALID_CLIENT_ID   || true
+            INVALID_CLIENT_ID || false
     }
 
     void 'should return #result when personal code is #personalCode'() {
@@ -35,16 +35,16 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
         then:
             exists == result
         where:
-            personalCode        || result
-            validPersonalCode   || true
-            invalidPersonalCode || false
+            personalCode          || result
+            VALID_PERSONAL_CODE   || true
+            INVALID_PERSONAL_CODE || false
     }
 
     void 'should change client status to deleted when deleting client'() {
         when:
-            repository.changeClientStatus(validClientId, DELETED)
+            repository.changeClientStatus(VALID_CLIENT_ID, DELETED)
         then:
-            repository.findById(validClientId).get().status == DELETED
+            repository.findById(VALID_CLIENT_ID).get().status == DELETED
     }
 
 }

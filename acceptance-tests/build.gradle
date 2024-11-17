@@ -14,3 +14,7 @@ dependencies {
 codenarcTest {
     exclude 'io/osvaldas/backoffice/acceptance/*'
 }
+
+test {
+    failOnNoDiscoveredTests = false
+}

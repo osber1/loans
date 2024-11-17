@@ -58,15 +58,15 @@ class ClientControllerSpec extends AbstractControllerSpec {
         and:
             result.resolvedException.message.contains(errorMessage)
         where:
-            request                                                                               || errorMessage
-            buildClientRequest(null, surname, clientPersonalCode, clientEmail, clientPhoneNumber) || 'First name must be not empty.'
-            buildClientRequest(name, null, clientPersonalCode, clientEmail, clientPhoneNumber)    || 'Last name must be not empty.'
-            buildClientRequest(name, surname, null, clientEmail, clientPhoneNumber)               || 'Personal code must be not empty.'
-            buildClientRequest(name, surname, '123456789', clientEmail, clientPhoneNumber)        || 'Personal code must be 11 digits length.'
-            buildClientRequest(name, surname, '123456789as', clientEmail, clientPhoneNumber)      || 'Personal code must contain only digits.'
-            buildClientRequest(name, surname, clientPersonalCode, null, clientPhoneNumber)        || 'Email must be not empty.'
-            buildClientRequest(name, surname, clientPersonalCode, 'test', clientPhoneNumber)      || 'must be a well-formed email address'
-            buildClientRequest(name, surname, clientPersonalCode, clientEmail, null)              || 'Phone number must be not empty.'
+            request                                                                                    || errorMessage
+            buildClientRequest(null, SURNAME, CLIENT_PERSONAL_CODE, CLIENT_EMAIL, CLIENT_PHONE_NUMBER) || 'First name must be not empty.'
+            buildClientRequest(NAME, null, CLIENT_PERSONAL_CODE, CLIENT_EMAIL, CLIENT_PHONE_NUMBER)    || 'Last name must be not empty.'
+            buildClientRequest(NAME, SURNAME, null, CLIENT_EMAIL, CLIENT_PHONE_NUMBER)                 || 'Personal code must be not empty.'
+            buildClientRequest(NAME, SURNAME, '123456789', CLIENT_EMAIL, CLIENT_PHONE_NUMBER)          || 'Personal code must be 11 digits length.'
+            buildClientRequest(NAME, SURNAME, '123456789as', CLIENT_EMAIL, CLIENT_PHONE_NUMBER)        || 'Personal code must contain only digits.'
+            buildClientRequest(NAME, SURNAME, CLIENT_PERSONAL_CODE, null, CLIENT_PHONE_NUMBER)         || 'Email must be not empty.'
+            buildClientRequest(NAME, SURNAME, CLIENT_PERSONAL_CODE, 'test', CLIENT_PHONE_NUMBER)       || 'must be a well-formed email address'
+            buildClientRequest(NAME, SURNAME, CLIENT_PERSONAL_CODE, CLIENT_EMAIL, null)                || 'Phone number must be not empty.'
     }
 
     void 'should return client when it exists'() {
@@ -170,10 +170,10 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(clientNotFound.formatted(clientId))
+            response.contentAsString.contains(CLIENT_NOT_FOUND.formatted(CLIENT_ID))
         where:
-            method << [get('/api/v1/clients/{id}', clientId),
-                       delete('/api/v1/clients/{id}', clientId),
+            method << [get('/api/v1/clients/{id}', CLIENT_ID),
+                       delete('/api/v1/clients/{id}', CLIENT_ID),
                        put('/api/v1/clients').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
@@ -208,11 +208,19 @@ class ClientControllerSpec extends AbstractControllerSpec {
     }
 
     private ClientRegisterRequest buildRegisterClientRequest() {
-        new ClientRegisterRequest(name, surname, clientEmail, clientPhoneNumber, clientPersonalCode)
+        new ClientRegisterRequest(NAME, SURNAME, CLIENT_EMAIL, CLIENT_PHONE_NUMBER, CLIENT_PERSONAL_CODE)
     }
 
     private ClientUpdateRequest buildUpdateClientRequest() {
-        new ClientUpdateRequest(clientId, editedName, editedSurname, ACTIVE, clientEmail, clientPhoneNumber, clientPersonalCode, 0)
+        new ClientUpdateRequest(
+            CLIENT_ID,
+            editedName,
+            editedSurname,
+            ACTIVE,
+            CLIENT_EMAIL,
+            CLIENT_PHONE_NUMBER,
+            CLIENT_PERSONAL_CODE,
+            0)
     }
 
 }

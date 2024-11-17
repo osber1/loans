@@ -23,10 +23,10 @@ class PostponeServiceSpec extends AbstractSpec {
 
     void 'should postpone loan when it is first postpone'() {
         given:
-            loanService.getLoan(loanId) >> loan
+            loanService.getLoan(LOAN_ID) >> loan
             loanService.save(loan) >> loan
         when:
-            LoanPostpone loanPostpone = postponeService.postponeLoan(loanId)
+            LoanPostpone loanPostpone = postponeService.postponeLoan(LOAN_ID)
         then:
             with(loanPostpone) {
                 returnDate == firstPostpone.returnDate
@@ -40,10 +40,10 @@ class PostponeServiceSpec extends AbstractSpec {
         given:
             loan.loanPostpones = [firstPostpone] as Set
         and:
-            loanService.getLoan(loanId) >> loan
+            loanService.getLoan(LOAN_ID) >> loan
             loanService.save(loan) >> loan
         when:
-            LoanPostpone loanPostpone = postponeService.postponeLoan(loanId)
+            LoanPostpone loanPostpone = postponeService.postponeLoan(LOAN_ID)
         then:
             with(loanPostpone) {
                 returnDate == secondPostpone.returnDate
@@ -55,12 +55,12 @@ class PostponeServiceSpec extends AbstractSpec {
 
     void 'should throw when trying to postpone loan which is not open'() {
         given:
-            loanService.getLoan(loanId) >> buildLoan(100.0, CLOSED)
+            loanService.getLoan(LOAN_ID) >> buildLoan(100.0, CLOSED)
         when:
-            postponeService.postponeLoan(loanId)
+            postponeService.postponeLoan(LOAN_ID)
         then:
             BadRequestException e = thrown()
-            e.message == loanNotOpen
+            e.message == LOAN_NOT_OPEN
     }
 
 }

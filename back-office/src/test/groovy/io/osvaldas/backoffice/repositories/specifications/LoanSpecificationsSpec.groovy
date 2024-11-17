@@ -28,9 +28,9 @@ class LoanSpecificationsSpec extends AbstractDatabaseSpec {
         then:
             loans.size() == listSize
         where:
-            clientId        || listSize
-            validClientId   || 1
-            invalidClientId || 0
+            clientId          || listSize
+            VALID_CLIENT_ID   || 1
+            INVALID_CLIENT_ID || 0
     }
 
     void 'should return list size of #listSize when date is #creationDate'() {
@@ -41,8 +41,8 @@ class LoanSpecificationsSpec extends AbstractDatabaseSpec {
             loans.size() == listSize
         where:
             creationDate || listSize
-            date         || 1
-            futureDate   || 0
+            DATE         || 1
+            FUTURE_DATE  || 0
     }
 
     void 'should return list size of #listSize when status is #status'() {

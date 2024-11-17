@@ -33,7 +33,7 @@ class LoanServiceSpec extends AbstractSpec {
     ClientService clientService = Stub()
 
     TimeUtils timeUtils = Stub {
-        currentDateTime >> date
+        currentDateTime >> DATE
         hourOfDay >> 10
     }
 
@@ -57,9 +57,9 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should return loans list when there are loans'() {
         given:
-            clientService.getClient(clientId) >> registeredClientWithLoan
+            clientService.getClient(CLIENT_ID) >> registeredClientWithLoan
         when:
-            Collection loans = loanService.getLoans(clientId)
+            Collection loans = loanService.getLoans(CLIENT_ID)
         then:
             loans.size() == 1
         and:
@@ -68,84 +68,84 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should return empty list when there are no loans'() {
         given:
-            clientService.getClient(clientId) >> registeredClientWithId
+            clientService.getClient(CLIENT_ID) >> registeredClientWithId
         when:
-            Collection loans = loanService.getLoans(clientId)
+            Collection loans = loanService.getLoans(CLIENT_ID)
         then:
             loans == emptySet()
     }
 
     void 'should return loan when it exists'() {
         when:
-            Loan loan = loanService.getLoan(loanId)
+            Loan loan = loanService.getLoan(LOAN_ID)
         then:
-            loan.id == loanId
+            loan.id == LOAN_ID
         and:
-            1 * loanRepository.findById(loanId) >> of(loan)
+            1 * loanRepository.findById(LOAN_ID) >> of(loan)
     }
 
     void 'should throw exception when trying to get non existing loan'() {
         when:
-            loanService.getLoan(loanId)
+            loanService.getLoan(LOAN_ID)
         then:
             NotFoundException e = thrown()
-            e.message == "Loan with id ${loanId} does not exist."
+            e.message == "Loan with id ${LOAN_ID} does not exist."
         and:
-            1 * loanRepository.findById(loanId) >> empty()
+            1 * loanRepository.findById(LOAN_ID) >> empty()
     }
 
     void 'should throw exception when amount limit is exceeded'() {
         given:
-            clientService.getClient(clientId) >> activeClientWithId
+            clientService.getClient(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
-                >> new RiskValidationResponse(false, amountExceeds)
+                >> new RiskValidationResponse(false, AMOUNT_EXCEEDS)
         and:
-            Loan addedLoan = loanService.addLoan(buildLoan(1000.00), clientId)
+            Loan addedLoan = loanService.addLoan(buildLoan(1000.00), CLIENT_ID)
         when:
-            loanService.validate(addedLoan, clientId)
+            loanService.validate(addedLoan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
-            e.message == amountExceeds
+            e.message == AMOUNT_EXCEEDS
     }
 
     void 'should throw exception when max amount and forbidden time'() {
         given:
-            clientService.getClient(clientId) >> activeClientWithId
+            clientService.getClient(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
-                >> new RiskValidationResponse(false, riskTooHigh)
+                >> new RiskValidationResponse(false, RISK_TOO_HIGH)
         and:
-            Loan addedLoan = loanService.addLoan(loan, clientId)
+            Loan addedLoan = loanService.addLoan(loan, CLIENT_ID)
         when:
-            loanService.validate(addedLoan, clientId)
+            loanService.validate(addedLoan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
-            e.message == riskTooHigh
+            e.message == RISK_TOO_HIGH
     }
 
     void 'should throw exception when too much loans taken today'() {
         given:
-            clientService.getClient(clientId) >> activeClientWithId
+            clientService.getClient(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
-                >> new RiskValidationResponse(false, loanLimitExceeds)
+                >> new RiskValidationResponse(false, LOAN_LIMIT_EXCEEDS)
         when:
-            loanService.validate(loan, clientId)
+            loanService.validate(loan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
-            e.message == loanLimitExceeds
+            e.message == LOAN_LIMIT_EXCEEDS
     }
 
     void 'should throw exception when failed to call feign client'() {
         given:
-            clientService.getClient(clientId) >> activeClientWithId
+            clientService.getClient(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest) >> { throw new BadRequestException('') }
         and:
-            Loan addedLoan = loanService.addLoan(loan, clientId)
+            Loan addedLoan = loanService.addLoan(loan, CLIENT_ID)
         when:
-            loanService.validate(addedLoan, clientId)
+            loanService.validate(addedLoan, CLIENT_ID)
         then:
             addedLoan.status == NOT_EVALUATED
         and:
@@ -155,44 +155,44 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should take loan when validation pass'() {
         given:
-            clientService.getClient(clientId) >> activeClientWithId
+            clientService.getClient(CLIENT_ID) >> activeClientWithId
             clientService.save(activeClientWithId) >> activeClientWithLoan
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(true, 'Risk validation passed.')
         when:
-            Loan takenLoan = loanService.addLoan(loan, clientId)
-            loanService.validate(takenLoan, clientId)
+            Loan takenLoan = loanService.addLoan(loan, CLIENT_ID)
+            loanService.validate(takenLoan, CLIENT_ID)
         then:
             takenLoan == loan
     }
 
     void 'should reject last pending loan when new is taken'() {
         given:
-            Client client = buildClient(clientId, [(buildLoan(100.0, PENDING))] as Set, ACTIVE)
-            clientService.getClient(clientId) >> client
+            Client client = buildClient(CLIENT_ID, [(buildLoan(100.0, PENDING))] as Set, ACTIVE)
+            clientService.getClient(CLIENT_ID) >> client
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(true, 'Risk validation passed.')
         when:
-            loanService.addLoan(loan, clientId)
+            loanService.addLoan(loan, CLIENT_ID)
         then:
             REJECTED == client.loans.findAll { it.id == 1 }.first().status
     }
 
     void 'should throw exception when client is not active'() {
         given:
-            clientService.getClient(clientId) >> registeredClientWithId
+            clientService.getClient(CLIENT_ID) >> registeredClientWithId
         when:
-            loanService.addLoan(loan, clientId)
+            loanService.addLoan(loan, CLIENT_ID)
         then:
             ClientNotActiveException e = thrown()
-            e.message == clientNotActive
+            e.message == CLIENT_NOT_ACTIVE
     }
 
     void 'should get today taken loans count'() {
         when:
-            TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(clientId)
+            TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(CLIENT_ID)
         then:
             todayTakenLoansCount.takenLoansCount() == 1
         and:
@@ -209,9 +209,9 @@ class LoanServiceSpec extends AbstractSpec {
         expect:
             loanService.getLoansByStatus(status) == result
         where:
-            result | status
-            []     | NOT_EVALUATED
-            [loan] | OPEN
+            result             | status
+            []                 | NOT_EVALUATED
+            [buildLoan(100.0)] | OPEN
     }
 
 }
