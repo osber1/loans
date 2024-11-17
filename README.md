@@ -27,7 +27,7 @@
 
 ### Backend application
 
-To start the application you need to have Docker ant Java 21 installed.
+To start the application you need to have Docker ant Java 25 installed.
 
 ### Intellij IDEA
 

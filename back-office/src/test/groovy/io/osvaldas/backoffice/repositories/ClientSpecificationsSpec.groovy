@@ -5,7 +5,6 @@ import static io.osvaldas.api.clients.Status.DELETED
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.jpa.domain.Specification
 
 import io.osvaldas.backoffice.repositories.entities.Client
 import spock.lang.Subject
@@ -23,7 +22,7 @@ class ClientSpecificationsSpec extends AbstractDatabaseSpec {
 
     void 'should change client status to deleted when deleting client'() {
         when:
-            List<Client> clients = repository.findAll(Specification.where(clientStatusIs(status)))
+            List<Client> clients = repository.findAll(clientStatusIs(status))
         then:
             clients.size() == listSize
         where:

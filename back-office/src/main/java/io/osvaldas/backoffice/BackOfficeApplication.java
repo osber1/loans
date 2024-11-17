@@ -9,11 +9,8 @@ import org.springframework.data.envers.repository.support.EnversRevisionReposito
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
-
 @EnableCaching
 @EnableScheduling
-@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 @EnableFeignClients
 @SpringBootApplication(
     scanBasePackages = {

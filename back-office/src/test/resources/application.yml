@@ -1,14 +1,13 @@
-server:
-  error:
-    include-message: always
-    include-binding-errors: always
-
 spring:
   datasource:
     url: jdbc:tc:postgresql:16.2-alpine:///databasename
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
+  web:
+    error:
+      include-message: always
+      include-binding-errors: always
 
 application:
   interestRate: 10

@@ -24,14 +24,14 @@ public class PropertiesConfig {
     @NotNull
     @Min(0)
     @Max(24)
-    private int forbiddenHourFrom;
+    private Integer forbiddenHourFrom;
 
     @NotNull
     @Min(0)
     @Max(24)
-    private int forbiddenHourTo;
+    private Integer forbiddenHourTo;
 
     @NotNull
-    private int loanLimitPerDay;
+    private Integer loanLimitPerDay;
 
 }

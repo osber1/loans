@@ -4,7 +4,6 @@ import static io.osvaldas.api.loans.Status.OPEN
 import static io.osvaldas.api.loans.Status.PENDING
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.jpa.domain.Specification
 
 import io.osvaldas.backoffice.repositories.AbstractDatabaseSpec
 import io.osvaldas.backoffice.repositories.LoanRepository
@@ -24,30 +23,29 @@ class LoanSpecificationsSpec extends AbstractDatabaseSpec {
 
     void 'should return list size of #listSize when client id is #clientId'() {
         when:
-            List<Loan> loans = repository.findAll(Specification.where(LoanSpecifications.clientIdIs(clientId)))
+            List<Loan> loans = repository.findAll(LoanSpecifications.clientIdIs(clientId))
         then:
             loans.size() == listSize
         where:
-            clientId        || listSize
-            validClientId   || 1
-            invalidClientId || 0
+            clientId          || listSize
+            VALID_CLIENT_ID   || 1
+            INVALID_CLIENT_ID || 0
     }
 
     void 'should return list size of #listSize when date is #creationDate'() {
         when:
-            List<Loan> loans = repository.findAll(Specification.where(
-                LoanSpecifications.loanCreationDateIsAfter(creationDate)))
+            List<Loan> loans = repository.findAll(LoanSpecifications.loanCreationDateIsAfter(creationDate))
         then:
             loans.size() == listSize
         where:
             creationDate || listSize
-            date         || 1
-            futureDate   || 0
+            DATE         || 1
+            FUTURE_DATE  || 0
     }
 
     void 'should return list size of #listSize when status is #status'() {
         when:
-            List<Loan> loans = repository.findAll(Specification.where(LoanSpecifications.loanStatusIs(status)))
+            List<Loan> loans = repository.findAll(LoanSpecifications.loanStatusIs(status))
         then:
             loans.size() == listSize
         where:

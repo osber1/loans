@@ -105,12 +105,41 @@ ext {
         'StringCharset',
         'NonFinalStaticField',
         'DuplicateDateFormatField',
-        'RedundantSetterCall'
+        'RedundantSetterCall',
+        'ConstantNaming',
+        'Slf4jLoggerDeclaration',
+        'RedundantSetterCall',
+        'DeeplyNested',
+        'StatementSwitchToExpressionSwitch',
+        'UnnecessaryBreakInSwitch',
+        'DuplicateBranches',
+        'RedundantControlFlow',
+        'RedundantStringEscape',
+        'AssignmentExpression',
+        'NegativeBoolean',
+        'StringConcatToTextBlock',
+        'SelfSet',
+        'BooleanLiteral',
+        'EffectivelyPrivate',
+        'NullablePrimitive',
+        'RedundantNullCheck',
+        'FormatStringShouldUsePlaceholders',
+        'IfChainToSwitch',
+        'RefactorSwitch',
+        'UnnamedVariable',
+        'UnnecessarySemicolon',
     ]
 
     disabled_error_prone_rules = [
         'ImmutableListOf2',
         'ImmutableMapOf1',
-        'ImmutableSetOf'
+        'ImmutableSetOf',
+    ]
+
+    disabled_error_prone_checks = [
+        'LexicographicalAnnotationListing': 'OFF',
+        'NonStaticImport'                 : 'OFF',
+        'JavaTimeDefaultTimeZone'         : 'OFF',
+        'TimeZoneUsage'                   : 'OFF',
     ]
 }

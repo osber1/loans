@@ -1,6 +1,6 @@
 {
-  "name": "Java 21",
-  "image": "mcr.microsoft.com/devcontainers/java:1-21-bullseye",
+  "name": "Java 25",
+  "image": "mcr.microsoft.com/devcontainers/java:1-25-bullseye",
   "features": {
     "ghcr.io/devcontainers/features/java:1": {
       "installGradle": "true"

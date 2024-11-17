@@ -15,9 +15,6 @@ allprojects {
     group = 'io.osvaldas'
     version = '1.0-SNAPSHOT'
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-
     repositories {
         mavenCentral()
     }
@@ -26,10 +23,16 @@ allprojects {
 sonar {
     properties {
         property 'sonar.projectName', 'loans'
-        property "sonar.projectKey", "osber1_loans"
-        property "sonar.organization", "osber1"
-        property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.java.binaries", "**/*"
+        property 'sonar.projectKey', 'osber1_loans'
+        property 'sonar.organization', 'osber1'
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.java.binaries', '**/*'
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -45,8 +48,8 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom 'org.springframework.boot:spring-boot-dependencies:3.3.4'
-            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
+            mavenBom 'org.springframework.boot:spring-boot-dependencies:4.0.3'
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.1'
         }
     }
 
@@ -79,13 +82,18 @@ subprojects {
         )
 
         testImplementation(
-            libs.spring.boot.starter.test
+            libs.spring.boot.starter.test,
+            libs.spring.boot.webmvc.test,
+            libs.spring.boot.cache.test,
+            libs.wiremock
         )
     }
 
     tasks.withType(JavaCompile).configureEach {
         options.errorprone {
             disableWarningsInGeneratedCode = true
+            checks = disabled_error_prone_checks
+
             String enabledRules = enabled_error_prone_rules.join(',')
             String disabledRules = disabled_error_prone_rules.join('|')
             errorproneArgs.addAll(

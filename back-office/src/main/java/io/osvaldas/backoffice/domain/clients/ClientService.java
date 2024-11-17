@@ -5,8 +5,6 @@ import static io.osvaldas.api.clients.Status.DELETED;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_ALREADY_EXIST;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
-import static java.util.Optional.of;
-import static org.springframework.data.jpa.domain.Specification.where;
 
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +40,7 @@ public class ClientService {
 
     @Transactional
     public Client registerClient(Client client) {
-        return of(clientRepository.existsByPersonalCode(client.getPersonalCode()))
+        return Optional.of(clientRepository.existsByPersonalCode(client.getPersonalCode()))
             .filter(exists -> !exists)
             .map(s -> saveClientAndSendEmail(client))
             .orElseThrow(() -> new BadRequestException(CLIENT_ALREADY_EXIST));
@@ -56,7 +54,7 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public List<Client> getClientsByStatus(Status status) {
-        return clientRepository.findAll(where(clientStatusIs(status)));
+        return clientRepository.findAll(clientStatusIs(status));
     }
 
     @Transactional(readOnly = true)
@@ -70,7 +68,7 @@ public class ClientService {
         log.info("Updating client: {}", client.getId());
         String id = client.getId();
         return clientExists(id)
-            .map(s -> save(client))
+            .map(s -> clientRepository.save(client))
             .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND.formatted(id)));
     }
 
@@ -115,7 +113,7 @@ public class ClientService {
     }
 
     private Optional<Boolean> clientExists(String id) {
-        return of(clientRepository.existsById(id))
+        return Optional.of(clientRepository.existsById(id))
             .filter(exists -> exists);
     }
 

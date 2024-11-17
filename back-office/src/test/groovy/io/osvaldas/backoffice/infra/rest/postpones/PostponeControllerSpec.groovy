@@ -18,7 +18,9 @@ class PostponeControllerSpec extends AbstractControllerSpec {
 
     void 'should postpone loan when it exists'() {
         given:
-            Client savedClient = clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
+            Client client = buildClient(CLIENT_ID, [buildLoanWithoutId(100.0)] as Set, ACTIVE)
+        and:
+            Client savedClient = clientRepository.save(client)
         when:
             MockHttpServletResponse response = mockMvc
                 .perform(post('/api/v1/loans/extensions')
@@ -47,12 +49,14 @@ class PostponeControllerSpec extends AbstractControllerSpec {
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(loanNotFound.formatted(nonExistingId))
+            response.contentAsString.contains(LOAN_NOT_FOUND.formatted(nonExistingId))
     }
 
     void 'should return loan postpone when loan is postponed'() {
         given:
-            Client savedClient = clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
+            Client client = buildClient(CLIENT_ID, [buildLoanWithoutId(100.0)] as Set, ACTIVE)
+        and:
+            Client savedClient = clientRepository.save(client)
         and:
             mockMvc
                 .perform(post('/api/v1/loans/extensions')

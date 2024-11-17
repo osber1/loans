@@ -1,7 +1,8 @@
 package io.osvaldas.risk.domain.validators;
 
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS;
-import static java.util.Optional.of;
+
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class LoanLimitValidator implements ValidationRule {
 
     @Override
     public void validate(RiskValidationTarget target) {
-        of(client.getLoansTakenTodayCount(target.getClientId()))
+        Optional.of(client.getLoansTakenTodayCount(target.getClientId()))
             .map(TodayTakenLoansCount::takenLoansCount)
             .filter(count -> count > config.getLoanLimitPerDay())
             .ifPresent(count -> {

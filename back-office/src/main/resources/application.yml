@@ -1,8 +1,5 @@
 server:
   port: 8080
-  error:
-    include-message: always
-    include-binding-errors: always
 
 logging:
   file:
@@ -18,18 +15,20 @@ spring:
     username: root
     password: root
     driverClassName: org.postgresql.Driver
+    hikari.auto-commit: false
 
   jpa:
+    open-in-view: false
     hibernate.ddl-auto: none
     #    show-sql: true
     properties:
-#      javax:
-#        persistence:
-#          schema-generation:
-#            create-source: metadata
-#            scripts:
-#              action: create
-#              create-target: create.sql
+      #      javax:
+      #        persistence:
+      #          schema-generation:
+      #            create-source: metadata
+      #            scripts:
+      #              action: create
+      #              create-target: create.sql
       hibernate:
         #        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -42,6 +41,10 @@ spring:
 
   rabbitmq:
     host: localhost
+  web:
+    error:
+      include-message: always
+      include-binding-errors: always
 
 management:
   endpoints:
@@ -67,7 +70,7 @@ info:
     description: Simple loans application
     version: v1.0
   techstack:
-    java: Java 21
+    java: Java 25
     springBoot: 3.2.4
 
 application:
@@ -82,4 +85,4 @@ risk:
 scheduler:
   evaluateNotEvaluatedLoans:
     enabled: true
-    cron: "* */10 * * * *"
+    cron: "0 */10 * * * *"

@@ -22,7 +22,7 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
 
     void 'should not return loan when it does not exist'() {
         when:
-            Optional<Loan> loan = repository.findById(invalidLoanId)
+            Optional<Loan> loan = repository.findById(INVALID_LOAN_ID)
         then:
             loan.isEmpty()
     }
