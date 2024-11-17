@@ -11,12 +11,11 @@ import static io.osvaldas.backoffice.repositories.specifications.LoanSpecificati
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreationDateIsAfter;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs;
 import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.Optional.of;
-import static org.springframework.data.jpa.domain.Specification.where;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -86,18 +85,18 @@ public class LoanService {
     public void validate(Loan loan, String clientId) {
         setStatusAndSave(loan, NOT_EVALUATED);
         RiskValidationResponse response = sendValidationRequest(loan, clientId);
-        of(response)
+        Optional.of(response)
             .filter(RiskValidationResponse::success)
             .ifPresentOrElse(r -> approveAndSave(loan),
                 () -> rejectLoanAndThrow(loan, response.message()));
     }
 
     public List<Loan> getLoansByStatus(Status status) {
-        return loanRepository.findAll(where(loanStatusIs(status)));
+        return loanRepository.findAll(loanStatusIs(status));
     }
 
     private Client getActiveClient(String clientId) {
-        return of(getClient(clientId))
+        return Optional.of(getClient(clientId))
             .filter(c -> ACTIVE == c.getStatus())
             .orElseThrow(() -> new ClientNotActiveException(CLIENT_NOT_ACTIVE));
     }
@@ -115,10 +114,9 @@ public class LoanService {
     }
 
     private int getLoanTakenTodayCount(String clientId, ZonedDateTime date) {
-        Specification<Loan> specification = where(
-            clientIdIs(clientId)
-                .and(loanCreationDateIsAfter(date))
-                .and(loanStatusIs(OPEN)));
+        Specification<Loan> specification = clientIdIs(clientId)
+            .and(loanCreationDateIsAfter(date))
+            .and(loanStatusIs(OPEN));
         return loanRepository.findAll(specification).size();
     }
 
@@ -129,7 +127,7 @@ public class LoanService {
     }
 
     private void cancelPreviousPendingLoan(Client client) {
-        of(client)
+        Optional.of(client)
             .flatMap(Client::getLastLoan)
             .filter(loan -> PENDING == loan.getStatus())
             .ifPresent(loan -> setStatusAndSave(loan, REJECTED));

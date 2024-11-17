@@ -42,7 +42,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loan when it exists'() {
         given:
-            Loan savedLoan = loanRepository.save(loan)
+            Loan savedLoan = loanRepository.save(buildLoanWithoutId(100.0))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/{loanId}', savedLoan.id)
                 .contentType(APPLICATION_JSON))
@@ -61,18 +61,20 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should throw an exception when loan not found'() {
         when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/{id}', loanId)
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/{id}', LOAN_ID)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(loanNotFound.formatted(loanId))
+            response.contentAsString.contains(LOAN_NOT_FOUND.formatted(LOAN_ID))
     }
 
     void 'should return loans when client exists'() {
         given:
-            Client savedClient = clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
+            Client client = buildClient(CLIENT_ID, [buildLoanWithoutId(100.0)] as Set, ACTIVE)
+        and:
+            Client savedClient = clientRepository.save(client)
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
                 .param('clientId', savedClient.id)
@@ -81,19 +83,19 @@ class LoansControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            Set.of(objectMapper.readValue(response.contentAsString, LoanResponse[])).size() == 1
+            ([objectMapper.readValue(response.contentAsString, LoanResponse[])] as Set).size() == 1
     }
 
     void 'should throw an exception when client not found'() {
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
-                .param('clientId', clientId)
+                .param('clientId', CLIENT_ID)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
             response.status == NOT_FOUND.value()
         and:
-            response.contentAsString.contains(clientNotFound.formatted(clientId))
+            response.contentAsString.contains(CLIENT_NOT_FOUND.formatted(CLIENT_ID))
     }
 
     void 'should take loan when request is correct'() {
@@ -103,7 +105,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
             RiskValidationResponse validationResponse = new RiskValidationResponse(true, 'Risk validation passed.')
             stubWireMockResponse(validationResponse)
         when:
-            MockHttpServletResponse response = postLoanRequest(loanRequest, clientId)
+            MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
         then:
             response.status == OK.value()
         and:
@@ -119,15 +121,15 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(false, loanLimitExceeds)
+            RiskValidationResponse validationResponse = new RiskValidationResponse(false, LOAN_LIMIT_EXCEEDS)
             stubWireMockResponse(validationResponse)
         when:
-            postLoanRequest(loanRequest, clientId)
-            MockHttpServletResponse response = postLoanRequest(loanRequest, clientId)
+            postLoanRequest(loanRequest, CLIENT_ID)
+            MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
         then:
             response.status == BAD_REQUEST.value()
         and:
-            response.contentAsString.contains(loanLimitExceeds)
+            response.contentAsString.contains(LOAN_LIMIT_EXCEEDS)
         and:
             REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
@@ -137,14 +139,14 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(false, amountExceeds)
+            RiskValidationResponse validationResponse = new RiskValidationResponse(false, AMOUNT_EXCEEDS)
             stubWireMockResponse(validationResponse)
         when:
-            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(999999.0), clientId)
+            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(999999.0), CLIENT_ID)
         then:
             response.status == BAD_REQUEST.value()
         and:
-            response.contentAsString.contains(amountExceeds)
+            response.contentAsString.contains(AMOUNT_EXCEEDS)
         and:
             REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
@@ -154,14 +156,14 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(false, riskTooHigh)
+            RiskValidationResponse validationResponse = new RiskValidationResponse(false, RISK_TOO_HIGH)
             stubWireMockResponse(validationResponse)
         when:
-            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(50.0), clientId)
+            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(50.0), CLIENT_ID)
         then:
             response.status == BAD_REQUEST.value()
         and:
-            response.contentAsString.contains(riskTooHigh)
+            response.contentAsString.contains(RISK_TOO_HIGH)
         and:
             REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
@@ -170,19 +172,19 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(registeredClientWithId)
         when:
-            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(100.0), clientId)
+            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(100.0), CLIENT_ID)
         then:
             response.status == BAD_REQUEST.value()
         and:
-            response.contentAsString.contains(clientNotActive)
+            response.contentAsString.contains(CLIENT_NOT_ACTIVE)
     }
 
     void 'should return loans taken today count'() {
         given:
-            clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
+            clientRepository.save(buildClient(CLIENT_ID, [buildLoanWithoutId(100.0)] as Set, ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
-                .param('clientId', clientId)
+                .param('clientId', CLIENT_ID)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -193,7 +195,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     private StubMapping stubWireMockResponse(RiskValidationResponse response) {
         stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
-            .withRequestBody(containing(clientId))
+            .withRequestBody(containing(CLIENT_ID))
             .willReturn(aResponse()
                 .withHeader(CONTENT_TYPE, APPLICATION_JSON.toString())
                 .withStatus(200)

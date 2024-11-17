@@ -22,7 +22,7 @@ public class PropertiesConfig {
 
     @NotNull
     @Min(0)
-    private int postponeDays;
+    private Integer postponeDays;
 
     @NotNull
     @Min(0)

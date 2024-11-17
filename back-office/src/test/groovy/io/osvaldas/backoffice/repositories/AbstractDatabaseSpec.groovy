@@ -12,7 +12,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.cloud.openfeign.FeignAutoConfiguration
+import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.spock.Testcontainers
 
 import io.osvaldas.backoffice.repositories.entities.Client
@@ -28,43 +30,35 @@ abstract class AbstractDatabaseSpec extends Specification {
 
     @Shared
     @ServiceConnection
-    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer('postgres:16.2-alpine')
+    static GenericContainer postgreSQLContainer = new PostgreSQLContainer('postgres:17.6-alpine')
         .withDatabaseName('loans')
         .withUsername('root')
         .withPassword('root')
+        .waitingFor(Wait.forListeningPort())
 
-    @Shared
-    ZonedDateTime date = generateDate(2022)
+    static final ZonedDateTime DATE = generateDate(2022)
 
-    @Shared
-    ZonedDateTime futureDate = generateDate(2111)
+    static final ZonedDateTime FUTURE_DATE = generateDate(2111)
 
-    @Shared
-    String invalidClientId = 'invalidClientId'
+    static final String INVALID_CLIENT_ID = 'invalidClientId'
 
-    @Shared
-    String validClientId = 'validClientId'
+    static final String VALID_CLIENT_ID = 'validClientId'
 
-    @Shared
-    String validPersonalCode = '12345678911'
+    static final String VALID_PERSONAL_CODE = '12345678911'
 
-    @Shared
-    String invalidPersonalCode = '12345678910'
+    static final String INVALID_PERSONAL_CODE = '12345678910'
 
-    @Shared
+    static final int INVALID_LOAN_ID = 4758758
+
     Client client = createClient()
 
-    @Shared
-    int invalidLoanId = 4758758
-
-    @Shared
     Loan loan = createLoan()
 
     static {
         postgreSQLContainer.start()
     }
 
-    ZonedDateTime generateDate(int year) {
+    static ZonedDateTime generateDate(int year) {
         ZonedDateTime.of(
             year,
             1,
@@ -76,24 +70,24 @@ abstract class AbstractDatabaseSpec extends Specification {
             ZoneId.of('UTC'))
     }
 
-    private Loan createLoan() {
+    private static Loan createLoan() {
         new Loan().tap {
             amount = 10.00
             interestRate = 10.00
             termInMonths = 10
-            createdAt = date
+            createdAt = DATE
             status = OPEN
         }
     }
 
-    private Client createClient() {
+    private static Client createClient() {
         new Client().tap {
-            id = validClientId
+            id = VALID_CLIENT_ID
             firstName = 'Test'
             lastName = 'User'
             email = 'user@mail.com'
             phoneNumber = '+37062541365'
-            personalCode = validPersonalCode
+            personalCode = VALID_PERSONAL_CODE
             status = ACTIVE
         }
     }

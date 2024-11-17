@@ -1,3 +1,7 @@
+plugins {
+    id 'jacoco'
+}
+
 dependencies {
     implementation(
         libs.spring.boot.starter.validation
@@ -8,4 +12,27 @@ dependencies {
         libs.spock.core,
         libs.spock.spring
     )
+
+    testRuntimeOnly(
+        "org.junit.platform:junit-platform-launcher"
+    )
+
+}
+
+check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }

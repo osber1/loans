@@ -11,86 +11,72 @@ import io.osvaldas.api.clients.Status
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import io.osvaldas.backoffice.repositories.entities.LoanPostpone
-import spock.lang.Shared
 import spock.lang.Specification
 
 abstract class AbstractSpec extends Specification {
 
-    @Shared
-    int loanTermInMonths = 12
+    static final int LOAN_TERM_IN_MONTHS = 12
 
-    @Shared
-    ZonedDateTime date = generateDate()
+    static final ZonedDateTime DATE = generateDate()
 
-    @Shared
-    String clientId = 'clientId'
+    static final String CLIENT_ID = 'clientId'
 
-    @Shared
-    String name = 'Name'
+    static final String NAME = 'Name'
 
-    @Shared
-    String surname = 'Surname'
+    static final String SURNAME = 'Surname'
 
-    @Shared
-    String clientPersonalCode = '12345678910'
+    static final String CLIENT_PERSONAL_CODE = '12345678910'
 
-    @Shared
-    String clientEmail = 'test@mail.com'
+    static final String CLIENT_EMAIL = 'test@mail.com'
 
-    @Shared
-    String clientPhoneNumber = '37062514361'
+    static final String CLIENT_PHONE_NUMBER = '37062514361'
 
-    @Shared
-    long loanId = 1
+    static final long LOAN_ID = 1
 
-    @Shared
-    String clientNotFound = "Client with id ${clientId} does not exist."
+    static final String CLIENT_NOT_FOUND = "Client with id ${CLIENT_ID} does not exist."
 
-    @Shared
-    String clientAlreadyExist = 'Client with personal code already exists.'
+    static final String CLIENT_ALREADY_EXIST = 'Client with personal code already exists.'
 
-    @Shared
-    String loanNotFound = 'Loan with id %s does not exist.'
+    static final String LOAN_NOT_FOUND = 'Loan with id %s does not exist.'
 
-    @Shared
-    String riskTooHigh = 'Risk is too high, because you are trying ' +
+    static final String RISK_TOO_HIGH = 'Risk is too high, because you are trying ' +
         'to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
 
-    @Shared
-    String amountExceeds = 'The amount you are trying to borrow exceeds the max amount!'
+    static final String AMOUNT_EXCEEDS = 'The amount you are trying to borrow exceeds the max amount!'
 
-    @Shared
-    String loanLimitExceeds = 'Too many loans taken in a single day.'
+    static final String LOAN_LIMIT_EXCEEDS = 'Too many loans taken in a single day.'
 
-    @Shared
-    String clientNotActive = 'Client is not active.'
+    static final String CLIENT_NOT_ACTIVE = 'Client is not active.'
 
-    @Shared
-    String loanNotOpen = "Loan with id ${loanId} is not open."
+    static final String LOAN_NOT_OPEN = "Loan with id ${LOAN_ID} is not open."
 
-    @Shared
-    LoanPostpone firstPostpone = buildPostpone(1, 15.00, date.plusMonths(loanTermInMonths).plusWeeks(1))
+    LoanPostpone firstPostpone = buildPostpone(1, 15.00, DATE.plusMonths(LOAN_TERM_IN_MONTHS).plusWeeks(1))
 
-    @Shared
-    LoanPostpone secondPostpone = buildPostpone(2, 22.50, date.plusMonths(loanTermInMonths).plusWeeks(2))
+    LoanPostpone secondPostpone = buildPostpone(2, 22.50, DATE.plusMonths(LOAN_TERM_IN_MONTHS).plusWeeks(2))
 
-    @Shared
     Loan loan = buildLoan(100.0)
 
-    @Shared
     Client registeredClientWithoutId = buildClient('', [] as Set, REGISTERED)
 
-    @Shared
-    Client registeredClientWithId = buildClient(clientId, [] as Set, REGISTERED)
+    Client registeredClientWithId = buildClient(CLIENT_ID, [] as Set, REGISTERED)
 
-    @Shared
-    Client registeredClientWithLoan = buildClient(clientId, Set.of(loan), REGISTERED)
+    Client registeredClientWithLoan = buildClient(CLIENT_ID, [loan] as Set, REGISTERED)
 
-    @Shared
-    Client activeClientWithId = buildClient(clientId, [] as Set, ACTIVE)
+    Client activeClientWithId = buildClient(CLIENT_ID, [] as Set, ACTIVE)
 
-    @Shared
-    Client activeClientWithLoan = buildClient(clientId, Set.of(loan), ACTIVE)
+    Client activeClientWithLoan = buildClient(CLIENT_ID, [loan] as Set, ACTIVE)
+
+    static ZonedDateTime generateDate() {
+        ZonedDateTime.of(
+            2020,
+            1,
+            5,
+            10,
+            0,
+            0,
+            0,
+            ZoneId.of('UTC'))
+    }
 
     LoanPostpone buildPostpone(long loanId, BigDecimal newRate, ZonedDateTime newDate) {
         new LoanPostpone().tap {
@@ -102,40 +88,38 @@ abstract class AbstractSpec extends Specification {
 
     Loan buildLoan(BigDecimal loanAmount, io.osvaldas.api.loans.Status loanStatus = OPEN) {
         new Loan().tap {
-            id = loanId
+            id = LOAN_ID
             amount = loanAmount
             status = loanStatus
-            termInMonths = loanTermInMonths
+            termInMonths = LOAN_TERM_IN_MONTHS
             interestRate = 10.0
-            returnDate = date.plusMonths(loanTermInMonths)
+            returnDate = DATE.plusMonths(LOAN_TERM_IN_MONTHS)
+        }
+    }
+
+    Loan buildLoanWithoutId(BigDecimal loanAmount, io.osvaldas.api.loans.Status loanStatus = OPEN) {
+        new Loan().tap {
+            amount = loanAmount
+            status = loanStatus
+            termInMonths = LOAN_TERM_IN_MONTHS
+            interestRate = 10.0
+            returnDate = DATE.plusMonths(LOAN_TERM_IN_MONTHS)
         }
     }
 
     Client buildClient(String clientId, Set<Loan> clientLoans, Status clientStatus) {
         Client newClient = new Client().tap {
             id = clientId
-            firstName = name
-            lastName = surname
-            email = clientEmail
+            firstName = NAME
+            lastName = SURNAME
+            email = CLIENT_EMAIL
             status = clientStatus
-            phoneNumber = clientPhoneNumber
-            personalCode = clientPersonalCode
+            phoneNumber = CLIENT_PHONE_NUMBER
+            personalCode = CLIENT_PERSONAL_CODE
             loans = clientLoans
         }
         clientLoans.each { it.client = newClient }
         newClient
-    }
-
-    ZonedDateTime generateDate() {
-        ZonedDateTime.of(
-            2020,
-            1,
-            5,
-            10,
-            0,
-            0,
-            0,
-            ZoneId.of('UTC'))
     }
 
 }

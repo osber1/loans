@@ -45,7 +45,7 @@ class ClientServiceSpec extends AbstractSpec {
             clientService.registerClient(registeredClientWithoutId)
         then:
             BadRequestException e = thrown()
-            e.message == clientAlreadyExist
+            e.message == CLIENT_ALREADY_EXIST
         and:
             1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> true
             0 * messageProducer.publish(_ as EmailMessage, _ as String, _ as String)
@@ -55,7 +55,7 @@ class ClientServiceSpec extends AbstractSpec {
         when:
             Client registeredClient = clientService.registerClient(registeredClientWithoutId)
         then:
-            registeredClient.id == clientId
+            registeredClient.id == CLIENT_ID
         and:
             1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> false
             1 * clientRepository.save(registeredClientWithoutId) >> registeredClientWithId
@@ -85,42 +85,42 @@ class ClientServiceSpec extends AbstractSpec {
 
     void 'should return client when it exists'() {
         when:
-            Client client = clientService.getClient(clientId)
+            Client client = clientService.getClient(CLIENT_ID)
         then:
-            client.id == clientId
+            client.id == CLIENT_ID
         and:
-            1 * clientRepository.findById(clientId) >> of(registeredClientWithId)
+            1 * clientRepository.findById(CLIENT_ID) >> of(registeredClientWithId)
     }
 
     void 'should throw exception when trying to get non existing client'() {
         when:
-            clientService.getClient(clientId)
+            clientService.getClient(CLIENT_ID)
         then:
             NotFoundException e = thrown()
-            e.message == clientNotFound
+            e.message == CLIENT_NOT_FOUND
         and:
-            1 * clientRepository.findById(clientId) >> empty()
+            1 * clientRepository.findById(CLIENT_ID) >> empty()
     }
 
     void 'should change client status to deleted when it exists'() {
         when:
-            clientService.deleteClient(clientId)
+            clientService.deleteClient(CLIENT_ID)
         then:
-            1 * clientRepository.changeClientStatus(clientId, DELETED)
+            1 * clientRepository.changeClientStatus(CLIENT_ID, DELETED)
         and:
-            1 * clientRepository.existsById(clientId) >> true
+            1 * clientRepository.existsById(CLIENT_ID) >> true
     }
 
     void 'should throw exception when trying to delete non existing client'() {
         when:
-            clientService.deleteClient(clientId)
+            clientService.deleteClient(CLIENT_ID)
         then:
             NotFoundException e = thrown()
-            e.message == clientNotFound
+            e.message == CLIENT_NOT_FOUND
         and:
-            0 * clientRepository.changeClientStatus(clientId, DELETED)
+            0 * clientRepository.changeClientStatus(CLIENT_ID, DELETED)
         and:
-            1 * clientRepository.existsById(clientId) >> false
+            1 * clientRepository.existsById(CLIENT_ID) >> false
     }
 
     void 'should update client when it exists'() {
@@ -129,7 +129,7 @@ class ClientServiceSpec extends AbstractSpec {
         then:
             1 * clientRepository.save(registeredClientWithId) >> registeredClientWithId
         and:
-            1 * clientRepository.existsById(clientId) >> true
+            1 * clientRepository.existsById(CLIENT_ID) >> true
     }
 
     void 'should throw exception when trying to update non existing client'() {
@@ -137,11 +137,11 @@ class ClientServiceSpec extends AbstractSpec {
             clientService.updateClient(registeredClientWithId)
         then:
             NotFoundException e = thrown()
-            e.message == clientNotFound
+            e.message == CLIENT_NOT_FOUND
         and:
             0 * clientRepository.save(registeredClientWithId)
         and:
-            1 * clientRepository.existsById(clientId) >> false
+            1 * clientRepository.existsById(CLIENT_ID) >> false
     }
 
     void 'should return all clients by status'() {

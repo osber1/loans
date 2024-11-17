@@ -39,7 +39,7 @@ public class ActuatorReleaseNotesEndpoint {
 
     @WriteOperation
     public void addReleaseNotes(@Selector String version, String releaseNotes) {
-        releaseNotesMap.put(version, Arrays.stream(releaseNotes.split(",")).toList());
+        releaseNotesMap.put(version, Arrays.asList(releaseNotes.split(",")));
     }
 
     @DeleteOperation

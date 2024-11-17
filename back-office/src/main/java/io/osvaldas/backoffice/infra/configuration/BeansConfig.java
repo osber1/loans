@@ -4,9 +4,10 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.NON_FINAL;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS;
-import static com.fasterxml.jackson.databind.json.JsonMapper.builder;
 import static java.time.Duration.ofMinutes;
 import static org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer;
+
+import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,13 +22,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 
 @Configuration
+@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 public class BeansConfig {
 
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
-        JsonMapper mapper = builder()
+        JsonMapper mapper = JsonMapper.builder()
             .addModule(new JavaTimeModule())
             .activateDefaultTyping(new ObjectMapper().getPolymorphicTypeValidator(), NON_FINAL, PROPERTY)
             .disable(FAIL_ON_UNKNOWN_PROPERTIES)
@@ -41,10 +44,10 @@ public class BeansConfig {
     }
 
     @Bean
-    public LockProvider lockProvider(JdbcTemplate jdbcTemplate) {
+    public LockProvider lockProvider(DataSource dataSource) {
         return new JdbcTemplateLockProvider(
             JdbcTemplateLockProvider.Configuration.builder()
-                .withJdbcTemplate(jdbcTemplate)
+                .withJdbcTemplate(new JdbcTemplate(dataSource))
                 .usingDbTime()
                 .build()
         );
