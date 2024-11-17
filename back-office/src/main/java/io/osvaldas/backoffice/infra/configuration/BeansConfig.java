@@ -8,6 +8,8 @@ import static com.fasterxml.jackson.databind.json.JsonMapper.builder;
 import static java.time.Duration.ofMinutes;
 import static org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer;
 
+import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -21,8 +23,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 
 @Configuration
+@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 public class BeansConfig {
 
     @Bean
@@ -41,10 +45,10 @@ public class BeansConfig {
     }
 
     @Bean
-    public LockProvider lockProvider(JdbcTemplate jdbcTemplate) {
+    public LockProvider lockProvider(DataSource dataSource) {
         return new JdbcTemplateLockProvider(
             JdbcTemplateLockProvider.Configuration.builder()
-                .withJdbcTemplate(jdbcTemplate)
+                .withJdbcTemplate(new JdbcTemplate(dataSource))
                 .usingDbTime()
                 .build()
         );

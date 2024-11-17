@@ -20,8 +20,9 @@ spring:
     driverClassName: org.postgresql.Driver
 
   jpa:
+    open-in-view: false
     hibernate.ddl-auto: none
-    #    show-sql: true
+#    show-sql: true
     properties:
 #      javax:
 #        persistence:
