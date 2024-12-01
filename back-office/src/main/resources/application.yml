@@ -18,6 +18,7 @@ spring:
     username: root
     password: root
     driverClassName: org.postgresql.Driver
+    hikari.auto-commit: false
 
   jpa:
     open-in-view: false
