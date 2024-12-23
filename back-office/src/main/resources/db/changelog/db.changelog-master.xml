@@ -55,7 +55,6 @@
             <column name="return_date" type="timestamp with time zone"/>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="client_id" type="varchar(255)"/>
-            <column name="version" type="BIGINT"/>
         </createTable>
 
         <createTable tableName="loan_aud">

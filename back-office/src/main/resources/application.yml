@@ -18,20 +18,20 @@ spring:
     username: root
     password: root
     driverClassName: org.postgresql.Driver
-  #    hikari.auto-commit: false
+    hikari.auto-commit: false
 
   jpa:
     open-in-view: false
     hibernate.ddl-auto: none
-    #    show-sql: true
+#    show-sql: true
     properties:
-      #      javax:
-      #        persistence:
-      #          schema-generation:
-      #            create-source: metadata
-      #            scripts:
-      #              action: create
-      #              create-target: create.sql
+#      javax:
+#        persistence:
+#          schema-generation:
+#            create-source: metadata
+#            scripts:
+#              action: create
+#              create-target: create.sql
       hibernate:
         #        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
