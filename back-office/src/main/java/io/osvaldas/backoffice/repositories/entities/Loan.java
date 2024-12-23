@@ -70,10 +70,6 @@ public class Loan {
     @ManyToOne(cascade = { DETACH, MERGE, PERSIST, REFRESH })
     private Client client;
 
-    public void addLoanPostpone(LoanPostpone loanPostpone) {
-        loanPostpones.add(loanPostpone);
-    }
-
     public LoanPostpone getLastLoanPostpone() {
         return getLoanPostpones().stream()
             .max(comparing(LoanPostpone::getReturnDate))
@@ -98,5 +94,9 @@ public class Loan {
         loanPostpone.incrementAndSetReturnDay(returnDate, postponeDays);
         addLoanPostpone(loanPostpone);
         loanPostpone.setLoan(this);
+    }
+
+    private void addLoanPostpone(LoanPostpone loanPostpone) {
+        loanPostpones.add(loanPostpone);
     }
 }

@@ -48,6 +48,10 @@ class LoanServiceSpec extends AbstractSpec {
     @Subject
     LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient)
 
+    void setup() {
+        loan.id = 1
+    }
+
     void 'should save loan'() {
         when:
             loanService.save(loan)
@@ -169,11 +173,12 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should reject last pending loan when new is taken'() {
         given:
-            Client client = buildClient(clientId, [(buildLoan(100.0, PENDING))] as Set, ACTIVE)
+            loan.status = PENDING
+        and:
+            Client client = buildClient(clientId, [loan] as Set, ACTIVE)
             clientService.getClient(clientId) >> client
         and:
-            riskCheckerClient.validate(_ as RiskValidationRequest)
-                >> new RiskValidationResponse(true, 'Risk validation passed.')
+            riskCheckerClient.validate(_ as RiskValidationRequest) >> new RiskValidationResponse(true, 'Risk validation passed.')
         when:
             loanService.addLoan(loan, clientId)
         then:

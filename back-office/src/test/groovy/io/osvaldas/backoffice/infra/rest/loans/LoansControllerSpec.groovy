@@ -42,7 +42,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loan when it exists'() {
         given:
-            Loan savedLoan = loanRepository.save(loan)
+            Loan savedLoan = loanRepository.save(this.loan)
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/{loanId}', savedLoan.id)
                 .contentType(APPLICATION_JSON))
@@ -72,7 +72,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loans when client exists'() {
         given:
-            Client savedClient = clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
+            Client savedClient = clientRepository.save(buildClient(clientId, [buildLoan(10.0)] as Set, ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
                 .param('clientId', savedClient.id)
@@ -81,7 +81,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            Set.of(objectMapper.readValue(response.contentAsString, LoanResponse[])).size() == 1
+            ([objectMapper.readValue(response.contentAsString, LoanResponse[])] as Set).size() == 1
     }
 
     void 'should throw an exception when client not found'() {
@@ -179,7 +179,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
 
     void 'should return loans taken today count'() {
         given:
-            clientRepository.save(buildClient(clientId, Set.of(loan), ACTIVE))
+            clientRepository.save(buildClient(clientId, [buildLoan(10.0)] as Set, ACTIVE))
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
                 .param('clientId', clientId)

@@ -84,13 +84,13 @@ abstract class AbstractSpec extends Specification {
     Client registeredClientWithId = buildClient(clientId, [] as Set, REGISTERED)
 
     @Shared
-    Client registeredClientWithLoan = buildClient(clientId, Set.of(loan), REGISTERED)
+    Client registeredClientWithLoan = buildClient(clientId, [loan] as Set, REGISTERED)
 
     @Shared
     Client activeClientWithId = buildClient(clientId, [] as Set, ACTIVE)
 
     @Shared
-    Client activeClientWithLoan = buildClient(clientId, Set.of(loan), ACTIVE)
+    Client activeClientWithLoan = buildClient(clientId, [loan] as Set, ACTIVE)
 
     LoanPostpone buildPostpone(long loanId, BigDecimal newRate, ZonedDateTime newDate) {
         new LoanPostpone().tap {
@@ -102,7 +102,7 @@ abstract class AbstractSpec extends Specification {
 
     Loan buildLoan(BigDecimal loanAmount, io.osvaldas.api.loans.Status loanStatus = OPEN) {
         new Loan().tap {
-            id = loanId
+//            id = loanId
             amount = loanAmount
             status = loanStatus
             termInMonths = loanTermInMonths

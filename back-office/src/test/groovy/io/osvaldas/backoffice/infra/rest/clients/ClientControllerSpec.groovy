@@ -141,7 +141,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == 2
+            (objectMapper.readValue(response.contentAsString, ClientResponse[]) as List).size() == 2
     }
 
     void 'should get list of clients by status'() {
@@ -155,7 +155,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == listSize
+            (objectMapper.readValue(response.contentAsString, ClientResponse[]) as List).size() == listSize
         where:
             status  || listSize
             ACTIVE  || 1

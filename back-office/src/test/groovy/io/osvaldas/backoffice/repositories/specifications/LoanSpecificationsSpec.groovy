@@ -17,6 +17,8 @@ class LoanSpecificationsSpec extends AbstractDatabaseSpec {
     @Autowired
     LoanRepository repository
 
+    Loan loan = createLoan()
+
     void setup() {
         loan.client = client
         repository.save(loan)

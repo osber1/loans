@@ -24,7 +24,7 @@ class RevisionsControllerSpec extends AbstractControllerSpec {
 
     void 'should return client revisions when they exist'() {
         given:
-            Client savedClient = clientRepository.save(buildClient(id, Set.of(loan), ACTIVE))
+            Client savedClient = clientRepository.save(buildClient(id, [loan] as Set, ACTIVE))
             savedClient.status = INACTIVE
             clientRepository.save(savedClient)
         when:
@@ -35,7 +35,7 @@ class RevisionsControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[]))*.status() == [ACTIVE, INACTIVE]
+            (objectMapper.readValue(response.contentAsString, ClientResponse[]) as List)*.status() == [ACTIVE, INACTIVE]
     }
 
     void 'should return loan revisions when they exist'() {
@@ -51,7 +51,7 @@ class RevisionsControllerSpec extends AbstractControllerSpec {
         then:
             response.status == OK.value()
         and:
-            List.of(objectMapper.readValue(response.contentAsString, LoanResponse[]))*.status() == [OPEN, CLOSED]
+            (objectMapper.readValue(response.contentAsString, LoanResponse[]) as List)*.status() == [OPEN, CLOSED]
     }
 
 }

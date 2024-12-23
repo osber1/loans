@@ -60,7 +60,7 @@ abstract class AbstractControllerSpec extends AbstractSpec {
         rabbitMQContainer.start()
     }
 
-    void cleanup() {
+    void setup() {
         clientRepository.deleteAll()
         loanRepository.deleteAll()
         cacheManager.cacheNames
