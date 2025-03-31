@@ -4,7 +4,7 @@ mapstruct = "1.6.3"
 spock = "2.4-M5-groovy-4.0"
 cucumber = "7.21.1"
 shedlock = "6.3.0"
-error_prone_picnic = "0.16.1"
+error_prone_picnic = "0.21.0"
 
 [plugins]
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
