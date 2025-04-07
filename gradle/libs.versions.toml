@@ -13,7 +13,7 @@ spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" 
 spotbugs = { id = "com.github.spotbugs", version = "6.1.7" }
 sonarqube = { id = "org.sonarqube", version = "6.0.1.5171" }
 errorprone = { id = "net.ltgt.errorprone", version = "4.1.0" }
-dependency_check = { id = "org.owasp.dependencycheck", version = "12.1.0" }
+dependency_check = { id = "org.owasp.dependencycheck", version = "12.1.1" }
 
 [libraries]
 spring_boot_starter_web = { module = "org.springframework.boot:spring-boot-starter-web" }
