@@ -38,7 +38,7 @@ spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spoc
 
 feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version = "4.2.1" }
 
-logstash = { module = "net.logstash.logback:logstash-logback-encoder", version = "8.0" }
+logstash = { module = "net.logstash.logback:logstash-logback-encoder", version = "8.1" }
 
 open_api = { module = "org.springdoc:springdoc-openapi-ui", version = "1.8.0" }
 
