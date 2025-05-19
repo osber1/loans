@@ -2,7 +2,7 @@
 spring_boot = "3.3.5"
 mapstruct = "1.6.3"
 spock = "2.4-M5-groovy-4.0"
-cucumber = "7.21.1"
+cucumber = "7.22.0"
 shedlock = "6.3.1"
 error_prone_picnic = "0.16.1"
 
@@ -11,9 +11,9 @@ spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
 jib = { id = "com.google.cloud.tools.jib", version = "3.4.5" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" }
 spotbugs = { id = "com.github.spotbugs", version = "6.1.7" }
-sonarqube = { id = "org.sonarqube", version = "6.0.1.5171" }
+sonarqube = { id = "org.sonarqube", version = "6.2.0.5505" }
 errorprone = { id = "net.ltgt.errorprone", version = "4.1.0" }
-dependency_check = { id = "org.owasp.dependencycheck", version = "12.1.0" }
+dependency_check = { id = "org.owasp.dependencycheck", version = "12.1.1" }
 
 [libraries]
 spring_boot_starter_web = { module = "org.springframework.boot:spring-boot-starter-web" }
@@ -38,7 +38,7 @@ spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spoc
 
 feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version = "4.2.1" }
 
-logstash = { module = "net.logstash.logback:logstash-logback-encoder", version = "8.0" }
+logstash = { module = "net.logstash.logback:logstash-logback-encoder", version = "8.1" }
 
 open_api = { module = "org.springdoc:springdoc-openapi-ui", version = "1.8.0" }
 
@@ -73,7 +73,7 @@ cucumber_junit = { module = "io.cucumber:cucumber-junit", version.ref = "cucumbe
 
 rest_assured = { module = "io.rest-assured:rest-assured" }
 
-java_faker = { module = "net.datafaker:datafaker", version = "2.4.2" }
+java_faker = { module = "net.datafaker:datafaker", version = "2.4.3" }
 
 shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
 shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
