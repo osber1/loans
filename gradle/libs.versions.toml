@@ -73,7 +73,7 @@ cucumber_junit = { module = "io.cucumber:cucumber-junit", version.ref = "cucumbe
 
 rest_assured = { module = "io.rest-assured:rest-assured" }
 
-java_faker = { module = "net.datafaker:datafaker", version = "2.4.2" }
+java_faker = { module = "net.datafaker:datafaker", version = "2.4.3" }
 
 shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
 shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
