@@ -1,7 +1,7 @@
 [versions]
 spring_boot = "3.3.5"
 mapstruct = "1.6.3"
-spock = "2.4-M5-groovy-4.0"
+spock = "2.4-M6-groovy-4.0"
 cucumber = "7.22.0"
 shedlock = "6.3.1"
 error_prone_picnic = "0.16.1"
