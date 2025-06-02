@@ -36,7 +36,7 @@ groovy_json = { module = "org.apache.groovy:groovy-json" }
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
 
-feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version = "4.2.1" }
+feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version = "4.3.0" }
 
 logstash = { module = "net.logstash.logback:logstash-logback-encoder", version = "8.1" }
 
