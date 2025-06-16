@@ -10,7 +10,7 @@ error_prone_picnic = "0.16.1"
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
 jib = { id = "com.google.cloud.tools.jib", version = "3.4.5" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" }
-spotbugs = { id = "com.github.spotbugs", version = "6.1.13" }
+spotbugs = { id = "com.github.spotbugs", version = "6.2.0" }
 sonarqube = { id = "org.sonarqube", version = "6.2.0.5505" }
 errorprone = { id = "net.ltgt.errorprone", version = "4.2.0" }
 dependency_check = { id = "org.owasp.dependencycheck", version = "12.1.2" }
