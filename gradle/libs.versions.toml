@@ -1,5 +1,5 @@
 [versions]
-spring_boot = "3.3.5"
+spring_boot = "3.5.4"
 mapstruct = "1.6.3"
 spock = "2.4-M6-groovy-4.0"
 cucumber = "7.27.0"
