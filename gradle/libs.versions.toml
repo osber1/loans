@@ -2,7 +2,7 @@
 spring_boot = "3.3.5"
 mapstruct = "1.6.3"
 spock = "2.4-M6-groovy-4.0"
-cucumber = "7.27.0"
+cucumber = "7.27.1"
 shedlock = "6.9.2"
 error_prone_picnic = "0.16.1"
 
