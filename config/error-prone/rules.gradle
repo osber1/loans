@@ -121,7 +121,8 @@ ext {
         'SelfSet',
         'BooleanLiteral',
         'EffectivelyPrivate',
-        'NullablePrimitive'
+        'NullablePrimitive',
+        'RedundantNullCheck'
     ]
 
     disabled_error_prone_rules = [
