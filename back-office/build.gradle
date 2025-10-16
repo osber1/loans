@@ -10,6 +10,9 @@ build {
 }
 
 jib {
+    from {
+        image = 'openjdk:25-jdk'
+    }
     to {
         image = "osvasldas97/${name}"
         tags = [version, "${version}"]
