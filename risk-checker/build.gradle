@@ -1,23 +1,10 @@
 plugins {
     id 'jacoco'
     alias(libs.plugins.spring.boot)
-    alias(libs.plugins.jib)
 }
 
 build {
-    dependsOn(tasks.jibDockerBuild)
-    dependsOn(tasks.jib)
-}
-
-jib {
-    from {
-        image = 'openjdk:25-jdk'
-    }
-    to {
-        image = "osvasldas97/${name}"
-        tags = [version, "${version}"]
-    }
-    jib.to.image "osvasldas97/${name}:${version}"
+    dependsOn(tasks.bootBuildImage)
 }
 
 dependencies {
