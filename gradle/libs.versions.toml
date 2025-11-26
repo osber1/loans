@@ -1,16 +1,16 @@
 [versions]
-spring_boot = "3.5.7"
+spring_boot = "4.0.0"
 mapstruct = "1.6.3"
-spock = "2.4-M6-groovy-4.0"
-cucumber = "7.31.0"
-shedlock = "7.0.0"
+spock = "2.4-M7-groovy-5.0"
+cucumber = "7.32.0"
+shedlock = "7.2.0"
 error_prone_picnic = "0.26.0"
 
 [plugins]
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" }
-spotbugs = { id = "com.github.spotbugs", version = "6.4.5" }
-sonarqube = { id = "org.sonarqube", version = "7.0.1.6134" }
+spotbugs = { id = "com.github.spotbugs", version = "6.4.6" }
+sonarqube = { id = "org.sonarqube", version = "7.1.0.6387" }
 errorprone = { id = "net.ltgt.errorprone", version = "4.3.0" }
 dependency_check = { id = "org.owasp.dependencycheck", version = "12.1.9" }
 
