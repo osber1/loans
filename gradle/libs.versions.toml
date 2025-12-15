@@ -1,16 +1,16 @@
 [versions]
 spring_boot = "3.5.7"
 mapstruct = "1.6.3"
-spock = "2.4-M6-groovy-4.0"
-cucumber = "7.31.0"
-shedlock = "7.0.0"
+spock = "2.4-groovy-5.0"
+cucumber = "7.33.0"
+shedlock = "7.2.2"
 error_prone_picnic = "0.26.0"
 
 [plugins]
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" }
-spotbugs = { id = "com.github.spotbugs", version = "6.4.5" }
-sonarqube = { id = "org.sonarqube", version = "7.0.1.6134" }
+spotbugs = { id = "com.github.spotbugs", version = "6.4.8" }
+sonarqube = { id = "org.sonarqube", version = "7.2.1.6560" }
 errorprone = { id = "net.ltgt.errorprone", version = "4.3.0" }
 dependency_check = { id = "org.owasp.dependencycheck", version = "12.1.9" }
 
@@ -29,8 +29,8 @@ spring_boot_cloud_stub_runner = { module = "org.springframework.cloud:spring-clo
 spring_boot_configuration_processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring_boot_testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 
-groovy = { module = "org.apache.groovy:groovy" }
-groovy_json = { module = "org.apache.groovy:groovy-json" }
+groovy = { module = "org.apache.groovy:groovy", version = "5.0.3" }
+groovy_json = { module = "org.apache.groovy:groovy-json" , version = "5.0.3" }
 
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
@@ -59,7 +59,7 @@ testcontainers_postgresql = { module = "org.testcontainers:postgresql" }
 testcontainers_rabbitmq = { module = "org.testcontainers:rabbitmq" }
 testcontainers_vault = { module = "org.testcontainers:vault" }
 
-greenmail = { module = "com.icegreen:greenmail", version = "2.1.7" }
+greenmail = { module = "com.icegreen:greenmail", version = "2.1.8" }
 
 awaitility = { module = "org.awaitility:awaitility" }
 
