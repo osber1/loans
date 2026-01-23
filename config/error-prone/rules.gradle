@@ -122,13 +122,15 @@ ext {
         'BooleanLiteral',
         'EffectivelyPrivate',
         'NullablePrimitive',
-        'RedundantNullCheck'
+        'RedundantNullCheck',
+        'FormatStringShouldUsePlaceholders',
+        'IfChainToSwitch',
     ]
 
     disabled_error_prone_rules = [
         'ImmutableListOf2',
         'ImmutableMapOf1',
-        'ImmutableSetOf'
+        'ImmutableSetOf',
     ]
 
     disabled_error_prone_checks = [
