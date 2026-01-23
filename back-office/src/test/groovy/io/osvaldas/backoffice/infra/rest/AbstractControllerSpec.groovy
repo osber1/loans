@@ -106,6 +106,7 @@ abstract class AbstractControllerSpec extends AbstractSpec {
         CacheManager cacheManager() {
             new ConcurrentMapCacheManager('LoanResponse')
         }
+
     }
 
     @TestConfiguration
