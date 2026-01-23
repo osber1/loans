@@ -30,8 +30,8 @@ spring_boot_cloud_stub_runner = { module = "org.springframework.cloud:spring-clo
 spring_boot_configuration_processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring_boot_testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 
-groovy = { module = "org.apache.groovy:groovy", versionRef = "groovy" }
-groovy_json = { module = "org.apache.groovy:groovy-json" , versionRef = "groovy" }
+groovy = { module = "org.apache.groovy:groovy", version.ref = "groovy" }
+groovy_json = { module = "org.apache.groovy:groovy-json" , version.ref = "groovy" }
 
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
