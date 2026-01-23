@@ -1,12 +1,12 @@
 [versions]
-spring_boot = "3.5.7"
+spring_boot = "4.0.2"
 mapstruct = "1.6.3"
 spock = "2.4-groovy-5.0"
 cucumber = "7.33.0"
 shedlock = "7.5.0"
 error_prone_picnic = "0.28.0"
 groovy = "5.0.4"
-
+testcontainers = "1.21.4"
 [plugins]
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" }
@@ -21,6 +21,7 @@ spring_boot_starter_test = { module = "org.springframework.boot:spring-boot-star
 spring_boot_starter_amqp = { module = "org.springframework.boot:spring-boot-starter-amqp" }
 spring_boot_starter_mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
 spring_boot_starter_data_jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring_boot_starter_liquibase = { module = "org.springframework.boot:spring-boot-starter-liquibase" }
 spring_boot_starter_validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring_boot_starter_actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring_boot_starter_data_redis = { module = "org.springframework.boot:spring-boot-starter-data-redis" }
@@ -29,12 +30,17 @@ spring_boot_starter_bootstrap = { module = "org.springframework.cloud:spring-clo
 spring_boot_cloud_stub_runner = { module = "org.springframework.cloud:spring-cloud-starter-contract-stub-runner" }
 spring_boot_configuration_processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring_boot_testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
+spring_boot_starter_data_jpa_test = { module = "org.springframework.boot:spring-boot-starter-data-jpa-test" }
+spring_boot_webmvc_test = { module = "org.springframework.boot:spring-boot-webmvc-test" }
+spring_boot_cache_test = { module = "org.springframework.boot:spring-boot-cache-test" }
 
 groovy = { module = "org.apache.groovy:groovy", version.ref = "groovy" }
-groovy_json = { module = "org.apache.groovy:groovy-json" , version.ref = "groovy" }
+groovy_json = { module = "org.apache.groovy:groovy-json", version.ref = "groovy" }
 
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
+
+wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.0.9" }
 
 feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
 
@@ -43,8 +49,6 @@ logstash = { module = "net.logstash.logback:logstash-logback-encoder", version =
 open_api = { module = "org.springdoc:springdoc-openapi-ui", version = "1.8.0" }
 
 prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
-
-liquibase_core = { module = "org.liquibase:liquibase-core" }
 
 postgresql = { module = "org.postgresql:postgresql" }
 
@@ -55,10 +59,10 @@ lombok = { module = "org.projectlombok:lombok" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct_processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 
-testcontainers_spock = { module = "org.testcontainers:spock" }
-testcontainers_postgresql = { module = "org.testcontainers:postgresql" }
-testcontainers_rabbitmq = { module = "org.testcontainers:rabbitmq" }
-testcontainers_vault = { module = "org.testcontainers:vault" }
+testcontainers_spock = { module = "org.testcontainers:spock", version.ref = "testcontainers" }
+testcontainers_postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+testcontainers_rabbitmq = { module = "org.testcontainers:rabbitmq", version.ref = "testcontainers" }
+testcontainers_vault = { module = "org.testcontainers:vault", version.ref = "testcontainers" }
 
 greenmail = { module = "com.icegreen:greenmail", version = "2.1.8" }
 
@@ -66,12 +70,12 @@ awaitility = { module = "org.awaitility:awaitility" }
 
 jackson_datatype_jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 
-jpamodelgen = { module = "org.hibernate.orm:hibernate-jpamodelgen" }
+hibernate_processor = { module = "org.hibernate.orm:hibernate-processor" }
 
 cucumber_java = { module = "io.cucumber:cucumber-java", version.ref = "cucumber" }
 cucumber_junit = { module = "io.cucumber:cucumber-junit", version.ref = "cucumber" }
 
-rest_assured = { module = "io.rest-assured:rest-assured" }
+rest_assured = { module = "io.rest-assured:rest-assured", version = "6.0.0" }
 
 java_faker = { module = "net.datafaker:datafaker", version = "2.5.3" }
 

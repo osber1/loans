@@ -125,7 +125,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             sendUpdateRequest()
         then:
             Exception e = thrown()
-            e.message.contains('Row was updated or deleted by another transaction')
+            e.message.contains('Row was already updated or deleted by another transaction for entity')
     }
 
     void 'should get list of clients when they exists'() {

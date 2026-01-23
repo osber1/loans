@@ -1,6 +1,7 @@
 package io.osvaldas.backoffice.infra.rest.loans
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor
 import static com.github.tomakehurst.wiremock.client.WireMock.containing
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
@@ -15,10 +16,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
+import org.wiremock.spring.ConfigureWireMock
+import org.wiremock.spring.EnableWireMock
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
@@ -32,13 +34,17 @@ import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Shared
 
-@AutoConfigureWireMock(port = 8081)
+@EnableWireMock([@ConfigureWireMock(port = 8081)])
 @ContextConfiguration(classes = TestClockConfig)
 @SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 class LoansControllerSpec extends AbstractControllerSpec {
 
     @Shared
     LoanRequest loanRequest = buildLoanRequest(100.00)
+
+    void setupSpec() {
+        configureFor('localhost', 8081)
+    }
 
     void 'should return loan when it exists'() {
         given:

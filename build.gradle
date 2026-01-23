@@ -48,8 +48,8 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom 'org.springframework.boot:spring-boot-dependencies:3.5.7'
-            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.0'
+            mavenBom 'org.springframework.boot:spring-boot-dependencies:4.0.2'
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.0'
         }
     }
 
@@ -82,7 +82,10 @@ subprojects {
         )
 
         testImplementation(
-            libs.spring.boot.starter.test
+            libs.spring.boot.starter.test,
+            libs.spring.boot.webmvc.test,
+            libs.spring.boot.cache.test,
+            libs.wiremock
         )
     }
 

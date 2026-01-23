@@ -3,13 +3,14 @@ package io.osvaldas.risk.infra.rest
 import java.time.Clock
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.web.servlet.MockMvc
+import org.wiremock.spring.ConfigureWireMock
+import org.wiremock.spring.EnableWireMock
 
 import com.fasterxml.jackson.databind.ObjectMapper
 
@@ -19,7 +20,7 @@ import spock.lang.Specification
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureWireMock(port = 8080)
+@EnableWireMock([@ConfigureWireMock(port = 8080)])
 abstract class AbstractControllerSpec extends Specification {
 
     @Shared
@@ -52,6 +53,11 @@ abstract class AbstractControllerSpec extends Specification {
         @Primary
         TestClockDelegate testClockDelegate(Clock clock) {
             new TestClockDelegate(clock)
+        }
+
+        @Bean
+        ObjectMapper objectMapper() {
+            new ObjectMapper()
         }
 
     }
