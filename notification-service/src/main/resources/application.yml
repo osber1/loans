@@ -1,7 +1,4 @@
 server:
-  error:
-    include-message: always
-    include-binding-errors: always
   port: 8082
 
 logging:
@@ -24,6 +21,10 @@ spring:
           auth: false
           starttls:
             enable: false
+  web:
+    error:
+      include-message: always
+      include-binding-errors: always
 
 management:
   endpoints:

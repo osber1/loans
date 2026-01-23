@@ -1,8 +1,3 @@
-server:
-  error:
-    include-message: always
-    include-binding-errors: always
-
 application:
   loanLimitPerDay: 1
   maxAmount: 100
@@ -10,4 +5,10 @@ application:
   forbiddenHourTo: 6
 
 back-office:
-  url: http://localhost:8080
+  url: ${wiremock.server.baseUrl:http://localhost:8080}
+
+spring:
+  web:
+    error:
+      include-message: always
+      include-binding-errors: always

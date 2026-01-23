@@ -1,7 +1,4 @@
 server:
-  error:
-    include-message: always
-    include-binding-errors: always
   port: 8081
 
 logging:
@@ -12,6 +9,10 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+  web:
+    error:
+      include-message: always
+      include-binding-errors: always
 
 management:
   endpoints:

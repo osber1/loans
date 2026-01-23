@@ -16,7 +16,7 @@ dependencies {
         libs.spring.data.envers,
         libs.spring.boot.starter.actuator,
         libs.spring.boot.starter.data.redis,
-        libs.liquibase.core,
+        libs.spring.boot.starter.liquibase,
         libs.open.api,
         libs.mapstruct,
         libs.postgresql,
@@ -30,7 +30,7 @@ dependencies {
 
     annotationProcessor(
         libs.mapstruct.processor,
-        libs.jpamodelgen
+        libs.hibernate.processor
     )
 
     testImplementation(
@@ -43,7 +43,8 @@ dependencies {
         libs.testcontainers.postgresql,
         libs.testcontainers.vault,
         libs.testcontainers.rabbitmq,
-        libs.spring.boot.cloud.stub.runner
+        libs.spring.boot.cloud.stub.runner,
+        libs.spring.boot.starter.data.jpa.test
     )
 }
 

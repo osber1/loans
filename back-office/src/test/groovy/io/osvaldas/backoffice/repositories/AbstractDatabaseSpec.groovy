@@ -2,21 +2,23 @@ package io.osvaldas.backoffice.repositories
 
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.loans.Status.OPEN
-import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE
+import static org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase.Replace.NONE
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.cloud.openfeign.FeignAutoConfiguration
+import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.spock.Testcontainers
 
+import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec.TestCacheConfig
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Shared
@@ -26,6 +28,7 @@ import spock.lang.Specification
 @Testcontainers
 @AutoConfigureTestDatabase(replace = NONE)
 @ImportAutoConfiguration([FeignAutoConfiguration])
+@ContextConfiguration(classes = TestCacheConfig)
 abstract class AbstractDatabaseSpec extends Specification {
 
     @Shared
