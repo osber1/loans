@@ -40,7 +40,7 @@ groovy_json = { module = "org.apache.groovy:groovy-json", version.ref = "groovy"
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
 
-wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.0.9" }
+wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.1.0" }
 
 feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
 
