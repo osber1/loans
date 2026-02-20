@@ -1,5 +1,5 @@
 [versions]
-spring_boot = "4.0.2"
+spring_boot = "4.0.3"
 mapstruct = "1.6.3"
 spock = "2.4-groovy-5.0"
 cucumber = "7.34.2"
@@ -77,11 +77,11 @@ cucumber_junit = { module = "io.cucumber:cucumber-junit", version.ref = "cucumbe
 
 rest_assured = { module = "io.rest-assured:rest-assured", version = "6.0.0" }
 
-java_faker = { module = "net.datafaker:datafaker", version = "2.5.3" }
+java_faker = { module = "net.datafaker:datafaker", version = "2.5.4" }
 
 shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
 shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
 
-error_prone = { module = "com.google.errorprone:error_prone_core", version = "2.46.0" }
+error_prone = { module = "com.google.errorprone:error_prone_core", version = "2.47.0" }
 error_prone_picnic_support = { module = "tech.picnic.error-prone-support:error-prone-contrib", version.ref = "error_prone_picnic" }
 error_prone_picnic_refaster = { module = "tech.picnic.error-prone-support:refaster-runner", version.ref = "error_prone_picnic" }
