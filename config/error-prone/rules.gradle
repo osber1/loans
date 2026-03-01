@@ -125,6 +125,8 @@ ext {
         'RedundantNullCheck',
         'FormatStringShouldUsePlaceholders',
         'IfChainToSwitch',
+        'RefactorSwitch',
+        'UnnamedVariable',
     ]
 
     disabled_error_prone_rules = [
