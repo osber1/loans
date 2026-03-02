@@ -12,7 +12,7 @@ spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" }
 spotbugs = { id = "com.github.spotbugs", version = "6.4.8" }
 sonarqube = { id = "org.sonarqube", version = "7.2.2.6593" }
-errorprone = { id = "net.ltgt.errorprone", version = "5.0.0" }
+errorprone = { id = "net.ltgt.errorprone", version = "5.1.0" }
 dependency_check = { id = "org.owasp.dependencycheck", version = "12.2.0" }
 
 [libraries]
@@ -40,7 +40,7 @@ groovy_json = { module = "org.apache.groovy:groovy-json", version.ref = "groovy"
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
 
-wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.1.0" }
+wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.2.0" }
 
 feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
 
@@ -82,6 +82,6 @@ java_faker = { module = "net.datafaker:datafaker", version = "2.5.4" }
 shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
 shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
 
-error_prone = { module = "com.google.errorprone:error_prone_core", version = "2.47.0" }
+error_prone = { module = "com.google.errorprone:error_prone_core", version = "2.48.0" }
 error_prone_picnic_support = { module = "tech.picnic.error-prone-support:error-prone-contrib", version.ref = "error_prone_picnic" }
 error_prone_picnic_refaster = { module = "tech.picnic.error-prone-support:refaster-runner", version.ref = "error_prone_picnic" }
