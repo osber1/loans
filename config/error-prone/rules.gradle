@@ -127,6 +127,7 @@ ext {
         'IfChainToSwitch',
         'RefactorSwitch',
         'UnnamedVariable',
+        'UnnecessarySemicolon',
     ]
 
     disabled_error_prone_rules = [
