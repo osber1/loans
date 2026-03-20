@@ -1,9 +1,9 @@
 [versions]
-spring_boot = "4.0.3"
+spring_boot = "4.0.4"
 mapstruct = "1.6.3"
 spock = "2.4-groovy-5.0"
 cucumber = "7.34.3"
-shedlock = "7.6.0"
+shedlock = "7.7.0"
 error_prone_picnic = "0.28.0"
 groovy = "5.0.4"
 testcontainers = "1.21.4"
