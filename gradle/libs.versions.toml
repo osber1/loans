@@ -5,15 +5,15 @@ spock = "2.4-groovy-5.0"
 cucumber = "7.34.3"
 shedlock = "7.7.0"
 error_prone_picnic = "0.29.0"
-groovy = "5.0.5"
+groovy = "5.0.6"
 testcontainers = "1.21.4"
 [plugins]
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" }
-spotbugs = { id = "com.github.spotbugs", version = "6.5.1" }
+spotbugs = { id = "com.github.spotbugs", version = "6.5.4" }
 sonarqube = { id = "org.sonarqube", version = "7.3.0.8198" }
 errorprone = { id = "net.ltgt.errorprone", version = "5.1.0" }
-dependency_check = { id = "org.owasp.dependencycheck", version = "12.2.1" }
+dependency_check = { id = "org.owasp.dependencycheck", version = "12.2.2" }
 
 [libraries]
 spring_boot_starter_web = { module = "org.springframework.boot:spring-boot-starter-web" }
