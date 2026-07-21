@@ -9,21 +9,23 @@ import spock.lang.Subject
 
 class ThirdPartyRiskValidatorSpec extends AbstractSpec {
 
-    ThirdPartyRiskProviderClient client = Stub {
-        isApproved(_ as RiskValidationTarget) >> true
-    }
+    ThirdPartyRiskProviderClient client = Mock()
 
     @Subject
     ThirdPartyRiskValidator thirdPartyRiskValidator = new ThirdPartyRiskValidator(client)
 
     void 'validate does not throw and does not reject the target for any RiskValidationTarget'() {
+        given:
+            RiskValidationTarget target = new RiskValidationTarget(loanAmount: 100.00, clientId: clientId)
         when:
-            thirdPartyRiskValidator.validate(new RiskValidationTarget(loanAmount: 100.00, clientId: clientId))
+            thirdPartyRiskValidator.validate(target)
         then:
             notThrown(ValidationRuleException)
+        and:
+            1 * client.isApproved(target) >> true
     }
 
-    void 'is constructed via constructor injection with ThirdPartyRiskProviderClient as a Stub dependency'() {
+    void 'is constructed via constructor injection with ThirdPartyRiskProviderClient as a dependency'() {
         expect:
             thirdPartyRiskValidator instanceof ValidationRule
         and:

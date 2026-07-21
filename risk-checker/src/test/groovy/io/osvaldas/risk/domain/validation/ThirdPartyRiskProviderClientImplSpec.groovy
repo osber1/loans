@@ -13,12 +13,12 @@ class ThirdPartyRiskProviderClientImplSpec extends AbstractSpec {
         expect:
             client instanceof ThirdPartyRiskProviderClient
         and:
-            client.isApproved(new RiskValidationTarget(loanAmount: 100.00, clientId: clientId)) != null
+            client.isApproved(new RiskValidationTarget(loanAmount: 100.00, clientId: clientId)) == true
     }
 
     void 'always returns a positive result and never throws'() {
         expect:
-            client.isApproved(target)
+            client.isApproved(target) == true
 
         where:
             target << [
