@@ -1,19 +1,19 @@
 [versions]
-spring_boot = "4.0.6"
+spring_boot = "4.1.0"
 mapstruct = "1.6.3"
 spock = "2.4-groovy-5.0"
-cucumber = "7.34.3"
+cucumber = "7.34.6"
 shedlock = "7.7.0"
-error_prone_picnic = "0.29.0"
-groovy = "5.0.6"
+error_prone_picnic = "0.30.0"
+groovy = "5.0.8"
 testcontainers = "1.21.4"
 [plugins]
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" }
-spotbugs = { id = "com.github.spotbugs", version = "6.5.5" }
-sonarqube = { id = "org.sonarqube", version = "7.3.0.8198" }
+spotbugs = { id = "com.github.spotbugs", version = "6.5.10" }
+sonarqube = { id = "org.sonarqube", version = "7.4.0.8496" }
 errorprone = { id = "net.ltgt.errorprone", version = "5.1.0" }
-dependency_check = { id = "org.owasp.dependencycheck", version = "12.2.2" }
+dependency_check = { id = "org.owasp.dependencycheck", version = "13.0.0" }
 
 [libraries]
 spring_boot_starter_web = { module = "org.springframework.boot:spring-boot-starter-web" }
@@ -40,7 +40,7 @@ groovy_json = { module = "org.apache.groovy:groovy-json", version.ref = "groovy"
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
 
-wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.2.1" }
+wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.2.2" }
 
 feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
 
@@ -64,7 +64,7 @@ testcontainers_postgresql = { module = "org.testcontainers:postgresql", version.
 testcontainers_rabbitmq = { module = "org.testcontainers:rabbitmq", version.ref = "testcontainers" }
 testcontainers_vault = { module = "org.testcontainers:vault", version.ref = "testcontainers" }
 
-greenmail = { module = "com.icegreen:greenmail", version = "2.1.8" }
+greenmail = { module = "com.icegreen:greenmail", version = "2.1.12" }
 
 awaitility = { module = "org.awaitility:awaitility" }
 
@@ -75,13 +75,13 @@ hibernate_processor = { module = "org.hibernate.orm:hibernate-processor" }
 cucumber_java = { module = "io.cucumber:cucumber-java", version.ref = "cucumber" }
 cucumber_junit = { module = "io.cucumber:cucumber-junit", version.ref = "cucumber" }
 
-rest_assured = { module = "io.rest-assured:rest-assured", version = "6.0.0" }
+rest_assured = { module = "io.rest-assured:rest-assured", version = "6.0.1" }
 
-java_faker = { module = "net.datafaker:datafaker", version = "2.5.4" }
+java_faker = { module = "net.datafaker:datafaker", version = "2.7.0" }
 
 shedlock_spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
 shedlock_provider = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
 
-error_prone = { module = "com.google.errorprone:error_prone_core", version = "2.49.0" }
+error_prone = { module = "com.google.errorprone:error_prone_core", version = "2.50.0" }
 error_prone_picnic_support = { module = "tech.picnic.error-prone-support:error-prone-contrib", version.ref = "error_prone_picnic" }
 error_prone_picnic_refaster = { module = "tech.picnic.error-prone-support:refaster-runner", version.ref = "error_prone_picnic" }
