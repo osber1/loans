@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.testcontainers.containers.GenericContainer
-import org.testcontainers.containers.RabbitMQContainer
+import org.testcontainers.rabbitmq.RabbitMQContainer
 import org.testcontainers.spock.Testcontainers
 
 import tools.jackson.databind.ObjectMapper
