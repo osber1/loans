@@ -1,94 +1,48 @@
 package io.osvaldas.notifications.domain.emails;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.requireNonNullElse;
+import static org.springframework.web.util.HtmlUtils.htmlEscape;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.springframework.core.io.ClassPathResource;
+
 public final class EmailBuilder {
+
+    private static final Pattern PLACEHOLDER = Pattern.compile("\\{\\{(\\w+)}}");
+
+    private static final String HTML_TEMPLATE = loadTemplate("email/activation-email.html");
+
+    private static final String PLAIN_TEXT_TEMPLATE = loadTemplate("email/activation-email.txt");
 
     private EmailBuilder() {
     }
 
-    public static String buildEmailMessage() {
-        return """
-            <div style="font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c">
-                                <span style="display:none;font-size:1px;color:#fff;max-height:0"></span>
-                                <table role="presentation" width="100%%" style="border-collapse:collapse;min-width:100%%;width:100%%!important" cellpadding="0" cellspacing="0"
-                                border="0">
-                                   <tbody>
-                                      <tr>
-                                         <td width="100%%" height="53" bgcolor="#0b0c0c">
-                                            <table role="presentation" width="100%%" style="border-collapse:collapse;max-width:580px" cellpadding="0" cellspacing="0" border="0"
-                                            align="center">
-                                               <tbody>
-                                                  <tr>
-                                                     <td width="70" bgcolor="#0b0c0c" valign="middle">
-                                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">
-                                                           <tbody>
-                                                              <tr>
-                                                                 <td style="padding-left:10px">
-                                                                 </td>
-                                                                 <td style="font-size:28px;line-height:1.315789474;Margin-top:4px;padding-left:10px">
-                                                                    <span style="font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;
-                                                                    vertical-align:top;display:inline-block">Confirm your email</span>
-                                                                 </td>
-                                                              </tr>
-                                                           </tbody>
-                                                        </table>
-                                                        </a>
-                                                     </td>
-                                                  </tr>
-                                               </tbody>
-                                            </table>
-                                         </td>
-                                      </tr>
-                                   </tbody>
-                                </table>
-                                <table role="presentation" class="m_-6186904992287805515content" align="center" cellpadding="0" cellspacing="0" border="0"
-                                style="border-collapse:collapse;max-width:580px;width:100%%!important" width="100%%">
-                                   <tbody>
-                                      <tr>
-                                         <td width="10" height="10" valign="middle"></td>
-                                         <td>
-                                            <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">
-                                               <tbody>
-                                                  <tr>
-                                                     <td bgcolor="#1D70B8" width="100%%" height="10"></td>
-                                                  </tr>
-                                               </tbody>
-                                            </table>
-                                         </td>
-                                         <td width="10" valign="middle" height="10"></td>
-                                      </tr>
-                                   </tbody>
-                                </table>
-                                <table role="presentation" class="m_-6186904992287805515content" align="center" cellpadding="0" cellspacing="0" border="0"
-                                style="border-collapse:collapse;max-width:580px;width:100%%!important" width="100%%">
-                                   <tbody>
-                                      <tr>
-                                         <td height="30"><br></td>
-                                      </tr>
-                                      <tr>
-                                         <td width="10" valign="middle"><br></td>
-                                         <td style="font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px">
-                                            <p style="Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c">Hi  %s,</p>
-                                            <p style="Margin:0 0 20px 0;font-size:19px;
-                                               line-height:25px;color:#0b0c0c"> Thank you for registering. Please click on the below link to activate your account: </p>
-                                            <blockquote style="Margin:0 0 20px 0;
-                                               border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px">
-                                               <p style="Margin:0 0 20px 0;font-size:19px;line-height:25px;
-                                                  color:#0b0c0c"> <a href="%s">Activate Now</a> </p>
-                                            </blockquote>
-                                            <p>See you soon</p>
-                                         </td>
-                                         <td width="10" valign="middle"><br></td>
-                                      </tr>
-                                      <tr>
-                                         <td height="30"><br></td>
-                                      </tr>
-                                   </tbody>
-                                </table>
-                                <div class="yj6qo"></div>
-                                <div class="adL">
-                                </div>
-                             </div>
-            """;
+    public static EmailContent buildActivationEmail(String fullName, String activationLink) {
+        String name = requireNonNullElse(fullName, "");
+        String html = render(HTML_TEMPLATE, htmlEscape(name, UTF_8.name()), htmlEscape(activationLink, UTF_8.name()));
+        String plainText = render(PLAIN_TEXT_TEMPLATE, name, activationLink);
+        return new EmailContent(plainText, html);
+    }
+
+    private static String render(String template, String fullName, String activationLink) {
+        return PLACEHOLDER.matcher(template).replaceAll(match -> Matcher.quoteReplacement(switch (match.group(1)) {
+            case "fullName" -> fullName;
+            case "activationLink" -> activationLink;
+            default -> throw new IllegalStateException("Unknown email template placeholder: " + match.group(1));
+        }));
+    }
+
+    private static String loadTemplate(String path) {
+        try {
+            return new ClassPathResource(path).getContentAsString(UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to load email template: " + path, e);
+        }
     }
 
 }

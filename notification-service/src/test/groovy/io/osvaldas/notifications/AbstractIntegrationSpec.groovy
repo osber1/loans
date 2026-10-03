@@ -2,20 +2,24 @@ package io.osvaldas.notifications
 
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.RabbitMQContainer
-import org.testcontainers.spock.Testcontainers
 
 import io.osvaldas.notifications.domain.emails.AbstractEmailSpec
-import spock.lang.Shared
 
-@Testcontainers
+/**
+ * Containers are started once per JVM (singleton container pattern) and are shared by all
+ * integration specs and the cached Spring context. They are cleaned up by Testcontainers (Ryuk)
+ * when the JVM exits, so they must not be stopped after an individual spec.
+ */
 @SpringBootTest
-@AutoConfigureMockMvc
 abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
+
+    static final int MAILHOG_SMTP_PORT = 1025
+
+    static final int MAILHOG_API_PORT = 8025
 
     static String exchangeName = 'internal.exchange'
 
@@ -23,13 +27,11 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
 
     static String routingKeys = 'internal.notification.routing-key'
 
-    @Shared
     @ServiceConnection
     static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.13.1-management-alpine')
 
-    @Shared
     static GenericContainer mailhogContainer = new GenericContainer<>('mailhog/mailhog:v1.0.1')
-        .withExposedPorts(1025, 8025)
+        .withExposedPorts(MAILHOG_SMTP_PORT, MAILHOG_API_PORT)
 
     static {
         mailhogContainer.start()
@@ -46,14 +48,13 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
     }
 
     @DynamicPropertySource
-    static void rabbitMqProperties(DynamicPropertyRegistry registry) {
+    static void mailProperties(DynamicPropertyRegistry registry) {
         registry.add('spring.mail.host', mailhogContainer::getHost)
-        registry.add('spring.mail.port') { mailhogContainer.getMappedPort(1025) }
+        registry.add('spring.mail.port') { mailhogContainer.getMappedPort(MAILHOG_SMTP_PORT) }
     }
 
-    void cleanupSpec() {
-        rabbitMQContainer.stop()
-        mailhogContainer.stop()
+    static String mailhogApiUrl(String path) {
+        "http://${mailhogContainer.host}:${mailhogContainer.getMappedPort(MAILHOG_API_PORT)}${path}"
     }
 
 }

@@ -24,11 +24,8 @@ dependencies {
         libs.spock.core,
         libs.spock.spring,
         libs.spring.boot.testcontainers,
-        libs.testcontainers.spock,
         libs.testcontainers.rabbitmq,
-        libs.testcontainers.vault,
-        libs.greenmail,
-        libs.awaitility
+        libs.greenmail
     )
 }
 
