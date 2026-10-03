@@ -20,7 +20,9 @@
             <column name="email" type="VARCHAR(255)"/>
             <column name="status" type="VARCHAR(20)"/>
             <column name="phone_number" type="VARCHAR(255)"/>
-            <column name="personal_code" type="VARCHAR(20)"/>
+            <column name="personal_code" type="VARCHAR(11)">
+                <constraints unique="true" uniqueConstraintName="uk_client_personal_code"/>
+            </column>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="updated_at" type="timestamp with time zone"/>
             <column name="version" type="BIGINT"/>
@@ -35,7 +37,7 @@
             <column name="email" type="VARCHAR(255)"/>
             <column name="status" type="VARCHAR(20)"/>
             <column name="phone_number" type="VARCHAR(255)"/>
-            <column name="personal_code" type="VARCHAR(20)"/>
+            <column name="personal_code" type="VARCHAR(11)"/>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="updated_at" type="timestamp with time zone"/>
             <column name="rev" type="INT">
@@ -141,24 +143,6 @@
             </column>
         </createTable>
         <rollback/>
-    </changeSet>
-
-    <changeSet id="client-personal-code-length" author="osvaldas">
-        <comment>Personal code is always 11 digits; align the column with the Client entity (length = 11).</comment>
-        <modifyDataType tableName="client" columnName="personal_code" newDataType="VARCHAR(11)"/>
-        <modifyDataType tableName="client_aud" columnName="personal_code" newDataType="VARCHAR(11)"/>
-        <rollback>
-            <modifyDataType tableName="client" columnName="personal_code" newDataType="VARCHAR(20)"/>
-            <modifyDataType tableName="client_aud" columnName="personal_code" newDataType="VARCHAR(20)"/>
-        </rollback>
-    </changeSet>
-
-    <changeSet id="client-personal-code-unique" author="osvaldas">
-        <comment>Guard against concurrent registrations with the same personal code.</comment>
-        <addUniqueConstraint tableName="client" columnNames="personal_code" constraintName="uk_client_personal_code"/>
-        <rollback>
-            <dropUniqueConstraint tableName="client" constraintName="uk_client_personal_code"/>
-        </rollback>
     </changeSet>
 
 </databaseChangeLog>
