@@ -30,12 +30,6 @@ sonar {
     }
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
-}
-
 subprojects {
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'groovy'
@@ -45,6 +39,12 @@ subprojects {
     apply plugin: 'org.sonarqube'
     apply plugin: 'net.ltgt.errorprone'
     apply plugin: 'org.owasp.dependencycheck'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(25)
+        }
+    }
 
     dependencyManagement {
         imports {
