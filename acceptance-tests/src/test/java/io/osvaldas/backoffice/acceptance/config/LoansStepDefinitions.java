@@ -17,8 +17,12 @@ import io.restassured.specification.RequestSpecification;
 
 public class LoansStepDefinitions {
 
-    private static final String BASE_URI = "http://localhost:8080";
-    // private static final String BASE_URI = "http://back-office.osber.io";
+    /**
+     * Back-office URL, configurable with the {@code acceptance.baseUri} system property
+     * (e.g. {@code ./gradlew :acceptance-tests:acceptanceTest -Pacceptance.baseUri=...})
+     * or the {@code ACCEPTANCE_BASE_URI} environment variable.
+     */
+    private static final String BASE_URI = baseUri();
 
     private String clientId;
 
@@ -59,7 +63,7 @@ public class LoansStepDefinitions {
 
         responseSuccess(response);
 
-        LoanResponse loanResponse = response.as(LoanResponse[].class)[0];
+        LoanResponse loanResponse = firstLoan(response);
 
         loanId = loanResponse.id();
         assertThat(loanResponse.amount()).isNotEqualTo(ZERO);
@@ -69,7 +73,7 @@ public class LoansStepDefinitions {
     public void extensionIsTaken() {
         request()
             .queryParam("loanId", loanId)
-            .post("api/v1/loans/extensions")
+            .post("/api/v1/loans/extensions")
             .then().assertThat().statusCode(200);
     }
 
@@ -81,7 +85,25 @@ public class LoansStepDefinitions {
 
         responseSuccess(response);
 
-        assertThat(response.as(LoanResponse[].class)[0].loanPostpones()).isNotEmpty();
+        assertThat(firstLoan(response).loanPostpones()).isNotEmpty();
+    }
+
+    private LoanResponse firstLoan(Response response) {
+        LoanResponse[] loans = response.as(LoanResponse[].class);
+        assertThat(loans).as("loans of client %s", clientId).isNotEmpty();
+        return loans[0];
+    }
+
+    private static String baseUri() {
+        String fromProperty = System.getProperty("acceptance.baseUri");
+        if (fromProperty != null && !fromProperty.isBlank()) {
+            return fromProperty;
+        }
+        String fromEnvironment = System.getenv("ACCEPTANCE_BASE_URI");
+        if (fromEnvironment != null && !fromEnvironment.isBlank()) {
+            return fromEnvironment;
+        }
+        return "http://localhost:8080";
     }
 
     private static RequestSpecification request() {
