@@ -131,7 +131,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should throw exception when amount limit is exceeded'() {
         given:
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(false, AMOUNT_EXCEEDS)
@@ -148,7 +148,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should throw exception when max amount and forbidden time'() {
         given:
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(false, RISK_TOO_HIGH)
@@ -176,7 +176,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should throw exception when failed to call feign client'() {
         given:
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest) >> { throw new BadRequestException('') }
         and:
@@ -192,7 +192,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should take loan when validation pass'() {
         given:
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(true, 'Risk validation passed.')
@@ -208,7 +208,7 @@ class LoanServiceSpec extends AbstractSpec {
     void 'should reject last pending loan when new is taken'() {
         given:
             Loan pendingLoan = buildLoan(100.0, PENDING)
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         when:
             loanService.addLoan(buildLoanWithoutId(100.0), CLIENT_ID)
         then:
@@ -220,7 +220,7 @@ class LoanServiceSpec extends AbstractSpec {
     void 'should not reject last loan when it is not pending'() {
         given:
             Loan openLoan = buildLoan(100.0, OPEN)
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         when:
             loanService.addLoan(buildLoanWithoutId(100.0), CLIENT_ID)
         then:
@@ -231,7 +231,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should throw exception when client is not active'() {
         given:
-            clientService.getClient(CLIENT_ID) >> registeredClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> registeredClientWithId
         when:
             loanService.addLoan(loan, CLIENT_ID)
         then:

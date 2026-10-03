@@ -104,7 +104,7 @@ public class LoanService {
     }
 
     private Client getActiveClient(String clientId) {
-        return Optional.of(getClient(clientId))
+        return Optional.of(clientService.getClientForUpdate(clientId))
             .filter(c -> ACTIVE == c.getStatus())
             .orElseThrow(() -> new ClientNotActiveException(CLIENT_NOT_ACTIVE));
     }

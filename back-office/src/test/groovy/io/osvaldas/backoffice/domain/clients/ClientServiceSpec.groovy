@@ -106,6 +106,25 @@ class ClientServiceSpec extends AbstractSpec {
             1 * clientRepository.findById(CLIENT_ID) >> empty()
     }
 
+    void 'should return locked client when getting it for update'() {
+        when:
+            Client client = clientService.getClientForUpdate(CLIENT_ID)
+        then:
+            client.is(activeClientWithId)
+        and:
+            1 * clientRepository.findForUpdateById(CLIENT_ID) >> of(activeClientWithId)
+    }
+
+    void 'should throw exception when trying to get non existing client for update'() {
+        when:
+            clientService.getClientForUpdate(CLIENT_ID)
+        then:
+            NotFoundException e = thrown()
+            e.message == CLIENT_NOT_FOUND
+        and:
+            1 * clientRepository.findForUpdateById(CLIENT_ID) >> empty()
+    }
+
     void 'should change client status to #newStatus when it exists'() {
         given:
             Client client = buildClient(CLIENT_ID, [] as Set, REGISTERED)
