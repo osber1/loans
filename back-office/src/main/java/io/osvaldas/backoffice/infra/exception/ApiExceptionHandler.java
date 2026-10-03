@@ -18,18 +18,6 @@ import feign.FeignException;
 import io.osvaldas.api.exceptions.ApiRequestException;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Translates exceptions into RFC 9457 problem details.
- * <ul>
- *     <li>{@link ApiRequestException} - the status carried by the exception.</li>
- *     <li>{@link OptimisticLockingFailureException} - 409, the resource was changed concurrently (stale version).</li>
- *     <li>{@link DataIntegrityViolationException} - 409, e.g. a duplicate personal code that slipped past the
- *     existence check because of a concurrent registration.</li>
- *     <li>{@link FeignException} - 502 when a downstream service answered with an error, 503 when it could not be
- *     reached at all (no HTTP status, e.g. connection refused or timeout).</li>
- * </ul>
- * Client errors (4xx) are logged at WARN without a stack trace; server errors (5xx) at ERROR with the stack trace.
- */
 @Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {

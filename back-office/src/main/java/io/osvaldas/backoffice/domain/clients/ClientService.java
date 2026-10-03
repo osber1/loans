@@ -34,11 +34,6 @@ public class ClientService {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    /**
-     * Registers a new client. The existence check gives a friendly error for the common case, while the unique
-     * constraint on {@code client.personal_code} guards against concurrent registrations (mapped to HTTP 409).
-     * The notification is sent only after the transaction commits.
-     */
     @Transactional
     public Client registerClient(Client client) {
         if (clientRepository.existsByPersonalCode(client.getPersonalCode())) {
@@ -66,13 +61,6 @@ public class ClientService {
         return findClient(id);
     }
 
-    /**
-     * Updates the editable details of an existing client. Status, personal code, creation date and loans are never
-     * taken from the request; they change only through dedicated operations.
-     *
-     * @param changes detached client carrying the requested values and the version the caller has seen
-     * @return the managed, updated client
-     */
     @Transactional
     public Client updateClient(Client changes) {
         String id = changes.getId();

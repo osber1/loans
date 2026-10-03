@@ -19,10 +19,6 @@ public interface ClientMapper {
 
     Collection<ClientResponse> map(Collection<Client> all);
 
-    /**
-     * Maps only the fields a client is allowed to change, plus id and version used to locate the client and detect
-     * concurrent modifications. Status and personal code are deliberately not mapped.
-     */
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "personalCode", ignore = true)
     @Mapping(target = "loans", ignore = true)

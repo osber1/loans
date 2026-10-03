@@ -81,10 +81,6 @@ public class ClientController {
         service.activateClient(id);
     }
 
-    /**
-     * Activation through GET is kept only so that activation links in already sent registration emails keep working.
-     * New callers must use {@code POST clients/{id}/active}.
-     */
     @GetMapping("clients/{id}/active")
     @Operation(deprecated = true, description = "Deprecated: kept for activation links in already sent emails. Use POST clients/{id}/active.")
     public void activateClientFromEmailLink(@PathVariable String id) {
