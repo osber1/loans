@@ -65,13 +65,11 @@ subprojects {
         )
 
         implementation(
-            libs.lombok,
             libs.spring.boot.starter.web,
-            libs.spring.boot.starter.bootstrap,
-            libs.spring.boot.starter.validation,
-            libs.logstash
+            libs.spring.boot.starter.validation
         )
 
+        // Lombok is only needed at compile time and must not end up in the boot jars
         compileOnly(
             libs.lombok
         )
@@ -87,6 +85,17 @@ subprojects {
             libs.spring.boot.cache.test,
             libs.wiremock
         )
+    }
+
+    // Bootstrap configuration (bootstrap*.yml) and JSON logging (logback-spring.xml) are only used by the
+    // deployable Spring Boot applications, not by the shared libraries or the acceptance tests
+    plugins.withId('org.springframework.boot') {
+        dependencies {
+            implementation(
+                libs.spring.boot.starter.bootstrap,
+                libs.logstash
+            )
+        }
     }
 
     // Error Prone runs the configured rule set on every compilation and only reports findings.
