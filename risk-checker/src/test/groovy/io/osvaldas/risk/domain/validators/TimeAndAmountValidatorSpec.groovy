@@ -1,6 +1,6 @@
 package io.osvaldas.risk.domain.validators
 
-import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH_BETWEEN_HOURS
+import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH
 
 import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException
@@ -73,7 +73,7 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
             timeUtils.hourOfDay >> hour
         and:
             TimeException e = thrown()
-            e.message == RISK_TOO_HIGH_BETWEEN_HOURS.formatted(fromText, toText)
+            e.message == RISK_TOO_HIGH.formatted(fromText, toText)
         where:
             from | to | hour || fromText | toText
             0    | 6  | 0    || '00:00'  | '06:00'

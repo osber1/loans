@@ -1,7 +1,7 @@
 package io.osvaldas.risk.domain.validators;
 
 import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS;
-import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH_BETWEEN_HOURS;
+import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH;
 
 import java.math.BigDecimal;
 
@@ -37,7 +37,7 @@ public class TimeAndAmountValidator implements ValidationRule {
         int from = config.getForbiddenHourFrom();
         int to = config.getForbiddenHourTo();
         if (isWithinWindow(timeUtils.getHourOfDay(), from, to) && amount.compareTo(config.getMaxAmount()) == 0) {
-            throw new TimeException(RISK_TOO_HIGH_BETWEEN_HOURS.formatted(formatHour(from), formatHour(to)));
+            throw new TimeException(RISK_TOO_HIGH.formatted(formatHour(from), formatHour(to)));
         }
     }
 
