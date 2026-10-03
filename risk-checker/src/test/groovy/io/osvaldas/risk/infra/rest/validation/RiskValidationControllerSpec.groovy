@@ -4,6 +4,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS
+import static io.osvaldas.risk.domain.validators.LoanLimitValidator.NO_LOANS_COUNT
 import static io.osvaldas.risk.infra.exception.ApiExceptionHandler.BACK_OFFICE_ERROR
 import static io.osvaldas.risk.infra.exception.ApiExceptionHandler.BACK_OFFICE_UNAVAILABLE
 import static java.time.Clock.fixed
@@ -55,6 +56,9 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
 
     @Shared
     String backOfficeErrorClientId = 'backOfficeErrorClientId'
+
+    @Shared
+    String noCountClientId = 'noCountClientId'
 
     @Shared
     String loansTakenTodayPath = '/api/v1/loans/today'
@@ -150,6 +154,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             backOfficeErrorLoanId | validClientId           || BAD_GATEWAY         | BACK_OFFICE_ERROR
             validLoanId           | backOfficeErrorClientId || SERVICE_UNAVAILABLE | BACK_OFFICE_UNAVAILABLE
             slowLoanId            | validClientId           || SERVICE_UNAVAILABLE | BACK_OFFICE_UNAVAILABLE
+            validLoanId           | noCountClientId         || BAD_GATEWAY         | NO_LOANS_COUNT
     }
 
     void 'should return bad request when request is invalid: #description'() {

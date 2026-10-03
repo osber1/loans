@@ -1,11 +1,13 @@
 package io.osvaldas.risk.domain.validators
 
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS
+import static org.springframework.http.HttpStatus.BAD_GATEWAY
 
 import io.osvaldas.api.exceptions.ValidationRuleException.LoanLimitException
 import io.osvaldas.api.loans.TodayTakenLoansCount
 import io.osvaldas.risk.AbstractSpec
 import io.osvaldas.risk.domain.validation.BackOfficeClient
+import io.osvaldas.risk.domain.validation.BackOfficeResponseException
 import io.osvaldas.risk.infra.configuration.PropertiesConfig
 import io.osvaldas.risk.repositories.risk.RiskValidationTarget
 import spock.lang.Subject
@@ -44,13 +46,15 @@ class LoanLimitValidatorSpec extends AbstractSpec {
             count << [2, 6]
     }
 
-    void 'should pass validation when back-office returns no count'() {
+    void 'should fail when back-office returns no count'() {
         given:
             client.getLoansTakenTodayCount(clientId) >> null
         when:
             loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
         then:
-            notThrown(LoanLimitException)
+            BackOfficeResponseException e = thrown()
+            e.message == LoanLimitValidator.NO_LOANS_COUNT
+            e.httpStatus == BAD_GATEWAY
     }
 
 }
