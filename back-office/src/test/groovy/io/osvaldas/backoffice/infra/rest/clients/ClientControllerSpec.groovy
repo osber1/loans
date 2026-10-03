@@ -306,7 +306,8 @@ class ClientControllerSpec extends AbstractControllerSpec {
         new ClientRegisterRequest(NAME, SURNAME, CLIENT_EMAIL, CLIENT_PHONE_NUMBER, CLIENT_PERSONAL_CODE)
     }
 
-    private ClientUpdateRequest buildUpdateClientRequest(Status status = ACTIVE, String personalCode = CLIENT_PERSONAL_CODE) {
+    private ClientUpdateRequest buildUpdateClientRequest(Status status = ACTIVE,
+                                                         String personalCode = CLIENT_PERSONAL_CODE) {
         new ClientUpdateRequest(
             CLIENT_ID,
             editedName,

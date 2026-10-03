@@ -74,9 +74,8 @@ class ClientServiceSpec extends AbstractSpec {
             clients.content == [registeredClientWithId, registeredClientWithId]
             clients.totalElements == 5
         and:
-            1 * clientRepository.findAll({ Pageable pageable ->
-                pageable.pageNumber == 0 && pageable.pageSize == 2 && pageable.sort == Sort.by('lastName').descending()
-            }) >> new PageImpl<>([registeredClientWithId, registeredClientWithId], PageRequest.of(0, 2), 5)
+            1 * clientRepository.findAll(PageRequest.of(0, 2, Sort.by('lastName').descending()))
+                >> new PageImpl<>([registeredClientWithId, registeredClientWithId], PageRequest.of(0, 2), 5)
     }
 
     void 'should return empty page when there are no clients'() {
@@ -210,7 +209,7 @@ class ClientServiceSpec extends AbstractSpec {
             clients.content == [registeredClientWithId]
             clients.totalElements == 11
         and:
-            1 * clientRepository.findAll(_ as Specification, { Pageable pageable -> pageable.pageNumber == 1 && pageable.pageSize == 10 })
+            1 * clientRepository.findAll(_ as Specification, PageRequest.of(1, 10, Sort.by('lastName').descending()))
                 >> new PageImpl<>([registeredClientWithId], PageRequest.of(1, 10), 11)
     }
 

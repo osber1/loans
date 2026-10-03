@@ -17,6 +17,10 @@ import spock.lang.Subject
 
 class ApiExceptionHandlerSpec extends AbstractSpec {
 
+    static final String DUPLICATE_PERSONAL_CODE = 'violates unique constraint "uk_client_personal_code"'
+
+    static final String NOT_NULL_VIOLATION = 'null value in column "first_name" violates not-null constraint'
+
     @Subject
     ApiExceptionHandler handler = new ApiExceptionHandler()
 
@@ -30,7 +34,8 @@ class ApiExceptionHandlerSpec extends AbstractSpec {
 
     void 'should map optimistic locking failure to conflict'() {
         when:
-            ProblemDetail problem = handler.handleOptimisticLockingFailure(new ObjectOptimisticLockingFailureException(Client, CLIENT_ID))
+            ProblemDetail problem = handler.handleOptimisticLockingFailure(
+                new ObjectOptimisticLockingFailureException(Client, CLIENT_ID))
         then:
             problem.status == CONFLICT.value()
             problem.detail == ApiExceptionHandler.CONCURRENT_MODIFICATION
@@ -44,9 +49,9 @@ class ApiExceptionHandlerSpec extends AbstractSpec {
             problem.status == CONFLICT.value()
             problem.detail == detail
         where:
-            cause                                                                      || detail
-            'duplicate key value violates unique constraint "uk_client_personal_code"' || CLIENT_ALREADY_EXIST
-            'null value in column "first_name" violates not-null constraint'          || ApiExceptionHandler.DATA_CONFLICT
+            cause                   || detail
+            DUPLICATE_PERSONAL_CODE || CLIENT_ALREADY_EXIST
+            NOT_NULL_VIOLATION      || ApiExceptionHandler.DATA_CONFLICT
     }
 
     void 'should map feign exception with status #feignStatus to #expectedStatus'() {
