@@ -111,7 +111,6 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
                 loanPostpones()*.interestRate() as Set == [15.00, 22.50] as Set
             }
         cleanup:
-            // PostponeControllerSpec expects postpone ids to start from 1
             jdbcTemplate.execute('ALTER SEQUENCE postpone_seq RESTART WITH 1')
     }
 
