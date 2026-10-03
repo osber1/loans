@@ -13,7 +13,7 @@ class NotificationConsumerSpec extends Specification {
     String clientId = 'clientId'
 
     @Shared
-    String link = 'http://localhost:8080/api/v1/client/%s/active'
+    String link = 'http://localhost:8080/api/v1/clients/%s/active'
 
     @Shared
     String fullName = 'Name Surname'
