@@ -1,5 +1,7 @@
 package io.osvaldas.notifications.domain.emails;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -19,11 +21,11 @@ public class EmailService implements EmailSender {
     private final PropertiesConfig config;
 
     @Override
-    public void send(String receiverEmail, String content) {
+    public void send(String receiverEmail, EmailContent content) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-            helper.setText(content, true);
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, UTF_8.name());
+            helper.setText(content.plainText(), content.html());
             helper.setTo(receiverEmail);
             helper.setSubject(config.getSubject());
             helper.setFrom(config.getSenderAddress());

@@ -1,0 +1,7 @@
+Hi {{fullName}},
+
+Thank you for registering. Please open the link below to activate your account:
+
+{{activationLink}}
+
+See you soon
