@@ -21,10 +21,6 @@ spring:
           auth: false
           starttls:
             enable: false
-  web:
-    error:
-      include-message: always
-      include-binding-errors: always
 
 management:
   endpoints:
@@ -44,4 +40,4 @@ management:
 email:
   senderAddress: hello@osber.com
   subject: Confirm your email
-  activationLink: http://localhost:8080/api/v1/client/%s/active
+  activationLink: http://localhost:8080/api/v1/clients/%s/active
