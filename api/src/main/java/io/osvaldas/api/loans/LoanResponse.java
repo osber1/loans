@@ -1,9 +1,5 @@
 package io.osvaldas.api.loans;
 
-import static io.osvaldas.api.loans.Status.NOT_EVALUATED;
-import static java.math.BigDecimal.ZERO;
-import static java.time.ZonedDateTime.now;
-
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Set;
@@ -18,9 +14,5 @@ public record LoanResponse(long id,
                            ZonedDateTime returnDate,
                            ZonedDateTime createdAt,
                            Set<LoanPostponeResponse> loanPostpones) {
-
-    public LoanResponse() {
-        this(0L, ZERO, ZERO, 0, NOT_EVALUATED, now(), now(), Set.of());
-    }
 
 }
