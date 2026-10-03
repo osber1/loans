@@ -15,7 +15,7 @@
     </module>
 
     <module name="RegexpSingleline">
-        <property name="format" value="printStacktrace()"/>
+        <property name="format" value="\.printStackTrace\("/>
         <property name="message" value="Stacktrace printing is not allowed"/>
     </module>
 
