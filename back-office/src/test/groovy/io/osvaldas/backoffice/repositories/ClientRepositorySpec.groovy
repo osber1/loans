@@ -1,8 +1,7 @@
 package io.osvaldas.backoffice.repositories
 
-import static io.osvaldas.api.clients.Status.DELETED
-
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
 
 import io.osvaldas.backoffice.repositories.entities.Client
 import spock.lang.Subject
@@ -40,11 +39,21 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
             INVALID_PERSONAL_CODE || false
     }
 
-    void 'should change client status to deleted when deleting client'() {
+    void 'should reject client with already registered personal code'() {
+        given:
+            Client duplicate = new Client().tap {
+                id = INVALID_CLIENT_ID
+                firstName = 'Other'
+                lastName = 'User'
+                email = 'other@mail.com'
+                phoneNumber = '+37062541366'
+                personalCode = VALID_PERSONAL_CODE
+            }
         when:
-            repository.changeClientStatus(VALID_CLIENT_ID, DELETED)
+            repository.saveAndFlush(duplicate)
         then:
-            repository.findById(VALID_CLIENT_ID).get().status == DELETED
+            DataIntegrityViolationException e = thrown()
+            e.message.contains('uk_client_personal_code')
     }
 
 }

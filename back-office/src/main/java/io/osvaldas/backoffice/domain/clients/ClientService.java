@@ -6,24 +6,22 @@ import static io.osvaldas.api.util.ExceptionMessages.CLIENT_ALREADY_EXIST;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.osvaldas.api.clients.Status;
-import io.osvaldas.api.email.EmailMessage;
 import io.osvaldas.api.exceptions.BadRequestException;
 import io.osvaldas.api.exceptions.NotFoundException;
 import io.osvaldas.backoffice.repositories.ClientRepository;
 import io.osvaldas.backoffice.repositories.entities.Client;
-import io.osvaldas.messages.RabbitMQMessageProducer;
-import io.osvaldas.messages.RabbitProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,52 +32,58 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
 
-    private final RabbitMQMessageProducer messageProducer;
-
-    private final RabbitProperties rabbitProperties;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Client registerClient(Client client) {
-        return Optional.of(clientRepository.existsByPersonalCode(client.getPersonalCode()))
-            .filter(exists -> !exists)
-            .map(s -> saveClientAndSendEmail(client))
-            .orElseThrow(() -> new BadRequestException(CLIENT_ALREADY_EXIST));
+        if (clientRepository.existsByPersonalCode(client.getPersonalCode())) {
+            throw new BadRequestException(CLIENT_ALREADY_EXIST);
+        }
+        client.setRandomId();
+        Client savedClient = clientRepository.saveAndFlush(client);
+        log.info("Client registered: {}", savedClient.getId());
+        eventPublisher.publishEvent(new ClientRegisteredEvent(savedClient.getId(), savedClient.getFullName(), savedClient.getEmail()));
+        return savedClient;
     }
 
     @Transactional(readOnly = true)
-    public Collection<Client> getClients(int page, int size) {
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by("lastName").descending());
-        return clientRepository.findAll(pageRequest).getContent();
+    public Page<Client> getClients(int page, int size) {
+        return clientRepository.findAll(pageRequest(page, size));
     }
 
     @Transactional(readOnly = true)
-    public List<Client> getClientsByStatus(Status status) {
-        return clientRepository.findAll(clientStatusIs(status));
+    public Page<Client> getClientsByStatus(Status status, int page, int size) {
+        return clientRepository.findAll(clientStatusIs(status), pageRequest(page, size));
     }
 
     @Transactional(readOnly = true)
     public Client getClient(String id) {
-        return clientRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND.formatted(id)));
+        return findClient(id);
     }
 
     @Transactional
-    public Client updateClient(Client client) {
-        log.info("Updating client: {}", client.getId());
-        String id = client.getId();
-        return clientExists(id)
-            .map(s -> clientRepository.save(client))
-            .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND.formatted(id)));
+    public Client updateClient(Client changes) {
+        String id = changes.getId();
+        log.info("Updating client: {}", id);
+        Client client = findClient(id);
+        if (!Objects.equals(client.getVersion(), changes.getVersion())) {
+            throw new ObjectOptimisticLockingFailureException(Client.class, id);
+        }
+        client.setFirstName(changes.getFirstName());
+        client.setLastName(changes.getLastName());
+        client.setEmail(changes.getEmail());
+        client.setPhoneNumber(changes.getPhoneNumber());
+        return clientRepository.saveAndFlush(client);
     }
 
     @Transactional
     public void deleteClient(String id) {
-        changeClientStatusIfExists(id, DELETED);
+        changeClientStatus(id, DELETED);
     }
 
     @Transactional
     public void activateClient(String id) {
-        changeClientStatusIfExists(id, ACTIVE);
+        changeClientStatus(id, ACTIVE);
     }
 
     @Transactional
@@ -87,34 +91,18 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    private Client saveClientAndSendEmail(Client client) {
-        Client savedClient = saveNewClient(client);
-        sendMessage(savedClient);
-        return savedClient;
-    }
-
-    private void sendMessage(Client client) {
-        EmailMessage message = new EmailMessage(client.getId(), client.getFullName(), client.getEmail());
-        messageProducer.publish(message, rabbitProperties.getExchanges().getInternal(), rabbitProperties.getRoutingKeys().getInternalNotification());
-    }
-
-    private Client saveNewClient(Client client) {
-        client.setRandomId();
-        log.info("Client registered: {}", client.getId());
-        return save(client);
-    }
-
-    private void changeClientStatusIfExists(String id, Status status) {
+    private void changeClientStatus(String id, Status status) {
         log.info("Changing client: {} status to: {}", id, status);
-        clientExists(id)
-            .ifPresentOrElse(s -> clientRepository.changeClientStatus(id, status), () -> {
-                throw new NotFoundException(CLIENT_NOT_FOUND.formatted(id));
-            });
+        findClient(id).setStatus(status);
     }
 
-    private Optional<Boolean> clientExists(String id) {
-        return Optional.of(clientRepository.existsById(id))
-            .filter(exists -> exists);
+    private static Pageable pageRequest(int page, int size) {
+        return PageRequest.of(page, size, Sort.by("lastName").descending());
+    }
+
+    private Client findClient(String id) {
+        return clientRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND.formatted(id)));
     }
 
 }

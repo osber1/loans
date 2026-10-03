@@ -20,7 +20,9 @@
             <column name="email" type="VARCHAR(255)"/>
             <column name="status" type="VARCHAR(20)"/>
             <column name="phone_number" type="VARCHAR(255)"/>
-            <column name="personal_code" type="VARCHAR(20)"/>
+            <column name="personal_code" type="VARCHAR(11)">
+                <constraints unique="true" uniqueConstraintName="uk_client_personal_code"/>
+            </column>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="updated_at" type="timestamp with time zone"/>
             <column name="version" type="BIGINT"/>
@@ -35,7 +37,7 @@
             <column name="email" type="VARCHAR(255)"/>
             <column name="status" type="VARCHAR(20)"/>
             <column name="phone_number" type="VARCHAR(255)"/>
-            <column name="personal_code" type="VARCHAR(20)"/>
+            <column name="personal_code" type="VARCHAR(11)"/>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="updated_at" type="timestamp with time zone"/>
             <column name="rev" type="INT">
