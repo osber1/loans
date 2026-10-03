@@ -1,7 +1,7 @@
 package io.osvaldas.risk.domain.validators;
 
 import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS;
-import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH;
+import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH_BETWEEN_HOURS;
 
 import java.math.BigDecimal;
 
@@ -30,9 +30,10 @@ public class TimeAndAmountValidator implements ValidationRule {
     }
 
     private void checkTimeAndAmount(BigDecimal amount) {
-        int currentHour = timeUtils.getHourOfDay();
-        if (config.getForbiddenHourFrom() <= currentHour && currentHour <= config.getForbiddenHourTo() && amount.compareTo(config.getMaxAmount()) == 0) {
-            throw new TimeException(RISK_TOO_HIGH);
+        int from = config.getForbiddenHourFrom();
+        int to = config.getForbiddenHourTo();
+        if (isWithinWindow(timeUtils.getHourOfDay(), from, to) && amount.compareTo(config.getMaxAmount()) == 0) {
+            throw new TimeException(RISK_TOO_HIGH_BETWEEN_HOURS.formatted(formatHour(from), formatHour(to)));
         }
     }
 
@@ -40,6 +41,20 @@ public class TimeAndAmountValidator implements ValidationRule {
         if (clientAmount.compareTo(config.getMaxAmount()) > 0) {
             throw new AmountException(AMOUNT_EXCEEDS);
         }
+    }
+
+    /**
+     * Half-open window {@code [from, to)}; wraps around midnight when {@code from > to}, empty when {@code from == to}.
+     */
+    static boolean isWithinWindow(int hour, int from, int to) {
+        if (from <= to) {
+            return from <= hour && hour < to;
+        }
+        return hour >= from || hour < to;
+    }
+
+    private static String formatHour(int hour) {
+        return "%02d:00".formatted(hour);
     }
 
 }

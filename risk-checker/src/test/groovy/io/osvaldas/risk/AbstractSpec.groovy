@@ -1,5 +1,9 @@
 package io.osvaldas.risk
 
+import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
+import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS
+import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH_BETWEEN_HOURS
+
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -9,13 +13,12 @@ class AbstractSpec extends Specification {
     String clientId = 'clientId'
 
     @Shared
-    String loanLimitExceeds = 'Too many loans taken in a single day.'
+    String loanLimitExceeds = LOAN_LIMIT_EXCEEDS
 
     @Shared
-    String riskTooHigh = 'Risk is too high, because you are trying to get loan' +
-        ' between 00:00 and 6:00 and you want to borrow the max amount!'
+    String riskTooHigh = RISK_TOO_HIGH_BETWEEN_HOURS.formatted('00:00', '06:00')
 
     @Shared
-    String amountExceeds = 'The amount you are trying to borrow exceeds the max amount!'
+    String amountExceeds = AMOUNT_EXCEEDS
 
 }
