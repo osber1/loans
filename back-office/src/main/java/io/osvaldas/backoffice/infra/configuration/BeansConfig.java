@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
@@ -59,13 +60,18 @@ public class BeansConfig {
      * Declared explicitly because Spring Boot 4 only auto-configures a CacheManager when the
      * spring-boot-cache module is on the classpath, and so that each known cache gets a serializer
      * bound to the type it holds instead of relying on type ids embedded in the payload.
+     *
+     * <p>Writes are immediate: with Lettuce, Spring Data Redis 4 otherwise performs cache puts,
+     * evictions and clears asynchronously, so a read right after a put can miss the entry and a read
+     * right after an {@code @CacheEvict} can still return the evicted value.
      */
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory,
                                           RedisCacheConfiguration cacheConfiguration) {
         JsonMapper mapper = configureCacheMapper(JsonMapper.builder()).build();
+        RedisCacheWriter cacheWriter = RedisCacheWriter.create(connectionFactory, writer -> writer.immediateWrites());
 
-        return RedisCacheManager.builder(connectionFactory)
+        return RedisCacheManager.builder(cacheWriter)
             .cacheDefaults(cacheConfiguration)
             .withCacheConfiguration(LOAN_RESPONSE_CACHE, cacheConfiguration
                 .serializeValuesWith(fromSerializer(new JacksonJsonRedisSerializer<>(mapper, LoanResponse.class))))
