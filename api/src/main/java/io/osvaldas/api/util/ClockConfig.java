@@ -1,9 +1,9 @@
 package io.osvaldas.api.util;
 
-import static java.time.Clock.systemUTC;
-
 import java.time.Clock;
+import java.time.ZoneId;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class ClockConfig {
 
     @Bean
-    public Clock clock() {
-        return systemUTC();
+    public Clock clock(@Value("${application.timeZone:Europe/Vilnius}") ZoneId timeZone) {
+        return Clock.system(timeZone);
     }
 }

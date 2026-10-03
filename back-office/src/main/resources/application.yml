@@ -74,6 +74,7 @@ info:
     springBoot: 3.2.4
 
 application:
+  timeZone: Europe/Vilnius
   interestRate: 10
   interestIncrementFactor: 1.5
   postponeDays: 7
