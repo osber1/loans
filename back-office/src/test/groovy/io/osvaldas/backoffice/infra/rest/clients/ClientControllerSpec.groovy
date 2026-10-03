@@ -211,12 +211,12 @@ class ClientControllerSpec extends AbstractControllerSpec {
                        put('/api/v1/clients').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
-    void 'should activate client when it exists'() {
+    void 'should activate client with #httpMethod when it exists'() {
         given:
             clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc
-                .perform(get('/api/v1/clients/{id}/active', registeredClientWithId.id)
+                .perform(request('/api/v1/clients/{id}/active', registeredClientWithId.id)
                     .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -224,7 +224,29 @@ class ClientControllerSpec extends AbstractControllerSpec {
         and:
             with(clientRepository.findById(registeredClientWithId.id).get()) {
                 status == ACTIVE
+                version == 1L
+                updatedAt != null
             }
+        where:
+            httpMethod | request
+            'POST'     | { String url, Object id -> post(url, id) }
+            'GET'      | { String url, Object id -> get(url, id) }
+    }
+
+    void 'should return not found when activating non existing client with #httpMethod'() {
+        when:
+            MockHttpServletResponse response = mockMvc
+                .perform(request('/api/v1/clients/{id}/active', CLIENT_ID)
+                    .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == NOT_FOUND.value()
+        and:
+            response.contentAsString.contains(CLIENT_NOT_FOUND.formatted(CLIENT_ID))
+        where:
+            httpMethod | request
+            'POST'     | { String url, Object id -> post(url, id) }
+            'GET'      | { String url, Object id -> get(url, id) }
     }
 
     private MvcResult sendRegistrationClientRequest(ClientRegisterRequest request) {

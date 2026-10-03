@@ -19,6 +19,7 @@ import io.osvaldas.api.clients.Status;
 import io.osvaldas.backoffice.domain.clients.ClientService;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.mapper.ClientMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -66,8 +67,19 @@ public class ClientController {
         service.deleteClient(id);
     }
 
-    @GetMapping("clients/{id}/active")
+    @PostMapping("clients/{id}/active")
+    @Operation(description = "Activates the client.")
     public void activateClient(@PathVariable String id) {
+        service.activateClient(id);
+    }
+
+    /**
+     * Activation through GET is kept only so that activation links in already sent registration emails keep working.
+     * New callers must use {@code POST clients/{id}/active}.
+     */
+    @GetMapping("clients/{id}/active")
+    @Operation(deprecated = true, description = "Deprecated: kept for activation links in already sent emails. Use POST clients/{id}/active.")
+    public void activateClientFromEmailLink(@PathVariable String id) {
         service.activateClient(id);
     }
 }
