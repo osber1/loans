@@ -10,13 +10,6 @@ import io.osvaldas.risk.repositories.risk.RiskValidationTarget;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Runs the risk validation rules for a loan.
- *
- * <p>Only business rejections ({@link ValidationRuleException}) are turned into an unsuccessful
- * {@link RiskValidationResponse}. Infrastructure failures (e.g. back-office being unavailable) are
- * propagated, so the caller gets an error status instead of a permanent rejection.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

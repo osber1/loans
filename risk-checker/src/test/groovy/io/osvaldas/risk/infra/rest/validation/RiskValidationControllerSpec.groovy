@@ -131,7 +131,6 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    // loan 4: back-office returns 500; backOfficeErrorClientId: back-office returns 503; loan 5: times out
     void 'should return #status when back-office fails for loan #loanId and client #clientId'() {
         given:
             RiskValidationRequest request = new RiskValidationRequest(loanId, clientId)

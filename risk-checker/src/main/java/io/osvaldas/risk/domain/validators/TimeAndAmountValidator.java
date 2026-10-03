@@ -16,9 +16,6 @@ import io.osvaldas.risk.infra.configuration.PropertiesConfig;
 import io.osvaldas.risk.repositories.risk.RiskValidationTarget;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Local (no remote calls) rule, so it runs before rules calling other services.
- */
 @Component
 @RequiredArgsConstructor
 @Order(TimeAndAmountValidator.ORDER)
@@ -50,9 +47,6 @@ public class TimeAndAmountValidator implements ValidationRule {
         }
     }
 
-    /**
-     * Half-open window {@code [from, to)}; wraps around midnight when {@code from > to}, empty when {@code from == to}.
-     */
     static boolean isWithinWindow(int hour, int from, int to) {
         if (from <= to) {
             return from <= hour && hour < to;

@@ -13,12 +13,6 @@ import feign.RetryableException;
 import io.osvaldas.api.exceptions.ApiRequestException;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Maps exceptions to RFC 9457 problem details.
- *
- * <p>Extending {@link ResponseEntityExceptionHandler} makes standard Spring MVC exceptions
- * (e.g. request body validation errors or unreadable JSON) render as 400 problem details.
- */
 @Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {

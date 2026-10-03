@@ -22,18 +22,11 @@ public class PropertiesConfig {
     @Min(0)
     private BigDecimal maxAmount;
 
-    /**
-     * First hour (inclusive, 0-23) of the forbidden window.
-     */
     @NotNull
     @Min(0)
     @Max(23)
     private Integer forbiddenHourFrom;
 
-    /**
-     * Hour (exclusive, 0-23) at which the forbidden window ends. When it is lower than
-     * {@link #forbiddenHourFrom} the window wraps around midnight (e.g. 22 to 6); when equal, the window is empty.
-     */
     @NotNull
     @Min(0)
     @Max(23)

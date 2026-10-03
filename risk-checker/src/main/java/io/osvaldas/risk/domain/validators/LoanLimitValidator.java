@@ -14,14 +14,6 @@ import io.osvaldas.risk.repositories.risk.RiskValidationTarget;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Rejects the loan when the client has already reached the daily loan limit.
- *
- * <p>Back-office reports how many loans the client has taken today <em>other than</em> the loan being
- * evaluated, so the evaluated loan is rejected once that count reaches the limit.
- *
- * <p>Calls back-office, so it runs after the local rules.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
