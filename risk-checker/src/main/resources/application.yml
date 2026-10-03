@@ -37,6 +37,7 @@ management:
       enabled: true
 
 application:
+  timeZone: Europe/Vilnius
   loanLimitPerDay: 30
   maxAmount: 100
   forbiddenHourFrom: 0
