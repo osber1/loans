@@ -3,14 +3,40 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "daily"
-    groups:
-      gradle-dependencies:
-        patterns:
-          - "*"
+      interval: "weekly"
     open-pull-requests-limit: 10
+    groups:
+      spring:
+        patterns:
+          - "org.springframework*"
+          - "io.spring*"
+          - "org.springdoc*"
+      build-tooling:
+        patterns:
+          - "com.google.errorprone*"
+          - "tech.picnic*"
+          - "com.github.spotbugs*"
+          - "org.sonarqube*"
+          - "org.owasp*"
+          - "net.ltgt*"
+      testing:
+        patterns:
+          - "org.spockframework*"
+          - "org.testcontainers*"
+          - "io.cucumber*"
+          - "io.rest-assured*"
+          - "org.wiremock*"
+          - "com.icegreen*"
+      gradle-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     open-pull-requests-limit: 10
+    groups:
+      github-actions:
+        patterns:
+          - "*"

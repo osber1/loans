@@ -1,20 +1,36 @@
 dependencies {
-    implementation(
+    testImplementation(
         project(':api'),
         libs.rest.assured,
-        libs.java.faker
-    )
-
-    testImplementation(
+        libs.java.faker,
         libs.cucumber.java,
-        libs.cucumber.junit
+        libs.cucumber.junit.platform.engine,
+        libs.junit.platform.suite
+    )
+
+    testRuntimeOnly(
+        libs.junit.platform.launcher
     )
 }
 
-codenarcTest {
-    exclude 'io/osvaldas/backoffice/acceptance/*'
+tasks.named('test') {
+    enabled = false
 }
 
-test {
-    failOnNoDiscoveredTests = false
+Provider<String> acceptanceBaseUri = providers.gradleProperty('acceptance.baseUri')
+
+tasks.register('acceptanceTest', Test) {
+    description = 'Runs the Cucumber acceptance tests against a running back-office (default http://localhost:8080).'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+
+    if (acceptanceBaseUri.isPresent()) {
+        systemProperty 'acceptance.baseUri', acceptanceBaseUri.get()
+    }
+
+    outputs.upToDateWhen { false }
+    outputs.cacheIf { false }
 }

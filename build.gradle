@@ -30,12 +30,6 @@ sonar {
     }
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
-}
-
 subprojects {
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'groovy'
@@ -46,10 +40,16 @@ subprojects {
     apply plugin: 'net.ltgt.errorprone'
     apply plugin: 'org.owasp.dependencycheck'
 
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(25)
+        }
+    }
+
     dependencyManagement {
         imports {
-            mavenBom 'org.springframework.boot:spring-boot-dependencies:4.1.1'
-            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.3'
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${libs.versions.spring.boot.get()}"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${libs.versions.spring.cloud.release.get()}"
         }
     }
 
@@ -65,11 +65,8 @@ subprojects {
         )
 
         implementation(
-            libs.lombok,
             libs.spring.boot.starter.web,
-            libs.spring.boot.starter.bootstrap,
-            libs.spring.boot.starter.validation,
-            libs.logstash
+            libs.spring.boot.starter.validation
         )
 
         compileOnly(
@@ -87,6 +84,15 @@ subprojects {
             libs.spring.boot.cache.test,
             libs.wiremock
         )
+    }
+
+    plugins.withId('org.springframework.boot') {
+        dependencies {
+            implementation(
+                libs.spring.boot.starter.bootstrap,
+                libs.logstash
+            )
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {
