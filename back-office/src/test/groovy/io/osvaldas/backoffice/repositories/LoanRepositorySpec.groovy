@@ -1,8 +1,6 @@
 package io.osvaldas.backoffice.repositories
 
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
-import static io.osvaldas.api.loans.Status.OPEN
-import static io.osvaldas.api.loans.Status.PENDING
 
 import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,18 +33,6 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
             Optional<Loan> loan = repository.findById(INVALID_LOAN_ID)
         then:
             loan.isEmpty()
-    }
-
-    void 'should return client last loan'() {
-        given:
-            Client savedClient = entityManager.persist(client)
-            Loan firstLoan = saveLoan(savedClient, OPEN)
-            Loan lastLoan = saveLoan(savedClient, PENDING)
-        expect:
-            repository.findFirstByClientIdOrderByIdDesc(VALID_CLIENT_ID).get().id == lastLoan.id
-            firstLoan.id < lastLoan.id
-        and:
-            repository.findFirstByClientIdOrderByIdDesc(INVALID_CLIENT_ID).isEmpty()
     }
 
     void 'should fetch postpones together with loan'() {

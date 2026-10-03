@@ -82,7 +82,6 @@ public class LoanService {
     public Loan addLoan(Loan loan, String clientId) {
         log.info("Adding loan for client: {}", clientId);
         Client client = getActiveClient(clientId);
-        rejectPreviousPendingLoan(clientId);
         return addLoanToClient(client, loan);
     }
 
@@ -135,15 +134,6 @@ public class LoanService {
         loan.setInterestAndReturnDate(config.getInterestRate(), timeUtils.getCurrentDateTime());
         loan.setClient(client);
         return loanRepository.save(loan);
-    }
-
-    private void rejectPreviousPendingLoan(String clientId) {
-        loanRepository.findFirstByClientIdOrderByIdDesc(clientId)
-            .filter(loan -> PENDING == loan.getStatus())
-            .ifPresent(loan -> {
-                log.info("Rejecting previous pending loan: {}", loan.getId());
-                loan.setStatus(REJECTED);
-            });
     }
 
     private Client getClient(String clientId) {

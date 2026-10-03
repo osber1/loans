@@ -40,7 +40,6 @@ class LoanServiceSpec extends AbstractSpec {
     LoanRepository loanRepository = Mock {
         save(_ as Loan) >> loan
         findById(LOAN_ID) >> { of(loan) }
-        findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> empty()
     }
 
     @Subject
@@ -203,30 +202,6 @@ class LoanServiceSpec extends AbstractSpec {
             takenLoan == loan
         and:
             takenLoan.status == OPEN
-    }
-
-    void 'should reject last pending loan when new is taken'() {
-        given:
-            Loan pendingLoan = buildLoan(100.0, PENDING)
-            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
-        when:
-            loanService.addLoan(buildLoanWithoutId(100.0), CLIENT_ID)
-        then:
-            1 * loanRepository.findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> of(pendingLoan)
-        and:
-            pendingLoan.status == REJECTED
-    }
-
-    void 'should not reject last loan when it is not pending'() {
-        given:
-            Loan openLoan = buildLoan(100.0, OPEN)
-            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
-        when:
-            loanService.addLoan(buildLoanWithoutId(100.0), CLIENT_ID)
-        then:
-            1 * loanRepository.findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> of(openLoan)
-        and:
-            openLoan.status == OPEN
     }
 
     void 'should throw exception when client is not active'() {
