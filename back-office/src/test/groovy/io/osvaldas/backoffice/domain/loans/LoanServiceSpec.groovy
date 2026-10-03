@@ -7,6 +7,8 @@ import static io.osvaldas.api.loans.Status.REJECTED
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
+import org.springframework.cache.Cache
+import org.springframework.cache.CacheManager
 import org.springframework.data.jpa.domain.Specification
 
 import io.osvaldas.api.exceptions.BadRequestException
@@ -37,6 +39,12 @@ class LoanServiceSpec extends AbstractSpec {
 
     RiskCheckerClient riskCheckerClient = Mock()
 
+    Cache loanResponseCache = Mock()
+
+    CacheManager cacheManager = Stub {
+        getCache('LoanResponse') >> loanResponseCache
+    }
+
     LoanRepository loanRepository = Mock {
         save(_ as Loan) >> loan
         findById(LOAN_ID) >> { of(loan) }
@@ -44,7 +52,8 @@ class LoanServiceSpec extends AbstractSpec {
     }
 
     @Subject
-    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient)
+    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient,
+        cacheManager)
 
     void setup() {
         loan.status = PENDING
@@ -188,6 +197,8 @@ class LoanServiceSpec extends AbstractSpec {
         and:
             BadRequestException e = thrown()
             e.message == ''
+        and:
+            1 * loanResponseCache.evict(LOAN_ID)
     }
 
     void 'should take loan when validation pass'() {
