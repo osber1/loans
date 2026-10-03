@@ -1,3 +1,15 @@
+spring:
+  rabbitmq:
+    listener:
+      simple:
+        default-requeue-rejected: false
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 50ms
+          multiplier: 1
+          max-interval: 50ms
+
 email:
   senderAddress: hello@osber.com
   subject: Confirm your email

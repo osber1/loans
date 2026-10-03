@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.web.servlet.MockMvc
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.databind.ObjectMapper
 
 import io.osvaldas.risk.TestClockDelegate
 import spock.lang.Shared
@@ -45,11 +45,6 @@ abstract class AbstractControllerSpec extends Specification {
         @Primary
         TestClockDelegate testClockDelegate(Clock clock) {
             new TestClockDelegate(clock)
-        }
-
-        @Bean
-        ObjectMapper objectMapper() {
-            new ObjectMapper()
         }
 
     }

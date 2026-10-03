@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:tc:postgresql:16.2-alpine:///databasename
+    url: jdbc:tc:postgresql:17.6-alpine:///databasename
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
 
 logging:

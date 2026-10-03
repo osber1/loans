@@ -22,7 +22,6 @@ dependencies {
         libs.postgresql,
         libs.feign,
         libs.prometheus,
-        libs.jackson.datatype.jsr310,
         libs.vault,
         libs.shedlock.spring,
         libs.shedlock.provider
@@ -41,7 +40,6 @@ dependencies {
         libs.spring.boot.testcontainers,
         libs.testcontainers.spock,
         libs.testcontainers.postgresql,
-        libs.testcontainers.vault,
         libs.testcontainers.rabbitmq,
         libs.spring.boot.cloud.stub.runner,
         libs.spring.boot.starter.data.jpa.test

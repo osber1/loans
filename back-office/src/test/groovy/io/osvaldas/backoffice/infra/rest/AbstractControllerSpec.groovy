@@ -1,7 +1,5 @@
 package io.osvaldas.backoffice.infra.rest
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS
 import static java.time.Clock.fixed
 import static java.time.Instant.parse
 import static java.time.ZoneId.of
@@ -18,15 +16,12 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.testcontainers.containers.GenericContainer
-import org.testcontainers.containers.RabbitMQContainer
+import org.testcontainers.rabbitmq.RabbitMQContainer
 import org.testcontainers.spock.Testcontainers
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import tools.jackson.databind.ObjectMapper
 
 import io.osvaldas.api.clients.ClientRegisterRequest
 import io.osvaldas.api.loans.LoanRequest
@@ -39,7 +34,6 @@ import spock.lang.Shared
 @Testcontainers
 @ActiveProfiles('test')
 @AutoConfigureMockMvc
-@ContextConfiguration(classes = TestObjectMapperConfig)
 abstract class AbstractControllerSpec extends AbstractSpec {
 
     @Shared
@@ -107,20 +101,6 @@ abstract class AbstractControllerSpec extends AbstractSpec {
         @Bean
         CacheManager cacheManager() {
             new ConcurrentMapCacheManager('LoanResponse')
-        }
-
-    }
-
-    @TestConfiguration
-    static class TestObjectMapperConfig {
-
-        @Bean
-        ObjectMapper objectMapper() {
-            JsonMapper.builder()
-                .addModule(new JavaTimeModule())
-                .disable(FAIL_ON_UNKNOWN_PROPERTIES)
-                .disable(WRITE_DATE_KEYS_AS_TIMESTAMPS)
-                .build()
         }
 
     }
