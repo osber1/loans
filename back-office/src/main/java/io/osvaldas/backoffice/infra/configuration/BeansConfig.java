@@ -61,6 +61,7 @@ public class BeansConfig {
             .cacheDefaults(cacheConfiguration)
             .withCacheConfiguration(LOAN_RESPONSE_CACHE, cacheConfiguration
                 .serializeValuesWith(fromSerializer(new JacksonJsonRedisSerializer<>(mapper, LoanResponse.class))))
+            .transactionAware()
             .build();
     }
 

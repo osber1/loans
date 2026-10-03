@@ -1,8 +1,9 @@
 package io.osvaldas.backoffice.infra.rest.loans;
 
+import static io.osvaldas.backoffice.infra.configuration.BeansConfig.LOAN_RESPONSE_CACHE;
+
 import java.util.Collection;
 
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +30,7 @@ public class LoansController {
 
     private final LoanMapper loanMapper;
 
-    @Cacheable(value = "LoanResponse", key = "#loanId")
+    @Cacheable(cacheNames = LOAN_RESPONSE_CACHE, key = "#loanId")
     @GetMapping("loans/{loanId}")
     public LoanResponse getLoan(@PathVariable long loanId) {
         return loanMapper.map(service.getLoan(loanId));
@@ -40,7 +41,6 @@ public class LoansController {
         return loanMapper.map(service.getLoans(clientId));
     }
 
-    @CacheEvict(value = "LoanResponse", allEntries = true)
     @PostMapping("loans")
     public LoanResponse takeLoan(@RequestParam String clientId, @Valid @RequestBody LoanRequest request) {
         Loan loan = loanMapper.map(request);
