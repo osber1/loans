@@ -47,7 +47,7 @@ feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
 
 logstash = { module = "net.logstash.logback:logstash-logback-encoder", version = "9.0" }
 
-open_api = { module = "org.springdoc:springdoc-openapi-ui", version = "1.8.0" }
+open_api = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version = "3.0.3" }
 
 prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
 
