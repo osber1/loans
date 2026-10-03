@@ -53,6 +53,7 @@ class PropertiesValidationSpec extends Specification {
     @Configuration(proxyBeanMethods = false)
     @EnableConfigurationProperties([PropertiesConfig, RabbitProperties])
     static class PropertiesConfiguration {
+
     }
 
 }
