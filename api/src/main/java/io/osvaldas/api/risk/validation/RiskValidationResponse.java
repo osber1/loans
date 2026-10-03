@@ -1,8 +1,5 @@
 package io.osvaldas.api.risk.validation;
 
-/**
- * Outcome of a risk validation. {@code reason} is {@code null} when the validation succeeded.
- */
 public record RiskValidationResponse(boolean success, RiskRejectionReason reason, String message) {
 
     public static final String PASSED_MESSAGE = "Risk validation passed.";
