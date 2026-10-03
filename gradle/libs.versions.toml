@@ -5,15 +5,15 @@ spring_cloud_contract = "5.0.3"
 mapstruct = "1.6.3"
 spock = "2.4-groovy-5.0"
 cucumber = "7.34.7"
-shedlock = "7.9.0"
+shedlock = "7.10.1"
 error_prone_picnic = "0.30.0"
 groovy = "5.1.1"
 testcontainers = "1.21.4"
 [plugins]
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
 spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" }
-spotbugs = { id = "com.github.spotbugs", version = "6.5.11" }
-sonarqube = { id = "org.sonarqube", version = "7.4.0.8496" }
+spotbugs = { id = "com.github.spotbugs", version = "6.5.12" }
+sonarqube = { id = "org.sonarqube", version = "7.5.0.8588" }
 errorprone = { id = "net.ltgt.errorprone", version = "5.1.1" }
 dependency_check = { id = "org.owasp.dependencycheck", version = "13.0.0" }
 
@@ -42,7 +42,7 @@ groovy_json = { module = "org.apache.groovy:groovy-json", version.ref = "groovy"
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
 
-wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.2.2" }
+wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.4.2" }
 
 feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
 
@@ -66,7 +66,7 @@ testcontainers_postgresql = { module = "org.testcontainers:postgresql", version.
 testcontainers_rabbitmq = { module = "org.testcontainers:rabbitmq", version.ref = "testcontainers" }
 testcontainers_vault = { module = "org.testcontainers:vault", version.ref = "testcontainers" }
 
-greenmail = { module = "com.icegreen:greenmail", version = "2.1.13" }
+greenmail = { module = "com.icegreen:greenmail", version = "2.1.14" }
 
 awaitility = { module = "org.awaitility:awaitility" }
 
