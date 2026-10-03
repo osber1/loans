@@ -29,6 +29,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import groovy.json.JsonBuilder
 import io.osvaldas.api.loans.LoanRequest
 import io.osvaldas.api.loans.LoanResponse
+import io.osvaldas.api.risk.validation.RiskRejectionReason
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Client
@@ -109,7 +110,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(true, 'Risk validation passed.')
+            RiskValidationResponse validationResponse = RiskValidationResponse.passed()
             stubWireMockResponse(validationResponse)
         when:
             MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
@@ -128,7 +129,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(false, LOAN_LIMIT_EXCEEDS)
+            RiskValidationResponse validationResponse =
+                RiskValidationResponse.rejected(RiskRejectionReason.LOAN_LIMIT_EXCEEDS, LOAN_LIMIT_EXCEEDS)
             stubWireMockResponse(validationResponse)
         when:
             postLoanRequest(loanRequest, CLIENT_ID)
@@ -146,7 +148,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(false, AMOUNT_EXCEEDS)
+            RiskValidationResponse validationResponse =
+                RiskValidationResponse.rejected(RiskRejectionReason.AMOUNT_EXCEEDS, AMOUNT_EXCEEDS)
             stubWireMockResponse(validationResponse)
         when:
             MockHttpServletResponse response = postLoanRequest(buildLoanRequest(999999.0), CLIENT_ID)
@@ -163,7 +166,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             clientRepository.save(activeClientWithId)
         and:
-            RiskValidationResponse validationResponse = new RiskValidationResponse(false, RISK_TOO_HIGH)
+            RiskValidationResponse validationResponse =
+                RiskValidationResponse.rejected(RiskRejectionReason.FORBIDDEN_TIME, RISK_TOO_HIGH)
             stubWireMockResponse(validationResponse)
         when:
             MockHttpServletResponse response = postLoanRequest(buildLoanRequest(50.0), CLIENT_ID)
@@ -222,7 +226,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         given:
             long clientVersion = clientRepository.save(activeClientWithId).version
         and:
-            stubWireMockResponse(new RiskValidationResponse(true, 'Risk validation passed.'))
+            stubWireMockResponse(RiskValidationResponse.passed())
         when:
             MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
         then:

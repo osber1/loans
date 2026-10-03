@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional
 import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.api.loans.Status
 import io.osvaldas.api.risk.validation.RiskValidationRequest
+import io.osvaldas.api.risk.validation.RiskRejectionReason
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.backoffice.domain.clients.ClientService
@@ -90,7 +91,8 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
         when:
             loanService.validate(evaluatedLoan, VALID_CLIENT_ID)
         then:
-            1 * riskCheckerClient.validate(new RiskValidationRequest(evaluatedLoan.id, VALID_CLIENT_ID, 3L))
+            1 * riskCheckerClient.validate(
+                new RiskValidationRequest(evaluatedLoan.id, VALID_CLIENT_ID, evaluatedLoan.amount, 3L))
                 >> passedValidation()
     }
 
@@ -103,7 +105,8 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
         when:
             loanService.validate(evaluatedLoan, VALID_CLIENT_ID)
         then:
-            1 * riskCheckerClient.validate(new RiskValidationRequest(evaluatedLoan.id, VALID_CLIENT_ID, 0L))
+            1 * riskCheckerClient.validate(
+                new RiskValidationRequest(evaluatedLoan.id, VALID_CLIENT_ID, evaluatedLoan.amount, 0L))
                 >> passedValidation()
     }
 
@@ -174,12 +177,12 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
 
     private RiskValidationResponse checkLoanLimit(RiskValidationRequest request) {
         request.loansTakenToday() >= LOAN_LIMIT
-            ? new RiskValidationResponse(false, LOAN_LIMIT_EXCEEDS)
+            ? RiskValidationResponse.rejected(RiskRejectionReason.LOAN_LIMIT_EXCEEDS, LOAN_LIMIT_EXCEEDS)
             : passedValidation()
     }
 
     private RiskValidationResponse passedValidation() {
-        new RiskValidationResponse(true, 'Risk validation passed.')
+        RiskValidationResponse.passed()
     }
 
     private Loan saveLoan(Client loanClient, Status loanStatus) {

@@ -16,6 +16,7 @@ import io.osvaldas.api.exceptions.ClientNotActiveException
 import io.osvaldas.api.exceptions.NotFoundException
 import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.api.risk.validation.RiskValidationRequest
+import io.osvaldas.api.risk.validation.RiskRejectionReason
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.backoffice.AbstractSpec
@@ -141,13 +142,15 @@ class LoanServiceSpec extends AbstractSpec {
             clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
-                >> new RiskValidationResponse(false, AMOUNT_EXCEEDS)
+                >> RiskValidationResponse.rejected(RiskRejectionReason.AMOUNT_EXCEEDS, AMOUNT_EXCEEDS)
         and:
             Loan addedLoan = loanService.addLoan(buildLoan(1000.00), CLIENT_ID)
         when:
             loanService.validate(addedLoan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
+            e instanceof ValidationRuleException.AmountException
+            e.reason == RiskRejectionReason.AMOUNT_EXCEEDS
             e.message == AMOUNT_EXCEEDS
         and:
             addedLoan.status == REJECTED
@@ -158,13 +161,15 @@ class LoanServiceSpec extends AbstractSpec {
             clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
-                >> new RiskValidationResponse(false, RISK_TOO_HIGH)
+                >> RiskValidationResponse.rejected(RiskRejectionReason.FORBIDDEN_TIME, RISK_TOO_HIGH)
         and:
             Loan addedLoan = loanService.addLoan(loan, CLIENT_ID)
         when:
             loanService.validate(addedLoan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
+            e instanceof ValidationRuleException.TimeException
+            e.reason == RiskRejectionReason.FORBIDDEN_TIME
             e.message == RISK_TOO_HIGH
     }
 
@@ -173,12 +178,30 @@ class LoanServiceSpec extends AbstractSpec {
             clientService.getClient(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
-                >> new RiskValidationResponse(false, LOAN_LIMIT_EXCEEDS)
+                >> RiskValidationResponse.rejected(RiskRejectionReason.LOAN_LIMIT_EXCEEDS, LOAN_LIMIT_EXCEEDS)
         when:
             loanService.validate(loan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
+            e instanceof ValidationRuleException.LoanLimitException
+            e.reason == RiskRejectionReason.LOAN_LIMIT_EXCEEDS
             e.message == LOAN_LIMIT_EXCEEDS
+    }
+
+    void 'should still reject loan when risk checker gives no reason'() {
+        given:
+            clientService.getClient(CLIENT_ID) >> activeClientWithId
+        and:
+            riskCheckerClient.validate(_ as RiskValidationRequest)
+                >> new RiskValidationResponse(false, null, 'Rejected.')
+        when:
+            loanService.validate(loan, CLIENT_ID)
+        then:
+            ValidationRuleException e = thrown()
+            e.reason == null
+            e.message == 'Rejected.'
+        and:
+            loan.status == REJECTED
     }
 
     void 'should throw exception when failed to call feign client'() {
@@ -204,7 +227,7 @@ class LoanServiceSpec extends AbstractSpec {
             clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
-                >> new RiskValidationResponse(true, 'Risk validation passed.')
+                >> RiskValidationResponse.passed()
         when:
             Loan takenLoan = loanService.addLoan(loan, CLIENT_ID)
             loanService.validate(takenLoan, CLIENT_ID)
@@ -231,8 +254,8 @@ class LoanServiceSpec extends AbstractSpec {
             1 * loanRepository.count(_ as Specification) >> 3L
             0 * loanRepository.findAll(_ as Specification)
         then:
-            1 * riskCheckerClient.validate(new RiskValidationRequest(LOAN_ID, CLIENT_ID, 3L))
-                >> new RiskValidationResponse(true, 'Risk validation passed.')
+            1 * riskCheckerClient.validate(new RiskValidationRequest(LOAN_ID, CLIENT_ID, loan.amount, 3L))
+                >> RiskValidationResponse.passed()
     }
 
     void 'should return #result.size() loans when status is #status'() {

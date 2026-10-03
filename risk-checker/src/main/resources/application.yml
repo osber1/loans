@@ -13,13 +13,6 @@ spring:
     error:
       include-message: always
       include-binding-errors: always
-  cloud:
-    openfeign:
-      client:
-        config:
-          back-office:
-            connectTimeout: 1000
-            readTimeout: 3000
 
 management:
   endpoints:
@@ -41,6 +34,3 @@ application:
   maxAmount: 100
   forbiddenHourFrom: 0
   forbiddenHourTo: 6
-
-back-office:
-  url: http://localhost:8080

@@ -10,7 +10,6 @@ build {
 dependencies {
     implementation(
         project(':api'),
-        libs.feign,
         libs.prometheus,
         libs.spring.boot.starter.actuator,
     )

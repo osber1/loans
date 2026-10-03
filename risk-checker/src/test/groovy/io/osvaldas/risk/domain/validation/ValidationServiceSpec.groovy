@@ -1,10 +1,9 @@
 package io.osvaldas.risk.domain.validation
 
-import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
+import static io.osvaldas.api.risk.validation.RiskRejectionReason.AMOUNT_EXCEEDS
+import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS as AMOUNT_EXCEEDS_MESSAGE
 
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException
-import io.osvaldas.api.loans.LoanResponse
-import io.osvaldas.api.loans.Status
 import io.osvaldas.api.risk.validation.RiskValidationRequest
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.risk.AbstractSpec
@@ -15,45 +14,40 @@ import spock.lang.Subject
 class ValidationServiceSpec extends AbstractSpec {
 
     @Shared
-    long loanId = 1
-
-    @Shared
     BigDecimal amount = 55.5
 
     @Shared
-    RiskValidationRequest request = new RiskValidationRequest(loanId, clientId, 1L)
+    RiskValidationRequest request = new RiskValidationRequest(1L, clientId, amount, 1L)
 
     Validator validator = Mock()
 
-    BackOfficeClient backOfficeClient = Stub {
-        getLoan(loanId) >> new LoanResponse(loanId, amount, 10.0, 12, Status.NOT_EVALUATED, null, null, [] as Set)
-    }
-
     @Subject
-    ValidationService validationService = new ValidationService(validator, backOfficeClient)
+    ValidationService validationService = new ValidationService(validator)
 
     void 'should return successful validation when checking risk'() {
         when:
             RiskValidationResponse response = validationService.validate(request)
         then:
             response.success()
+            response.reason() == null
         and:
             1 * validator.validate(new RiskValidationTarget(amount, clientId, 1))
     }
 
-    void 'should return failed validation when validation rule rejects loan'() {
+    void 'should return failed validation with reason when validation rule rejects loan'() {
         when:
             RiskValidationResponse response = validationService.validate(request)
         then:
-            1 * validator.validate(_ as RiskValidationTarget) >> { throw new AmountException(AMOUNT_EXCEEDS) }
+            1 * validator.validate(_ as RiskValidationTarget) >> { throw new AmountException(AMOUNT_EXCEEDS_MESSAGE) }
         and:
             !response.success()
-            response.message() == AMOUNT_EXCEEDS
+            response.reason() == AMOUNT_EXCEEDS
+            response.message() == AMOUNT_EXCEEDS_MESSAGE
     }
 
-    void 'should propagate infrastructure failures instead of rejecting loan'() {
+    void 'should propagate unexpected failures instead of rejecting loan'() {
         given:
-            IllegalStateException failure = new IllegalStateException('back-office is down')
+            IllegalStateException failure = new IllegalStateException('boom')
         when:
             validationService.validate(request)
         then:

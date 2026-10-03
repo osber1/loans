@@ -32,6 +32,7 @@ import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.api.loans.LoanResponse
 import io.osvaldas.api.loans.Status
 import io.osvaldas.api.postpones.LoanPostponeResponse
+import io.osvaldas.api.risk.validation.RiskRejectionReason
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.backoffice.domain.loans.LoanService
 import io.osvaldas.backoffice.domain.scheduler.LoansTasksScheduler
@@ -49,9 +50,10 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
 
     static final String OTHER_CLIENT_PERSONAL_CODE = '10987654321'
 
-    static final RiskValidationResponse VALIDATION_PASSED = new RiskValidationResponse(true, 'Risk validation passed.')
+    static final RiskValidationResponse VALIDATION_PASSED = RiskValidationResponse.passed()
 
-    static final RiskValidationResponse VALIDATION_FAILED = new RiskValidationResponse(false, AMOUNT_EXCEEDS)
+    static final RiskValidationResponse VALIDATION_FAILED =
+        RiskValidationResponse.rejected(RiskRejectionReason.AMOUNT_EXCEEDS, AMOUNT_EXCEEDS)
 
     static final String UNTYPED_CACHE_NAME = 'UntypedCache'
 
