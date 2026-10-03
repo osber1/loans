@@ -220,7 +220,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
             objectMapper.readValue(response.contentAsString, TodayTakenLoansCount).takenLoansCount() == 1
     }
 
-    void 'should return loan with postpones when open-in-view is disabled'() {
+    void 'should return loan with postpones'() {
         given:
             Loan savedLoan = saveClientWithPostponedLoan()
         when:
@@ -236,7 +236,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    void 'should return client loans with postpones when open-in-view is disabled'() {
+    void 'should return client loans with postpones'() {
         given:
             Loan savedLoan = saveClientWithPostponedLoan()
         when:

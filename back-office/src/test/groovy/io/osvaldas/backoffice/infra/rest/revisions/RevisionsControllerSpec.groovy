@@ -54,7 +54,7 @@ class RevisionsControllerSpec extends AbstractControllerSpec {
             List.of(objectMapper.readValue(response.contentAsString, LoanResponse[]))*.status() == [OPEN, CLOSED]
     }
 
-    void 'should return loan revisions with postpones when open-in-view is disabled'() {
+    void 'should return loan revisions with postpones'() {
         given:
             Loan loan = buildLoanWithoutId(10.0, OPEN)
             loan.postponeLoan(7, 1.5)
