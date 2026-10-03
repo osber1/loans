@@ -70,7 +70,7 @@ public class Client {
     private ZonedDateTime updatedAt;
 
     @Version
-    private long version;
+    private Long version;
 
     public void addLoan(Loan loan) {
         loans.add(loan);
