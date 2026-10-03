@@ -5,8 +5,4 @@ import jakarta.validation.constraints.NotNull;
 
 public record RiskValidationRequest(@NotNull Long loanId, @NotEmpty String clientId) {
 
-    public RiskValidationRequest() {
-        this(0L, "");
-    }
-
 }

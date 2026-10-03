@@ -1,5 +1,5 @@
 application:
-  loanLimitPerDay: 1
+  loanLimitPerDay: 2
   maxAmount: 100
   forbiddenHourFrom: 0
   forbiddenHourTo: 6
@@ -12,3 +12,10 @@ spring:
     error:
       include-message: always
       include-binding-errors: always
+  cloud:
+    openfeign:
+      client:
+        config:
+          back-office:
+            connectTimeout: 1000
+            readTimeout: 1000

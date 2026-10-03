@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,15 +24,16 @@ public class PropertiesConfig {
 
     @NotNull
     @Min(0)
-    @Max(24)
+    @Max(23)
     private Integer forbiddenHourFrom;
 
     @NotNull
     @Min(0)
-    @Max(24)
+    @Max(23)
     private Integer forbiddenHourTo;
 
     @NotNull
+    @Positive
     private Integer loanLimitPerDay;
 
 }

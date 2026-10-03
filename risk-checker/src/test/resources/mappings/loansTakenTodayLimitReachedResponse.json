@@ -4,14 +4,14 @@
     "urlPath": "/api/v1/loans/today",
     "queryParameters": {
       "clientId": {
-        "equalTo": "clientId"
+        "equalTo": "tooMuchLoansClientId"
       }
     }
   },
   "response": {
     "status": 200,
     "jsonBody": {
-      "takenLoansCount": 1
+      "takenLoansCount": 2
     },
     "headers": {
       "Content-Type": "application/json"
