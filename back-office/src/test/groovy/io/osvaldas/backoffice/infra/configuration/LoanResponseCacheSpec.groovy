@@ -1,8 +1,6 @@
 package io.osvaldas.backoffice.infra.configuration
 
-import static com.github.tomakehurst.wiremock.client.WireMock.configureFor
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
@@ -25,7 +23,9 @@ import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.context.ContextConfiguration
 import org.wiremock.spring.ConfigureWireMock
 import org.wiremock.spring.EnableWireMock
+import org.wiremock.spring.InjectWireMock
 
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 
 import io.osvaldas.api.exceptions.ValidationRuleException
@@ -38,7 +38,7 @@ import io.osvaldas.backoffice.domain.scheduler.LoansTasksScheduler
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Loan
 
-@EnableWireMock([@ConfigureWireMock(port = 8081)])
+@EnableWireMock([@ConfigureWireMock(baseUrlProperties = 'risk.checker.url')])
 @ContextConfiguration(classes = TestClockConfig)
 @SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 class LoanResponseCacheSpec extends AbstractControllerSpec {
@@ -61,6 +61,9 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
 
     static final ZonedDateTime VILNIUS_DATE = ZonedDateTime.of(2021, 10, 12, 13, 10, 10, 123_456_789, VILNIUS)
 
+    @InjectWireMock
+    WireMockServer wireMock
+
     @Autowired
     StringRedisTemplate redisTemplate
 
@@ -82,10 +85,6 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
             new LoanPostponeResponse(1, VILNIUS_DATE.plusWeeks(1), 15.75),
             new LoanPostponeResponse(2, DATE.plusWeeks(2), 23.63),
         ] as Set)
-
-    void setupSpec() {
-        configureFor('localhost', 8081)
-    }
 
     void 'should store loan response in redis and read it back unchanged'() {
         given:
@@ -249,7 +248,7 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
     }
 
     private void stubRiskValidation(RiskValidationResponse response) {
-        stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
+        wireMock.stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
             .willReturn(okJson(objectMapper.writeValueAsString(response))))
     }
 

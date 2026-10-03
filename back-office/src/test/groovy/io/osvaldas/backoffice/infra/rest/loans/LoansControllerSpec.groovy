@@ -1,9 +1,7 @@
 package io.osvaldas.backoffice.infra.rest.loans
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
-import static com.github.tomakehurst.wiremock.client.WireMock.configureFor
 import static com.github.tomakehurst.wiremock.client.WireMock.containing
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.loans.Status.OPEN
@@ -22,7 +20,9 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
 import org.wiremock.spring.ConfigureWireMock
 import org.wiremock.spring.EnableWireMock
+import org.wiremock.spring.InjectWireMock
 
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
@@ -35,17 +35,16 @@ import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Shared
 
-@EnableWireMock([@ConfigureWireMock(port = 8081)])
+@EnableWireMock([@ConfigureWireMock(baseUrlProperties = 'risk.checker.url')])
 @ContextConfiguration(classes = TestClockConfig)
 @SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 class LoansControllerSpec extends AbstractControllerSpec {
 
+    @InjectWireMock
+    WireMockServer wireMock
+
     @Shared
     LoanRequest loanRequest = buildLoanRequest(100.00)
-
-    void setupSpec() {
-        configureFor('localhost', 8081)
-    }
 
     void 'should return loan when it exists'() {
         given:
@@ -242,7 +241,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
     }
 
     private StubMapping stubWireMockResponse(RiskValidationResponse response) {
-        stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
+        wireMock.stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
             .withRequestBody(containing(CLIENT_ID))
             .willReturn(aResponse()
                 .withHeader(CONTENT_TYPE, APPLICATION_JSON.toString())
