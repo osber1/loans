@@ -2,9 +2,11 @@ package io.osvaldas.backoffice.domain.postpones;
 
 import static io.osvaldas.api.loans.Status.OPEN;
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_OPEN;
+import static io.osvaldas.backoffice.infra.configuration.BeansConfig.LOAN_RESPONSE_CACHE;
 
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class PostponeService {
     private final PropertiesConfig config;
 
     @Transactional
+    @CacheEvict(cacheNames = LOAN_RESPONSE_CACHE, key = "#id")
     public LoanPostpone postponeLoan(long id) {
         log.info("Postponing loan: {}", id);
         Loan loan = getOpenLoan(id);

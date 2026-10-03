@@ -7,6 +7,7 @@ import static io.osvaldas.api.loans.Status.PENDING;
 import static io.osvaldas.api.loans.Status.REJECTED;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_ACTIVE;
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_FOUND;
+import static io.osvaldas.backoffice.infra.configuration.BeansConfig.LOAN_RESPONSE_CACHE;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.clientIdIs;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreatedAtOrAfter;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs;
@@ -18,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +54,8 @@ public class LoanService {
     private final TimeUtils timeUtils;
 
     private final RiskCheckerClient riskCheckerClient;
+
+    private final CacheManager cacheManager;
 
     @Transactional
     public Loan save(Loan loan) {
@@ -91,12 +95,17 @@ public class LoanService {
     }
 
     public void validate(Loan loan, String clientId) {
-        setStatusAndSave(loan, NOT_EVALUATED);
-        RiskValidationResponse response = sendValidationRequest(loan, clientId);
-        Optional.of(response)
-            .filter(RiskValidationResponse::success)
-            .ifPresentOrElse(r -> approveAndSave(loan),
-                () -> rejectLoanAndThrow(loan, response.message()));
+        try {
+            setStatusAndSave(loan, NOT_EVALUATED);
+            RiskValidationResponse response = sendValidationRequest(loan, clientId);
+            Optional.of(response)
+                .filter(RiskValidationResponse::success)
+                .ifPresentOrElse(r -> approveAndSave(loan),
+                    () -> rejectLoanAndThrow(loan, response.message()));
+        } finally {
+            Optional.ofNullable(cacheManager.getCache(LOAN_RESPONSE_CACHE))
+                .ifPresent(cache -> cache.evict(loan.getId()));
+        }
     }
 
     public List<Loan> getLoansByStatus(Status status) {

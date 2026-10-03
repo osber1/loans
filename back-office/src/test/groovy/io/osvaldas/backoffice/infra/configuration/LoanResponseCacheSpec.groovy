@@ -1,27 +1,57 @@
 package io.osvaldas.backoffice.infra.configuration
 
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import static io.osvaldas.api.clients.Status.ACTIVE
+import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
+import static io.osvaldas.api.loans.Status.REJECTED
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cache.Cache
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.mock.web.MockHttpServletResponse
+import org.springframework.test.context.ContextConfiguration
+import org.wiremock.spring.ConfigureWireMock
+import org.wiremock.spring.EnableWireMock
 
+import com.github.tomakehurst.wiremock.client.WireMock
+
+import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.api.loans.LoanResponse
+import io.osvaldas.api.loans.Status
 import io.osvaldas.api.postpones.LoanPostponeResponse
+import io.osvaldas.api.risk.validation.RiskValidationResponse
+import io.osvaldas.backoffice.domain.loans.LoanService
+import io.osvaldas.backoffice.domain.scheduler.LoansTasksScheduler
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Loan
 
+@EnableWireMock([@ConfigureWireMock(port = 8081)])
+@ContextConfiguration(classes = TestClockConfig)
+@SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 class LoanResponseCacheSpec extends AbstractControllerSpec {
 
     static final String CACHE_NAME = 'LoanResponse'
+
+    static final String OTHER_CLIENT_ID = 'otherClientId'
+
+    static final String OTHER_CLIENT_PERSONAL_CODE = '10987654321'
+
+    static final RiskValidationResponse VALIDATION_PASSED = new RiskValidationResponse(true, 'Risk validation passed.')
+
+    static final RiskValidationResponse VALIDATION_FAILED = new RiskValidationResponse(false, AMOUNT_EXCEEDS)
 
     static final String UNTYPED_CACHE_NAME = 'UntypedCache'
 
@@ -37,6 +67,9 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
     @Autowired
     JdbcTemplate jdbcTemplate
 
+    @Autowired
+    LoanService loanService
+
     LoanResponse loanResponse = new LoanResponse(
         CACHED_LOAN_ID,
         100.00,
@@ -49,6 +82,10 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
             new LoanPostponeResponse(1, VILNIUS_DATE.plusWeeks(1), 15.75),
             new LoanPostponeResponse(2, DATE.plusWeeks(2), 23.63),
         ] as Set)
+
+    void setupSpec() {
+        configureFor('localhost', 8081)
+    }
 
     void 'should store loan response in redis and read it back unchanged'() {
         given:
@@ -112,6 +149,112 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
             }
         cleanup:
             jdbcTemplate.execute('ALTER SEQUENCE postpone_seq RESTART WITH 1')
+    }
+
+    void 'should show new postpone after cached loan is postponed'() {
+        given:
+            Loan savedLoan = saveClientLoan(OPEN)
+        when:
+            LoanResponse cachedLoan = requestLoan(savedLoan.id)
+        then:
+            cachedLoan.loanPostpones().empty
+        when:
+            MockHttpServletResponse postponeResponse = mockMvc.perform(post('/api/v1/loans/extensions')
+                .param('loanId', "${savedLoan.id}"))
+                .andReturn().response
+        then:
+            postponeResponse.status == OK.value()
+            with(requestLoan(savedLoan.id).loanPostpones()) {
+                it*.interestRate() == [firstPostpone.interestRate]
+                it*.returnDate()*.toInstant() == [firstPostpone.returnDate.toInstant()]
+            }
+    }
+
+    void 'should show opened loan after cached loan passes validation'() {
+        given:
+            Loan savedLoan = saveClientLoan(NOT_EVALUATED)
+            stubRiskValidation(VALIDATION_PASSED)
+        when:
+            LoanResponse cachedLoan = requestLoan(savedLoan.id)
+        then:
+            cachedLoan.status() == NOT_EVALUATED
+        when:
+            loanService.validate(savedLoan, CLIENT_ID)
+        then:
+            requestLoan(savedLoan.id).status() == OPEN
+    }
+
+    void 'should show rejected loan after cached loan fails validation'() {
+        given:
+            Loan savedLoan = saveClientLoan(NOT_EVALUATED)
+            stubRiskValidation(VALIDATION_FAILED)
+        when:
+            LoanResponse cachedLoan = requestLoan(savedLoan.id)
+        then:
+            cachedLoan.status() == NOT_EVALUATED
+        when:
+            loanService.validate(savedLoan, CLIENT_ID)
+        then:
+            thrown(ValidationRuleException)
+            requestLoan(savedLoan.id).status() == REJECTED
+    }
+
+    void 'should show #status loan after cached loan is evaluated by scheduler'() {
+        given:
+            Loan savedLoan = saveClientLoan(NOT_EVALUATED)
+            stubRiskValidation(validationResponse)
+        when:
+            LoanResponse cachedLoan = requestLoan(savedLoan.id)
+        then:
+            cachedLoan.status() == NOT_EVALUATED
+        when:
+            new LoansTasksScheduler(loanService).evaluateNotEvaluatedLoans()
+        then:
+            requestLoan(savedLoan.id).status() == status
+        where:
+            validationResponse || status
+            VALIDATION_PASSED  || OPEN
+            VALIDATION_FAILED  || REJECTED
+    }
+
+    void 'should keep other client loan cached when a new loan is taken'() {
+        given:
+            Loan otherClientLoan = clientRepository.save(
+                buildClient(OTHER_CLIENT_ID, [buildLoanWithoutId(100.00)] as Set, ACTIVE)
+                    .tap { personalCode = OTHER_CLIENT_PERSONAL_CODE })
+                .loans.first()
+            clientRepository.save(activeClientWithId)
+            stubRiskValidation(VALIDATION_PASSED)
+        and:
+            LoanResponse cachedLoan = requestLoan(otherClientLoan.id)
+            loanRepository.save(otherClientLoan.tap { amount = 200.00 })
+        when:
+            MockHttpServletResponse takeLoanResponse = mockMvc.perform(post('/api/v1/loans')
+                .param('clientId', CLIENT_ID)
+                .content(objectMapper.writeValueAsString(buildLoanRequest(100.00)))
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            takeLoanResponse.status == OK.value()
+        and:
+            with(requestLoan(otherClientLoan.id)) {
+                it == cachedLoan
+                amount() == 100.00
+            }
+    }
+
+    private Loan saveClientLoan(Status loanStatus) {
+        clientRepository.save(buildClient(CLIENT_ID, [buildLoanWithoutId(100.00, loanStatus)] as Set, ACTIVE))
+            .loans.first()
+    }
+
+    private void stubRiskValidation(RiskValidationResponse response) {
+        stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
+            .willReturn(okJson(objectMapper.writeValueAsString(response))))
+    }
+
+    private LoanResponse requestLoan(long loanId) {
+        objectMapper.readValue(getLoan(loanId).contentAsString, LoanResponse)
     }
 
     private MockHttpServletResponse getLoan(long loanId) {
