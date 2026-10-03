@@ -82,7 +82,7 @@ public class ClientController {
     }
 
     @GetMapping("clients/{id}/active")
-    @Operation(deprecated = true, description = "Deprecated: kept for activation links in already sent emails. Use POST clients/{id}/active.")
+    @Operation(description = "Activates the client from the link in the activation email.")
     public void activateClientFromEmailLink(@PathVariable String id) {
         service.activateClient(id);
     }
