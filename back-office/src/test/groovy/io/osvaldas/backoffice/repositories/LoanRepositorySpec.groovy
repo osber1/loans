@@ -37,18 +37,6 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
             loan.isEmpty()
     }
 
-    void 'should increment version when loan is updated'() {
-        given:
-            Loan savedLoan = repository.saveAndFlush(loan)
-            Long initialVersion = savedLoan.version
-        when:
-            savedLoan.status = NOT_EVALUATED
-            repository.saveAndFlush(savedLoan)
-        then:
-            initialVersion == 0
-            savedLoan.version == initialVersion + 1
-    }
-
     void 'should return client last loan'() {
         given:
             Client savedClient = entityManager.persist(client)

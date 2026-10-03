@@ -8,8 +8,6 @@ import static java.util.Optional.empty
 import static java.util.Optional.of
 
 import org.springframework.data.jpa.domain.Specification
-import org.springframework.transaction.TransactionStatus
-import org.springframework.transaction.support.TransactionTemplate
 
 import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.api.exceptions.ClientNotActiveException
@@ -45,13 +43,8 @@ class LoanServiceSpec extends AbstractSpec {
         findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> empty()
     }
 
-    TransactionTemplate transactionTemplate = Stub {
-        executeWithoutResult(_) >> { args -> args[0].accept(Stub(TransactionStatus)) }
-    }
-
     @Subject
-    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils,
-        riskCheckerClient, transactionTemplate)
+    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient)
 
     void setup() {
         loan.status = PENDING
@@ -210,38 +203,6 @@ class LoanServiceSpec extends AbstractSpec {
             takenLoan == loan
         and:
             takenLoan.status == OPEN
-    }
-
-    void 'should change status of managed loan without merging the passed instance'() {
-        given:
-            Loan detachedLoan = buildLoan(100.0, PENDING)
-            Loan managedLoan = buildLoan(100.0, PENDING)
-        and:
-            riskCheckerClient.validate(_ as RiskValidationRequest)
-                >> new RiskValidationResponse(true, 'Risk validation passed.')
-        when:
-            loanService.validate(detachedLoan, CLIENT_ID)
-        then:
-            2 * loanRepository.findById(LOAN_ID) >> of(managedLoan)
-            0 * loanRepository.save(_)
-        and:
-            managedLoan.status == OPEN
-            detachedLoan.status == OPEN
-    }
-
-    void 'should not evaluate loan when its status was changed concurrently'() {
-        given:
-            Loan staleLoan = buildLoan(100.0, PENDING)
-        when:
-            loanService.validate(staleLoan, CLIENT_ID)
-        then:
-            1 * loanRepository.findById(LOAN_ID) >> of(buildLoan(100.0, OPEN))
-            0 * riskCheckerClient.validate(_)
-        and:
-            BadRequestException e = thrown()
-            e.message == LoanService.LOAN_STATUS_CHANGED.formatted(LOAN_ID, OPEN, [PENDING, NOT_EVALUATED])
-        and:
-            staleLoan.status == PENDING
     }
 
     void 'should reject last pending loan when new is taken'() {

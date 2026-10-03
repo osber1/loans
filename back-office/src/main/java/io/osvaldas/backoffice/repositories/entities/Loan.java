@@ -25,7 +25,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -66,9 +65,6 @@ public class Loan {
     @JoinColumn(name = "client_id")
     @ManyToOne(fetch = LAZY)
     private Client client;
-
-    @Version
-    private Long version;
 
     public void addLoanPostpone(LoanPostpone loanPostpone) {
         loanPostpones.add(loanPostpone);

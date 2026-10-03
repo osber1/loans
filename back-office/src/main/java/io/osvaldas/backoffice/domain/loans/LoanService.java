@@ -15,17 +15,13 @@ import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import io.osvaldas.api.exceptions.BadRequestException;
 import io.osvaldas.api.exceptions.ClientNotActiveException;
 import io.osvaldas.api.exceptions.NotFoundException;
 import io.osvaldas.api.exceptions.ValidationRuleException;
@@ -47,10 +43,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LoanService {
 
-    static final String LOAN_STATUS_CHANGED = "Loan with id %s has status %s, expected one of %s.";
-
-    private static final Set<Status> EVALUABLE_STATUSES = EnumSet.of(PENDING, NOT_EVALUATED);
-
     private final ClientService clientService;
 
     private final LoanRepository loanRepository;
@@ -60,8 +52,6 @@ public class LoanService {
     private final TimeUtils timeUtils;
 
     private final RiskCheckerClient riskCheckerClient;
-
-    private final TransactionTemplate transactionTemplate;
 
     @Transactional
     public Loan save(Loan loan) {
@@ -101,15 +91,14 @@ public class LoanService {
     }
 
     public void validate(Loan loan, String clientId) {
-        changeStatus(loan, EVALUABLE_STATUSES, NOT_EVALUATED);
+        setStatusAndSave(loan, NOT_EVALUATED);
         RiskValidationResponse response = sendValidationRequest(loan, clientId);
         Optional.of(response)
             .filter(RiskValidationResponse::success)
-            .ifPresentOrElse(r -> approve(loan),
+            .ifPresentOrElse(r -> approveAndSave(loan),
                 () -> rejectLoanAndThrow(loan, response.message()));
     }
 
-    @Transactional(readOnly = true)
     public List<Loan> getLoansByStatus(Status status) {
         return loanRepository.findAllWithClientByStatus(status);
     }
@@ -158,28 +147,19 @@ public class LoanService {
         return clientService.getClient(clientId);
     }
 
-    private void approve(Loan loan) {
+    private void approveAndSave(Loan loan) {
         log.info("Success validating loan: {}", loan.getId());
-        changeStatus(loan, Set.of(NOT_EVALUATED), OPEN);
+        setStatusAndSave(loan, OPEN);
     }
 
     private void rejectLoanAndThrow(Loan loan, String message) {
-        changeStatus(loan, Set.of(NOT_EVALUATED), REJECTED);
+        setStatusAndSave(loan, REJECTED);
         throw new ValidationRuleException(message);
     }
 
-    private void changeStatus(Loan loan, Set<Status> expectedStatuses, Status newStatus) {
-        long id = loan.getId();
-        transactionTemplate.executeWithoutResult(tx -> {
-            Loan managedLoan = loanRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(LOAN_NOT_FOUND.formatted(id)));
-            Status currentStatus = managedLoan.getStatus();
-            if (!expectedStatuses.contains(currentStatus)) {
-                throw new BadRequestException(LOAN_STATUS_CHANGED.formatted(id, currentStatus, expectedStatuses));
-            }
-            managedLoan.setStatus(newStatus);
-        });
-        loan.setStatus(newStatus);
+    private void setStatusAndSave(Loan loan, Status status) {
+        loan.setStatus(status);
+        loanRepository.save(loan);
     }
 
 }

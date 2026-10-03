@@ -1,7 +1,6 @@
 package io.osvaldas.backoffice
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.context.ApplicationContext
@@ -16,17 +15,9 @@ class BackOfficeApplicationSpec extends Specification {
     @Autowired
     ApplicationContext context
 
-    @Value('${spring.jpa.open-in-view}')
-    boolean openInView
-
     void 'should load context'() {
         expect:
             context
-    }
-
-    void 'should run tests with open-in-view disabled as in production'() {
-        expect:
-            !openInView
     }
 
 }
