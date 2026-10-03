@@ -82,13 +82,9 @@ The base URI can also be set with the `ACCEPTANCE_BASE_URI` environment variable
 ### Error Prone
 
 [Error Prone](https://errorprone.info) and [Error Prone Support](https://error-prone.picnic.tech) run on every
-Java compilation and report findings of the rule set in `config/error-prone/rules.gradle`; sources are never
-modified during a normal build. To let Error Prone apply its suggested fixes (including Refaster rules) to the
-sources in place, opt in explicitly and review the resulting diff:
-
-```shell
-./gradlew compileJava compileTestJava -PerrorpronePatch --rerun-tasks
-```
+Java compilation with the rule set in `config/error-prone/rules.gradle` and apply their suggested fixes
+(including Refaster rules) to the sources in place, so the code stays clean without extra steps. Review and commit
+the resulting diff after a build.
 
 ## CI
 

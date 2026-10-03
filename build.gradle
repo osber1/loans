@@ -95,25 +95,18 @@ subprojects {
         }
     }
 
-    boolean errorPronePatch = providers.gradleProperty('errorpronePatch').isPresent()
-
     tasks.withType(JavaCompile).configureEach {
         options.errorprone {
             disableWarningsInGeneratedCode = true
-            ignoreUnknownCheckNames = true
             checks = disabled_error_prone_checks
 
+            String enabledRules = enabled_error_prone_rules.join(',')
             String disabledRules = disabled_error_prone_rules.join('|')
-            errorproneArgs.add("-XepOpt:Refaster:NamePattern=^(?!.*(?:($disabledRules))).*\$")
-
-            if (errorPronePatch) {
-                errorproneArgs.addAll(
-                    "-XepPatchChecks:Refaster,${enabled_error_prone_rules.join(',')}",
-                    '-XepPatchLocation:IN_PLACE'
-                )
-            } else {
-                enable(*enabled_error_prone_rules)
-            }
+            errorproneArgs.addAll(
+                "-XepPatchChecks:Refaster,$enabledRules",
+                '-XepPatchLocation:IN_PLACE',
+                "-XepOpt:Refaster:NamePattern=^(?!.*(?:($disabledRules))).*\$"
+            )
         }
     }
 }
