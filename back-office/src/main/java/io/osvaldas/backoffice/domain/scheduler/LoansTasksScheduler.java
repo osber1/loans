@@ -6,10 +6,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import io.osvaldas.api.exceptions.ValidationRuleException;
 import io.osvaldas.backoffice.domain.loans.LoanService;
+import io.osvaldas.backoffice.repositories.entities.Loan;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "scheduler.evaluateNotEvaluatedLoans", name = "enabled", havingValue = "true")
@@ -17,11 +21,21 @@ public class LoansTasksScheduler {
 
     private final LoanService loanService;
 
-    @Scheduled(cron = "${scheduler.evaluateNotEvaluatedLoans.cron: 0 0 0 0 * *}")
-    @SchedulerLock(name = "evaluateNotEvaluatedLoans", lockAtLeastFor = "PT5S", lockAtMostFor = "PT30S")
+    @Scheduled(cron = "${scheduler.evaluateNotEvaluatedLoans.cron:0 */10 * * * *}")
+    @SchedulerLock(name = "evaluateNotEvaluatedLoans", lockAtLeastFor = "PT5S", lockAtMostFor = "PT10M")
     public void evaluateNotEvaluatedLoans() {
         loanService.getLoansByStatus(NOT_EVALUATED)
-            .forEach(loan -> loanService.validate(loan, loan.getClient().getId()));
+            .forEach(this::evaluate);
+    }
+
+    private void evaluate(Loan loan) {
+        try {
+            loanService.validate(loan, loan.getClient().getId());
+        } catch (ValidationRuleException e) {
+            log.warn("Loan {} rejected during scheduled evaluation: {}", loan.getId(), e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("Failed to evaluate loan {}", loan.getId(), e);
+        }
     }
 
 }

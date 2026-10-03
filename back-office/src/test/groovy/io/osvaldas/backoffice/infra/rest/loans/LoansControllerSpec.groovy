@@ -6,6 +6,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.containing
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import static io.osvaldas.api.clients.Status.ACTIVE
+import static io.osvaldas.api.loans.Status.CLOSED
+import static io.osvaldas.api.loans.Status.NOT_EVALUATED
+import static io.osvaldas.api.loans.Status.OPEN
+import static io.osvaldas.api.loans.Status.PENDING
 import static io.osvaldas.api.loans.Status.REJECTED
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpStatus.BAD_REQUEST
@@ -28,6 +32,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import groovy.json.JsonBuilder
 import io.osvaldas.api.loans.LoanRequest
 import io.osvaldas.api.loans.LoanResponse
+import io.osvaldas.api.loans.TodayTakenLoansCount
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Client
@@ -197,6 +202,77 @@ class LoansControllerSpec extends AbstractControllerSpec {
             response.status == OK.value()
         and:
             response.contentAsString.contains('1')
+    }
+
+    void 'should count only open loans taken today'() {
+        given:
+            Set<Loan> loans = [OPEN, NOT_EVALUATED, REJECTED, PENDING, CLOSED]
+                .collect { buildLoanWithoutId(100.0, it) } as Set
+            clientRepository.save(buildClient(CLIENT_ID, loans, ACTIVE))
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
+                .param('clientId', CLIENT_ID)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            objectMapper.readValue(response.contentAsString, TodayTakenLoansCount).takenLoansCount() == 1
+    }
+
+    void 'should return loan with postpones when open-in-view is disabled'() {
+        given:
+            Loan savedLoan = saveClientWithPostponedLoan()
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/{loanId}', savedLoan.id)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            with(objectMapper.readValue(response.contentAsString, LoanResponse)) {
+                id() == savedLoan.id
+                loanPostpones()*.interestRate() == [15.00]
+            }
+    }
+
+    void 'should return client loans with postpones when open-in-view is disabled'() {
+        given:
+            Loan savedLoan = saveClientWithPostponedLoan()
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
+                .param('clientId', CLIENT_ID)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            List<LoanResponse> loans = List.of(objectMapper.readValue(response.contentAsString, LoanResponse[]))
+            loans*.id() == [savedLoan.id]
+            loans.first().loanPostpones()*.interestRate() == [15.00]
+    }
+
+    void 'should open taken loan and keep client untouched'() {
+        given:
+            long clientVersion = clientRepository.save(activeClientWithId).version
+        and:
+            stubWireMockResponse(new RiskValidationResponse(true, 'Risk validation passed.'))
+        when:
+            MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
+        then:
+            response.status == OK.value()
+        and:
+            LoanResponse loanResponse = objectMapper.readValue(response.contentAsString, LoanResponse)
+            loanResponse.status() == OPEN
+            loanRepository.findById(loanResponse.id()).get().status == OPEN
+        and:
+            clientRepository.findById(CLIENT_ID).get().version == clientVersion
+    }
+
+    private Loan saveClientWithPostponedLoan() {
+        Loan loan = buildLoanWithoutId(100.0)
+        loan.postponeLoan(7, 1.5)
+        clientRepository.save(buildClient(CLIENT_ID, [loan] as Set, ACTIVE)).loans.first()
     }
 
     private StubMapping stubWireMockResponse(RiskValidationResponse response) {

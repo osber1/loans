@@ -11,7 +11,7 @@ import spock.lang.Subject
 
 class PostponeServiceSpec extends AbstractSpec {
 
-    LoanService loanService = Stub()
+    LoanService loanService = Mock()
 
     PropertiesConfig config = Stub {
         interestIncrementFactor >> 1.5
@@ -23,11 +23,12 @@ class PostponeServiceSpec extends AbstractSpec {
 
     void 'should postpone loan when it is first postpone'() {
         given:
-            loanService.getLoan(LOAN_ID) >> loan
-            loanService.save(loan) >> loan
+            loanService.getLoanForUpdate(LOAN_ID) >> loan
         when:
             LoanPostpone loanPostpone = postponeService.postponeLoan(LOAN_ID)
         then:
+            0 * loanService.save(_)
+        and:
             with(loanPostpone) {
                 returnDate == firstPostpone.returnDate
                 interestRate == firstPostpone.interestRate
@@ -40,8 +41,7 @@ class PostponeServiceSpec extends AbstractSpec {
         given:
             loan.loanPostpones = [firstPostpone] as Set
         and:
-            loanService.getLoan(LOAN_ID) >> loan
-            loanService.save(loan) >> loan
+            loanService.getLoanForUpdate(LOAN_ID) >> loan
         when:
             LoanPostpone loanPostpone = postponeService.postponeLoan(LOAN_ID)
         then:
@@ -55,7 +55,7 @@ class PostponeServiceSpec extends AbstractSpec {
 
     void 'should throw when trying to postpone loan which is not open'() {
         given:
-            loanService.getLoan(LOAN_ID) >> buildLoan(100.0, CLOSED)
+            loanService.getLoanForUpdate(LOAN_ID) >> buildLoan(100.0, CLOSED)
         when:
             postponeService.postponeLoan(LOAN_ID)
         then:

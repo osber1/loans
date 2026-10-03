@@ -30,11 +30,11 @@ public class PostponeService {
         log.info("Postponing loan: {}", id);
         Loan loan = getOpenLoan(id);
         loan.postponeLoan(config.getPostponeDays(), config.getInterestIncrementFactor());
-        return loanService.save(loan).getLastLoanPostpone();
+        return loan.getLastLoanPostpone();
     }
 
     private Loan getOpenLoan(long id) {
-        return Optional.of(loanService.getLoan(id))
+        return Optional.of(loanService.getLoanForUpdate(id))
             .filter(savedLoan -> OPEN == savedLoan.getStatus())
             .orElseThrow(() -> new BadRequestException(LOAN_NOT_OPEN.formatted(id)));
     }

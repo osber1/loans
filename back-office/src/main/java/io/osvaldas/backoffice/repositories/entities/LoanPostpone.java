@@ -1,9 +1,6 @@
 package io.osvaldas.backoffice.repositories.entities;
 
-import static jakarta.persistence.CascadeType.DETACH;
-import static jakarta.persistence.CascadeType.MERGE;
-import static jakarta.persistence.CascadeType.PERSIST;
-import static jakarta.persistence.CascadeType.REFRESH;
+import static jakarta.persistence.FetchType.LAZY;
 import static java.math.RoundingMode.HALF_UP;
 
 import java.math.BigDecimal;
@@ -39,7 +36,7 @@ public class LoanPostpone {
     private BigDecimal interestRate;
 
     @JoinColumn(name = "loan_id")
-    @ManyToOne(cascade = { DETACH, MERGE, PERSIST, REFRESH })
+    @ManyToOne(fetch = LAZY)
     private Loan loan;
 
     public void incrementAndSetInterestRate(BigDecimal interestRate, BigDecimal interestIncrementFactor) {

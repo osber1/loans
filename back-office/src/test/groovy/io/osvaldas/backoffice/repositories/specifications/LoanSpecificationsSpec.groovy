@@ -3,7 +3,10 @@ package io.osvaldas.backoffice.repositories.specifications
 import static io.osvaldas.api.loans.Status.OPEN
 import static io.osvaldas.api.loans.Status.PENDING
 
+import java.time.ZonedDateTime
+
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 
 import io.osvaldas.backoffice.repositories.AbstractDatabaseSpec
 import io.osvaldas.backoffice.repositories.LoanRepository
@@ -16,8 +19,11 @@ class LoanSpecificationsSpec extends AbstractDatabaseSpec {
     @Autowired
     LoanRepository repository
 
+    @Autowired
+    TestEntityManager entityManager
+
     void setup() {
-        loan.client = client
+        loan.client = entityManager.persist(client)
         repository.save(loan)
     }
 
@@ -34,13 +40,22 @@ class LoanSpecificationsSpec extends AbstractDatabaseSpec {
 
     void 'should return list size of #listSize when date is #creationDate'() {
         when:
-            List<Loan> loans = repository.findAll(LoanSpecifications.loanCreationDateIsAfter(creationDate))
+            List<Loan> loans = repository.findAll(LoanSpecifications.loanCreatedAtOrAfter(creationDate))
         then:
             loans.size() == listSize
         where:
             creationDate || listSize
             DATE         || 1
             FUTURE_DATE  || 0
+    }
+
+    void 'should include loan created exactly at the given date'() {
+        given:
+            entityManager.flush()
+            entityManager.clear()
+            ZonedDateTime createdAt = repository.findById(loan.id).get().createdAt
+        expect:
+            repository.count(LoanSpecifications.loanCreatedAtOrAfter(createdAt)) == 1
     }
 
     void 'should return list size of #listSize when status is #status'() {
