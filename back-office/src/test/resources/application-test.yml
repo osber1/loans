@@ -1,0 +1,22 @@
+# Test-only overrides. Everything else (incl. spring.jpa.open-in-view: false) comes from the main application.yml,
+# this file is activated via @ActiveProfiles('test') so tests run against the production configuration.
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16.2-alpine:///databasename
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+logging:
+  file:
+    name: build/logs/back-office.log
+
+rabbitmq:
+  exchanges:
+    internal: internal.exchange
+  queues:
+    notification: notification.queue
+  routing-keys:
+    internal-notification: internal.notification.routing-key
+
+scheduler:
+  evaluateNotEvaluatedLoans:
+    enabled: false

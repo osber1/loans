@@ -12,6 +12,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.cloud.openfeign.FeignAutoConfiguration
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.PostgreSQLContainer
@@ -26,6 +27,7 @@ import spock.lang.Specification
 
 @DataJpaTest
 @Testcontainers
+@ActiveProfiles('test')
 @AutoConfigureTestDatabase(replace = NONE)
 @ImportAutoConfiguration([FeignAutoConfiguration])
 @ContextConfiguration(classes = TestCacheConfig)
