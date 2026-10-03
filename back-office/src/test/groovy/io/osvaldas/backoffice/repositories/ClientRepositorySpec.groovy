@@ -1,7 +1,5 @@
 package io.osvaldas.backoffice.repositories
 
-import static io.osvaldas.api.clients.Status.DELETED
-
 import org.springframework.beans.factory.annotation.Autowired
 
 import io.osvaldas.backoffice.repositories.entities.Client
@@ -38,13 +36,6 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
             personalCode          || result
             VALID_PERSONAL_CODE   || true
             INVALID_PERSONAL_CODE || false
-    }
-
-    void 'should change client status to deleted when deleting client'() {
-        when:
-            repository.changeClientStatus(VALID_CLIENT_ID, DELETED)
-        then:
-            repository.findById(VALID_CLIENT_ID).get().status == DELETED
     }
 
 }

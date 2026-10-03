@@ -2,43 +2,34 @@ package io.osvaldas.backoffice.domain.clients
 
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.DELETED
+import static io.osvaldas.api.clients.Status.REGISTERED
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 
-import io.osvaldas.api.email.EmailMessage
 import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.api.exceptions.NotFoundException
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.entities.Client
-import io.osvaldas.messages.RabbitMQMessageProducer
-import io.osvaldas.messages.RabbitProperties
-import io.osvaldas.messages.RabbitProperties.Exchanges
-import io.osvaldas.messages.RabbitProperties.RoutingKeys
 import spock.lang.Subject
 
 class ClientServiceSpec extends AbstractSpec {
 
+    static final String OTHER_PERSONAL_CODE = '99999999999'
+
     ClientRepository clientRepository = Mock()
 
-    RabbitMQMessageProducer messageProducer = Mock()
-
-    RabbitProperties rabbitProperties = Stub {
-        exchanges >> Stub(Exchanges) {
-            internal >> 'internal.exchange'
-        }
-        routingKeys >> Stub(RoutingKeys) {
-            internalNotification >> 'internal.notification.routing-key'
-        }
-    }
+    ApplicationEventPublisher eventPublisher = Mock()
 
     @Subject
-    ClientService clientService = new ClientService(clientRepository, messageProducer, rabbitProperties)
+    ClientService clientService = new ClientService(clientRepository, eventPublisher)
 
     void 'should throw exception when registering client with existing personal code'() {
         when:
@@ -48,18 +39,30 @@ class ClientServiceSpec extends AbstractSpec {
             e.message == CLIENT_ALREADY_EXIST
         and:
             1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> true
-            0 * messageProducer.publish(_ as EmailMessage, _ as String, _ as String)
+            0 * clientRepository.saveAndFlush(_)
+            0 * eventPublisher.publishEvent(_)
     }
 
-    void 'should register new client when client with new personal code'() {
+    void 'should register new client and publish registration event when client with new personal code'() {
         when:
             Client registeredClient = clientService.registerClient(registeredClientWithoutId)
         then:
             registeredClient.id == CLIENT_ID
         and:
             1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> false
-            1 * clientRepository.save(registeredClientWithoutId) >> registeredClientWithId
-            1 * messageProducer.publish(_ as EmailMessage, _ as String, _ as String)
+            1 * clientRepository.saveAndFlush(registeredClientWithoutId) >> registeredClientWithId
+            1 * eventPublisher.publishEvent(new ClientRegisteredEvent(CLIENT_ID, NAME + ' ' + SURNAME, CLIENT_EMAIL))
+    }
+
+    void 'should not publish registration event when saving client fails'() {
+        when:
+            clientService.registerClient(registeredClientWithoutId)
+        then:
+            thrown(IllegalStateException)
+        and:
+            1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> false
+            1 * clientRepository.saveAndFlush(registeredClientWithoutId) >> { throw new IllegalStateException() }
+            0 * eventPublisher.publishEvent(_)
     }
 
     void 'should return clients list when there are clients'() {
@@ -102,34 +105,89 @@ class ClientServiceSpec extends AbstractSpec {
             1 * clientRepository.findById(CLIENT_ID) >> empty()
     }
 
-    void 'should change client status to deleted when it exists'() {
+    void 'should change client status to #newStatus when it exists'() {
+        given:
+            Client client = buildClient(CLIENT_ID, [] as Set, REGISTERED)
         when:
-            clientService.deleteClient(CLIENT_ID)
+            action(clientService)
         then:
-            1 * clientRepository.changeClientStatus(CLIENT_ID, DELETED)
+            client.status == newStatus
         and:
-            1 * clientRepository.existsById(CLIENT_ID) >> true
+            1 * clientRepository.findById(CLIENT_ID) >> of(client)
+            0 * clientRepository.save(_)
+        where:
+            newStatus || action
+            DELETED   || { ClientService service -> service.deleteClient(CLIENT_ID) }
+            ACTIVE    || { ClientService service -> service.activateClient(CLIENT_ID) }
     }
 
-    void 'should throw exception when trying to delete non existing client'() {
+    void 'should throw exception when trying to change status of non existing client'() {
         when:
-            clientService.deleteClient(CLIENT_ID)
+            action(clientService)
         then:
             NotFoundException e = thrown()
             e.message == CLIENT_NOT_FOUND
         and:
-            0 * clientRepository.changeClientStatus(CLIENT_ID, DELETED)
-        and:
-            1 * clientRepository.existsById(CLIENT_ID) >> false
+            1 * clientRepository.findById(CLIENT_ID) >> empty()
+        where:
+            action << [{ ClientService service -> service.deleteClient(CLIENT_ID) },
+                       { ClientService service -> service.activateClient(CLIENT_ID) }]
     }
 
-    void 'should update client when it exists'() {
-        when:
-            clientService.updateClient(registeredClientWithId)
-        then:
-            1 * clientRepository.save(registeredClientWithId) >> registeredClientWithId
+    void 'should update only editable client fields when it exists'() {
+        given:
+            Client storedClient = buildClient(CLIENT_ID, [loan] as Set, REGISTERED).tap {
+                version = 3L
+            }
         and:
-            1 * clientRepository.existsById(CLIENT_ID) >> true
+            Client changes = new Client().tap {
+                id = CLIENT_ID
+                firstName = 'newName'
+                lastName = 'newSurname'
+                email = 'new@mail.com'
+                phoneNumber = '37060000000'
+                personalCode = OTHER_PERSONAL_CODE
+                status = ACTIVE
+                version = 3L
+            }
+        when:
+            Client updatedClient = clientService.updateClient(changes)
+        then:
+            updatedClient.is(storedClient)
+        and:
+            with(updatedClient) {
+                firstName == 'newName'
+                lastName == 'newSurname'
+                email == 'new@mail.com'
+                phoneNumber == '37060000000'
+                personalCode == CLIENT_PERSONAL_CODE
+                status == REGISTERED
+                loans == [loan] as Set
+            }
+        and:
+            1 * clientRepository.findById(CLIENT_ID) >> of(storedClient)
+            1 * clientRepository.saveAndFlush(storedClient) >> storedClient
+    }
+
+    void 'should throw optimistic locking exception when updating client with stale version'() {
+        given:
+            Client storedClient = buildClient(CLIENT_ID, [] as Set, REGISTERED).tap {
+                version = 1L
+            }
+        and:
+            Client changes = buildClient(CLIENT_ID, [] as Set, REGISTERED).tap {
+                firstName = 'newName'
+                version = 0L
+            }
+        when:
+            clientService.updateClient(changes)
+        then:
+            thrown(ObjectOptimisticLockingFailureException)
+        and:
+            storedClient.firstName == NAME
+        and:
+            1 * clientRepository.findById(CLIENT_ID) >> of(storedClient)
+            0 * clientRepository.saveAndFlush(_)
     }
 
     void 'should throw exception when trying to update non existing client'() {
@@ -139,9 +197,8 @@ class ClientServiceSpec extends AbstractSpec {
             NotFoundException e = thrown()
             e.message == CLIENT_NOT_FOUND
         and:
-            0 * clientRepository.save(registeredClientWithId)
-        and:
-            1 * clientRepository.existsById(CLIENT_ID) >> false
+            1 * clientRepository.findById(CLIENT_ID) >> empty()
+            0 * clientRepository.saveAndFlush(_)
     }
 
     void 'should return all clients by status'() {
