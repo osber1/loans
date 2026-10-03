@@ -66,6 +66,20 @@ class IntegrationSpec extends AbstractIntegrationSpec {
             }
     }
 
+    void 'should dead-letter a message that keeps failing instead of retrying it forever'() {
+        given:
+            EmailMessage message = new EmailMessage(clientId, fullName, 'not an email address')
+        when:
+            amqpTemplate.convertAndSend(exchangeName, routingKeys, message)
+        then:
+            conditions.eventually {
+                assert amqpTemplate.receive(deadLetterQueueName) != null
+            }
+        and:
+            amqpTemplate.receive(queueName) == null
+            mailhogMessages().isEmpty()
+    }
+
     void 'should use a single json converting rabbit template and listener factory'() {
         expect:
             applicationContext.getBeansOfType(AmqpTemplate).size() == 1

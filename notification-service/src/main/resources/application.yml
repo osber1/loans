@@ -11,6 +11,17 @@ spring:
       enabled: ALWAYS
   rabbitmq:
     host: localhost
+    listener:
+      simple:
+        # A message that keeps failing is retried a few times and then rejected without requeue,
+        # so the broker dead-letters it (see the notification-dlx policy in loans-infra)
+        default-requeue-rejected: false
+        retry:
+          enabled: true
+          max-attempts: 4
+          initial-interval: 1s
+          multiplier: 2
+          max-interval: 10s
   mail:
     host: localhost
     port: 1025
