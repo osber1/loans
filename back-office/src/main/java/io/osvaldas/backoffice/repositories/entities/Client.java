@@ -56,7 +56,7 @@ public class Client {
     private Status status = REGISTERED;
 
     @NotNull
-    @Column(length = 11)
+    @Column(length = 11, unique = true)
     private String personalCode;
 
     @OneToMany(mappedBy = "client", cascade = ALL, fetch = LAZY)

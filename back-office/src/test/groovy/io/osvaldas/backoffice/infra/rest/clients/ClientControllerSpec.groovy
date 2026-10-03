@@ -131,7 +131,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
     void 'should get list of clients when they exists'() {
         given:
             clientRepository.save(buildClient('123123123', [] as Set, ACTIVE))
-            clientRepository.save(buildClient('890890890', [] as Set, ACTIVE))
+            clientRepository.save(buildClient('890890890', [] as Set, ACTIVE).tap { personalCode = '89089089000' })
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients')
                 .param('page', '0')
