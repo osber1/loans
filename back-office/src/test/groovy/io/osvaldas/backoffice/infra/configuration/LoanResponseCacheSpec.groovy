@@ -11,6 +11,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
+import java.sql.Timestamp
+import java.time.Duration
+import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -21,6 +24,7 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.transaction.support.TransactionTemplate
 import org.wiremock.spring.ConfigureWireMock
 import org.wiremock.spring.EnableWireMock
 import org.wiremock.spring.InjectWireMock
@@ -71,6 +75,9 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
 
     @Autowired
     JdbcTemplate jdbcTemplate
+
+    @Autowired
+    TransactionTemplate transactionTemplate
 
     @Autowired
     LoanService loanService
@@ -203,13 +210,17 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
     void 'should show #status loan after cached loan is evaluated by scheduler'() {
         given:
             Loan savedLoan = saveClientLoan(NOT_EVALUATED)
+            transactionTemplate.executeWithoutResult {
+                jdbcTemplate.update('UPDATE loan SET created_at = ? WHERE id = ?',
+                    Timestamp.from(Instant.parse('2021-10-12T10:00:00Z')), savedLoan.id)
+            }
             stubRiskValidation(validationResponse)
         when:
             LoanResponse cachedLoan = requestLoan(savedLoan.id)
         then:
             cachedLoan.status() == NOT_EVALUATED
         when:
-            new LoansTasksScheduler(loanService).evaluateNotEvaluatedLoans()
+            new LoansTasksScheduler(loanService, Duration.ofMinutes(5)).evaluateNotEvaluatedLoans()
         then:
             requestLoan(savedLoan.id).status() == status
         where:

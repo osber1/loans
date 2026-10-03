@@ -2,6 +2,7 @@ package io.osvaldas.backoffice.repositories;
 
 import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificat
     List<Loan> findAllWithPostponesByClientId(String clientId);
 
     @EntityGraph(attributePaths = "client")
-    List<Loan> findAllWithClientByStatus(Status status);
+    List<Loan> findAllWithClientByStatusAndCreatedAtBefore(Status status, ZonedDateTime createdBefore);
 
     @Lock(PESSIMISTIC_WRITE)
     Optional<Loan> findForUpdateById(long id);

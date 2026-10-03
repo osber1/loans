@@ -1,6 +1,9 @@
 package io.osvaldas.backoffice.repositories
 
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
+import static io.osvaldas.api.loans.Status.OPEN
+import static io.osvaldas.api.loans.Status.PENDING
+import static java.time.ZonedDateTime.now
 
 import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
@@ -61,11 +64,25 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
             entityManager.flush()
             entityManager.clear()
         when:
-            List<Loan> loans = repository.findAllWithClientByStatus(NOT_EVALUATED)
+            List<Loan> loans =
+                repository.findAllWithClientByStatusAndCreatedAtBefore(NOT_EVALUATED, now().plusMinutes(1))
         then:
             loans.size() == 1
             Hibernate.isInitialized(loans.first().client)
             loans.first().client.id == VALID_CLIENT_ID
+    }
+
+    void 'should not fetch loans created after the given time or with another status'() {
+        given:
+            Client savedClient = entityManager.persist(client)
+            saveLoan(savedClient, NOT_EVALUATED)
+            saveLoan(savedClient, OPEN)
+            entityManager.flush()
+            entityManager.clear()
+        expect:
+            repository.findAllWithClientByStatusAndCreatedAtBefore(NOT_EVALUATED, now().minusMinutes(1)).empty
+            repository.findAllWithClientByStatusAndCreatedAtBefore(PENDING, now().plusMinutes(1)).empty
+            repository.findAllWithClientByStatusAndCreatedAtBefore(NOT_EVALUATED, now().plusMinutes(1)).size() == 1
     }
 
     private Loan saveLoan(Client loanClient, io.osvaldas.api.loans.Status loanStatus) {
