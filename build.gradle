@@ -69,7 +69,6 @@ subprojects {
             libs.spring.boot.starter.validation
         )
 
-        // Lombok is only needed at compile time and must not end up in the boot jars
         compileOnly(
             libs.lombok
         )
@@ -87,8 +86,6 @@ subprojects {
         )
     }
 
-    // Bootstrap configuration (bootstrap*.yml) and JSON logging (logback-spring.xml) are only used by the
-    // deployable Spring Boot applications, not by the shared libraries or the acceptance tests
     plugins.withId('org.springframework.boot') {
         dependencies {
             implementation(
@@ -98,15 +95,11 @@ subprojects {
         }
     }
 
-    // Error Prone runs the configured rule set on every compilation and only reports findings.
-    // Rewriting sources in place is opt-in, so regular builds stay cacheable:
-    //   ./gradlew compileJava compileTestJava -PerrorpronePatch
     boolean errorPronePatch = providers.gradleProperty('errorpronePatch').isPresent()
 
     tasks.withType(JavaCompile).configureEach {
         options.errorprone {
             disableWarningsInGeneratedCode = true
-            // The rule list contains a few names that are not (or no longer) Error Prone checks
             ignoreUnknownCheckNames = true
             checks = disabled_error_prone_checks
 
@@ -119,8 +112,6 @@ subprojects {
                     '-XepPatchLocation:IN_PLACE'
                 )
             } else {
-                // Enable the rule set at each check's default severity (style checks warn, correctness
-                // checks keep failing the build as they did before) without touching the sources.
                 enable(*enabled_error_prone_rules)
             }
         }

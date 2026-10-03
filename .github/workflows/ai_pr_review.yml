@@ -15,7 +15,6 @@ concurrency:
 jobs:
   pr_agent_job:
     name: Run pr agent on every pull request
-    # Dependabot and fork PRs do not get the OpenAI secret
     if: github.actor != 'dependabot[bot]'
 
     runs-on: ubuntu-latest

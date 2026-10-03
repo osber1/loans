@@ -17,11 +17,6 @@ import io.restassured.specification.RequestSpecification;
 
 public class LoansStepDefinitions {
 
-    /**
-     * Back-office URL, configurable with the {@code acceptance.baseUri} system property
-     * (e.g. {@code ./gradlew :acceptance-tests:acceptanceTest -Pacceptance.baseUri=...})
-     * or the {@code ACCEPTANCE_BASE_URI} environment variable.
-     */
     private static final String BASE_URI = baseUri();
 
     private String clientId;

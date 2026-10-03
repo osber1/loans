@@ -139,7 +139,6 @@ ext {
         'NonStaticImport'                 : 'OFF',
         'JavaTimeDefaultTimeZone'         : 'OFF',
         'TimeZoneUsage'                   : 'OFF',
-        // Reports false positives on every Lombok-annotated class (and would "fix" them in patch mode)
         'UnnecessarySemicolon'            : 'OFF',
     ]
 }

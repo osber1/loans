@@ -13,8 +13,6 @@ dependencies {
     )
 }
 
-// The Cucumber scenarios call a running back-office instance, so they are not part of `test`/`check`.
-// Start the stack (see the loans-infra repository) and run them with `./gradlew :acceptance-tests:acceptanceTest`.
 tasks.named('test') {
     enabled = false
 }
@@ -33,7 +31,6 @@ tasks.register('acceptanceTest', Test) {
         systemProperty 'acceptance.baseUri', acceptanceBaseUri.get()
     }
 
-    // The result depends on the state of the external services, never reuse a previous run
     outputs.upToDateWhen { false }
     outputs.cacheIf { false }
 }
