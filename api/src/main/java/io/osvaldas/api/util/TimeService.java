@@ -5,11 +5,11 @@ import static java.time.ZonedDateTime.now;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class TimeService implements TimeUtils {
 
