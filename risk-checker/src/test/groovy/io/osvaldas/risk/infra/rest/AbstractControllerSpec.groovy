@@ -1,18 +1,21 @@
 package io.osvaldas.risk.infra.rest
 
+import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH
+
 import java.time.Clock
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.web.servlet.MockMvc
-import org.wiremock.spring.ConfigureWireMock
 import org.wiremock.spring.EnableWireMock
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.tomakehurst.wiremock.client.WireMock
 
 import io.osvaldas.risk.TestClockDelegate
 import spock.lang.Shared
@@ -20,18 +23,11 @@ import spock.lang.Specification
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@EnableWireMock([@ConfigureWireMock(port = 8080)])
+@EnableWireMock
 abstract class AbstractControllerSpec extends Specification {
 
     @Shared
-    String riskTooHigh = 'Risk is too high, because you are trying ' +
-        'to get loan between 00:00 and 6:00 and you want to borrow the max amount!'
-
-    @Shared
-    String amountExceeds = 'The amount you are trying to borrow exceeds the max amount!'
-
-    @Shared
-    String loanLimitExceeds = 'Too many loans taken in a single day.'
+    String riskTooHigh = RISK_TOO_HIGH.formatted('00:00', '06:00')
 
     @Autowired
     MockMvc mockMvc
@@ -42,8 +38,16 @@ abstract class AbstractControllerSpec extends Specification {
     @Autowired
     TestClockDelegate testClockDelegate
 
+    @Value('${wiremock.server.port}')
+    int wireMockPort
+
+    WireMock getWireMock() {
+        new WireMock(wireMockPort)
+    }
+
     void cleanup() {
         testClockDelegate.reset()
+        wireMock.resetRequests()
     }
 
     @TestConfiguration

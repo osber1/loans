@@ -2,10 +2,6 @@ package io.osvaldas.backoffice.repositories.entities;
 
 import static io.osvaldas.api.loans.Status.PENDING;
 import static jakarta.persistence.CascadeType.ALL;
-import static jakarta.persistence.CascadeType.DETACH;
-import static jakarta.persistence.CascadeType.MERGE;
-import static jakarta.persistence.CascadeType.PERSIST;
-import static jakarta.persistence.CascadeType.REFRESH;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static java.util.Comparator.comparing;
@@ -67,7 +63,7 @@ public class Loan {
     private Set<LoanPostpone> loanPostpones = new HashSet<>();
 
     @JoinColumn(name = "client_id")
-    @ManyToOne(cascade = { DETACH, MERGE, PERSIST, REFRESH })
+    @ManyToOne(fetch = LAZY)
     private Client client;
 
     public void addLoanPostpone(LoanPostpone loanPostpone) {

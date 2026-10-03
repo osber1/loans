@@ -17,6 +17,7 @@ import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.testcontainers.containers.GenericContainer
@@ -36,6 +37,7 @@ import spock.lang.Shared
 
 @SpringBootTest
 @Testcontainers
+@ActiveProfiles('test')
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = TestObjectMapperConfig)
 abstract class AbstractControllerSpec extends AbstractSpec {
@@ -69,11 +71,11 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     }
 
     void cleanup() {
-        clientRepository.deleteAll()
         loanRepository.deleteAll()
+        clientRepository.deleteAll()
         cacheManager.cacheNames
             .stream()
-            .each { cacheName -> cacheManager.getCache(cacheName).clear() }
+            .each { cacheName -> cacheManager.getCache(cacheName).invalidate() }
     }
 
     ClientRegisterRequest buildClientRequest(String clientName,

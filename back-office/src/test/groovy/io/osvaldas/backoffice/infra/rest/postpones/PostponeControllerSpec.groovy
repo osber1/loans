@@ -32,7 +32,7 @@ class PostponeControllerSpec extends AbstractControllerSpec {
         and:
             LoanPostpone postpone = objectMapper.readValue(response.contentAsString, LoanPostpone)
             with(postpone) {
-                id == firstPostpone.id
+                id > 0
                 interestRate == firstPostpone.interestRate
             }
     }

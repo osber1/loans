@@ -20,7 +20,9 @@
             <column name="email" type="VARCHAR(255)"/>
             <column name="status" type="VARCHAR(20)"/>
             <column name="phone_number" type="VARCHAR(255)"/>
-            <column name="personal_code" type="VARCHAR(20)"/>
+            <column name="personal_code" type="VARCHAR(11)">
+                <constraints unique="true" uniqueConstraintName="uk_client_personal_code"/>
+            </column>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="updated_at" type="timestamp with time zone"/>
             <column name="version" type="BIGINT"/>
@@ -35,7 +37,7 @@
             <column name="email" type="VARCHAR(255)"/>
             <column name="status" type="VARCHAR(20)"/>
             <column name="phone_number" type="VARCHAR(255)"/>
-            <column name="personal_code" type="VARCHAR(20)"/>
+            <column name="personal_code" type="VARCHAR(11)"/>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="updated_at" type="timestamp with time zone"/>
             <column name="rev" type="INT">
@@ -122,6 +124,20 @@
         <addForeignKeyConstraint baseColumnNames="rev" baseTableName="loan_postpone_aud"
                                  constraintName="FKi11mvh4xh7v3cx5340wredmal" referencedColumnNames="rev"
                                  referencedTableName="revinfo"/>
+
+        <createIndex tableName="loan" indexName="idx_loan_client_id_status_created_at">
+            <column name="client_id"/>
+            <column name="status"/>
+            <column name="created_at"/>
+        </createIndex>
+
+        <createIndex tableName="loan" indexName="idx_loan_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="loan_postpone" indexName="idx_loan_postpone_loan_id">
+            <column name="loan_id"/>
+        </createIndex>
         <rollback/>
     </changeSet>
 

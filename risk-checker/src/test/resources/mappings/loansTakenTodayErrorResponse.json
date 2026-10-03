@@ -1,20 +1,23 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/v1/loans/today?clientId=tooMuchLoansClientId",
+    "urlPath": "/api/v1/loans/today",
     "queryParameters": {
       "clientId": {
-        "equalTo": "tooMuchLoansClientId"
+        "equalTo": "backOfficeErrorClientId"
       }
     }
   },
   "response": {
-    "status": 200,
+    "status": 503,
     "jsonBody": {
-      "takenLoansCount": "999"
+      "type": "about:blank",
+      "title": "Service Unavailable",
+      "status": 503,
+      "detail": "Connection pool exhausted: jdbc:postgresql://internal-db:5432/loans"
     },
     "headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/problem+json"
     }
   }
 }

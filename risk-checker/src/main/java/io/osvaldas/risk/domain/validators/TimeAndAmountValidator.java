@@ -5,6 +5,7 @@ import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH;
 
 import java.math.BigDecimal;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException;
@@ -17,7 +18,10 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
+@Order(TimeAndAmountValidator.ORDER)
 public class TimeAndAmountValidator implements ValidationRule {
+
+    static final int ORDER = 1;
 
     private final PropertiesConfig config;
 
@@ -30,9 +34,10 @@ public class TimeAndAmountValidator implements ValidationRule {
     }
 
     private void checkTimeAndAmount(BigDecimal amount) {
-        int currentHour = timeUtils.getHourOfDay();
-        if (config.getForbiddenHourFrom() <= currentHour && currentHour <= config.getForbiddenHourTo() && amount.compareTo(config.getMaxAmount()) == 0) {
-            throw new TimeException(RISK_TOO_HIGH);
+        int from = config.getForbiddenHourFrom();
+        int to = config.getForbiddenHourTo();
+        if (isWithinWindow(timeUtils.getHourOfDay(), from, to) && amount.compareTo(config.getMaxAmount()) == 0) {
+            throw new TimeException(RISK_TOO_HIGH.formatted(formatHour(from), formatHour(to)));
         }
     }
 
@@ -40,6 +45,17 @@ public class TimeAndAmountValidator implements ValidationRule {
         if (clientAmount.compareTo(config.getMaxAmount()) > 0) {
             throw new AmountException(AMOUNT_EXCEEDS);
         }
+    }
+
+    static boolean isWithinWindow(int hour, int from, int to) {
+        if (from <= to) {
+            return from <= hour && hour < to;
+        }
+        return hour >= from || hour < to;
+    }
+
+    private static String formatHour(int hour) {
+        return "%02d:00".formatted(hour);
     }
 
 }
