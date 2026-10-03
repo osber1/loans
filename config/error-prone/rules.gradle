@@ -108,9 +108,7 @@ ext {
         'RedundantSetterCall',
         'ConstantNaming',
         'Slf4jLoggerDeclaration',
-        'RedundantSetterCall',
         'DeeplyNested',
-        'StatementSwitchToExpressionSwitch',
         'UnnecessaryBreakInSwitch',
         'DuplicateBranches',
         'RedundantControlFlow',
@@ -127,7 +125,6 @@ ext {
         'IfChainToSwitch',
         'RefactorSwitch',
         'UnnamedVariable',
-        'UnnecessarySemicolon',
     ]
 
     disabled_error_prone_rules = [
@@ -142,5 +139,7 @@ ext {
         'NonStaticImport'                 : 'OFF',
         'JavaTimeDefaultTimeZone'         : 'OFF',
         'TimeZoneUsage'                   : 'OFF',
+        // Reports false positives on every Lombok-annotated class (and would "fix" them in patch mode)
+        'UnnecessarySemicolon'            : 'OFF',
     ]
 }

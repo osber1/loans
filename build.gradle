@@ -89,18 +89,31 @@ subprojects {
         )
     }
 
+    // Error Prone runs the configured rule set on every compilation and only reports findings.
+    // Rewriting sources in place is opt-in, so regular builds stay cacheable:
+    //   ./gradlew compileJava compileTestJava -PerrorpronePatch
+    boolean errorPronePatch = providers.gradleProperty('errorpronePatch').isPresent()
+
     tasks.withType(JavaCompile).configureEach {
         options.errorprone {
             disableWarningsInGeneratedCode = true
+            // The rule list contains a few names that are not (or no longer) Error Prone checks
+            ignoreUnknownCheckNames = true
             checks = disabled_error_prone_checks
 
-            String enabledRules = enabled_error_prone_rules.join(',')
             String disabledRules = disabled_error_prone_rules.join('|')
-            errorproneArgs.addAll(
-                "-XepPatchChecks:Refaster,$enabledRules",
-                '-XepPatchLocation:IN_PLACE',
-                "-XepOpt:Refaster:NamePattern=^(?!.*(?:($disabledRules))).*\$"
-            )
+            errorproneArgs.add("-XepOpt:Refaster:NamePattern=^(?!.*(?:($disabledRules))).*\$")
+
+            if (errorPronePatch) {
+                errorproneArgs.addAll(
+                    "-XepPatchChecks:Refaster,${enabled_error_prone_rules.join(',')}",
+                    '-XepPatchLocation:IN_PLACE'
+                )
+            } else {
+                // Enable the rule set at each check's default severity (style checks warn, correctness
+                // checks keep failing the build as they did before) without touching the sources.
+                enable(*enabled_error_prone_rules)
+            }
         }
     }
 }
