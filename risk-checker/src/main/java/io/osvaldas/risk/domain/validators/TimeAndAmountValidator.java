@@ -5,6 +5,7 @@ import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH_BETWEEN_HOURS
 
 import java.math.BigDecimal;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException;
@@ -15,9 +16,15 @@ import io.osvaldas.risk.infra.configuration.PropertiesConfig;
 import io.osvaldas.risk.repositories.risk.RiskValidationTarget;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Local (no remote calls) rule, so it runs before rules calling other services.
+ */
 @Component
 @RequiredArgsConstructor
+@Order(TimeAndAmountValidator.ORDER)
 public class TimeAndAmountValidator implements ValidationRule {
+
+    static final int ORDER = 1;
 
     private final PropertiesConfig config;
 

@@ -11,7 +11,7 @@ import spock.lang.Subject
 class LoanLimitValidatorSpec extends AbstractSpec {
 
     PropertiesConfig config = Stub {
-        loanLimitPerDay >> 1
+        loanLimitPerDay >> 2
     }
 
     BackOfficeClient client = Stub()
@@ -19,23 +19,36 @@ class LoanLimitValidatorSpec extends AbstractSpec {
     @Subject
     LoanLimitValidator loanLimitValidator = new LoanLimitValidator(config, client)
 
-    void 'should pass validation when loans per day limit not exceeded'() {
+    void 'should pass validation when #count other loans taken today and limit is 2'() {
         given:
-            client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(1)
+            client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(count)
         when:
             loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
         then:
             notThrown(LoanLimitException)
+        where:
+            count << [0, 1]
     }
 
-    void 'should throw exception when loans per day limit exceeded'() {
+    void 'should throw exception when #count other loans taken today and limit is 2'() {
         given:
-            client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(6)
+            client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(count)
         when:
             loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
         then:
             LoanLimitException e = thrown()
             e.message == loanLimitExceeds
+        where:
+            count << [2, 6]
+    }
+
+    void 'should pass validation when back-office returns no count'() {
+        given:
+            client.getLoansTakenTodayCount(clientId) >> null
+        when:
+            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
+        then:
+            notThrown(LoanLimitException)
     }
 
 }
