@@ -21,7 +21,7 @@ class ValidationServiceSpec extends AbstractSpec {
     BigDecimal amount = 55.5
 
     @Shared
-    RiskValidationRequest request = new RiskValidationRequest(loanId, clientId)
+    RiskValidationRequest request = new RiskValidationRequest(loanId, clientId, 1L)
 
     Validator validator = Mock()
 
@@ -38,7 +38,7 @@ class ValidationServiceSpec extends AbstractSpec {
         then:
             response.success()
         and:
-            1 * validator.validate(new RiskValidationTarget(amount, clientId, loanId))
+            1 * validator.validate(new RiskValidationTarget(amount, clientId, 1))
     }
 
     void 'should return failed validation when validation rule rejects loan'() {

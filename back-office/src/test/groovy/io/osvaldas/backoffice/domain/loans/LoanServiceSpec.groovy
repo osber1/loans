@@ -13,7 +13,6 @@ import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.api.exceptions.ClientNotActiveException
 import io.osvaldas.api.exceptions.NotFoundException
 import io.osvaldas.api.exceptions.ValidationRuleException
-import io.osvaldas.api.loans.TodayTakenLoansCount
 import io.osvaldas.api.risk.validation.RiskValidationRequest
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.api.util.TimeUtils
@@ -214,14 +213,15 @@ class LoanServiceSpec extends AbstractSpec {
             e.message == CLIENT_NOT_ACTIVE
     }
 
-    void 'should get today taken loans count'() {
+    void 'should send loans taken today with validation request'() {
         when:
-            TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(CLIENT_ID, LOAN_ID)
+            loanService.validate(loan, CLIENT_ID)
         then:
-            todayTakenLoansCount.takenLoansCount() == 3
-        and:
             1 * loanRepository.count(_ as Specification) >> 3L
             0 * loanRepository.findAll(_ as Specification)
+        then:
+            1 * riskCheckerClient.validate(new RiskValidationRequest(LOAN_ID, CLIENT_ID, 3L))
+                >> new RiskValidationResponse(true, 'Risk validation passed.')
     }
 
     void 'should return #result.size() loans when status is #status'() {

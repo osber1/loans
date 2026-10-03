@@ -15,6 +15,6 @@ public class RiskValidationTarget {
 
     private String clientId;
 
-    private long loanId;
+    private long loansTakenToday;
 
 }

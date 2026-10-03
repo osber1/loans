@@ -56,7 +56,7 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
     }
 
     @SpringBean
-    RiskCheckerClient riskCheckerClient = Stub()
+    RiskCheckerClient riskCheckerClient = Mock()
 
     @Subject
     @Autowired
@@ -87,8 +87,11 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
             saveLoan(otherClient, OPEN)
             Loan evaluatedLoan = saveLoan(owner, NOT_EVALUATED)
             saveLoan(owner, OPEN)
-        expect:
-            takenLoansCount(evaluatedLoan) == 3
+        when:
+            loanService.validate(evaluatedLoan, VALID_CLIENT_ID)
+        then:
+            1 * riskCheckerClient.validate(new RiskValidationRequest(evaluatedLoan.id, VALID_CLIENT_ID, 3L))
+                >> passedValidation()
     }
 
     void 'should not count loans taken on earlier days'() {
@@ -97,8 +100,11 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
             Client owner = clientRepository.save(client)
             saveLoan(owner, OPEN)
             Loan evaluatedLoan = saveLoan(owner, NOT_EVALUATED)
-        expect:
-            takenLoansCount(evaluatedLoan) == 0
+        when:
+            loanService.validate(evaluatedLoan, VALID_CLIENT_ID)
+        then:
+            1 * riskCheckerClient.validate(new RiskValidationRequest(evaluatedLoan.id, VALID_CLIENT_ID, 0L))
+                >> passedValidation()
     }
 
     void 'should make parallel loan request of the same client wait until earlier one is committed'() {
@@ -167,14 +173,13 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
     }
 
     private RiskValidationResponse checkLoanLimit(RiskValidationRequest request) {
-        int count = loanService.getTodayTakenLoansCount(request.clientId(), request.loanId()).takenLoansCount()
-        count >= LOAN_LIMIT
+        request.loansTakenToday() >= LOAN_LIMIT
             ? new RiskValidationResponse(false, LOAN_LIMIT_EXCEEDS)
-            : new RiskValidationResponse(true, 'Risk validation passed.')
+            : passedValidation()
     }
 
-    private int takenLoansCount(Loan loan) {
-        loanService.getTodayTakenLoansCount(VALID_CLIENT_ID, loan.id).takenLoansCount()
+    private RiskValidationResponse passedValidation() {
+        new RiskValidationResponse(true, 'Risk validation passed.')
     }
 
     private Loan saveLoan(Client loanClient, Status loanStatus) {

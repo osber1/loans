@@ -28,7 +28,6 @@ import io.osvaldas.api.exceptions.ClientNotActiveException;
 import io.osvaldas.api.exceptions.NotFoundException;
 import io.osvaldas.api.exceptions.ValidationRuleException;
 import io.osvaldas.api.loans.Status;
-import io.osvaldas.api.loans.TodayTakenLoansCount;
 import io.osvaldas.api.risk.validation.RiskValidationRequest;
 import io.osvaldas.api.risk.validation.RiskValidationResponse;
 import io.osvaldas.api.util.TimeUtils;
@@ -85,12 +84,6 @@ public class LoanService {
         return addLoanToClient(client, loan);
     }
 
-    @Transactional(readOnly = true)
-    public TodayTakenLoansCount getTodayTakenLoansCount(String clientId, long loanId) {
-        long loansTakenToday = getLoanTakenTodayCount(clientId, loanId, timeUtils.getCurrentDateTime().truncatedTo(DAYS));
-        return new TodayTakenLoansCount(Math.toIntExact(loansTakenToday));
-    }
-
     public void validate(Loan loan, String clientId) {
         setStatusAndSave(loan, NOT_EVALUATED);
         RiskValidationResponse response = sendValidationRequest(loan, clientId);
@@ -111,9 +104,10 @@ public class LoanService {
     }
 
     private RiskValidationResponse sendValidationRequest(Loan loan, String clientId) {
+        long loansTakenToday = getLoanTakenTodayCount(clientId, loan.getId(), timeUtils.getCurrentDateTime().truncatedTo(DAYS));
         try {
             log.info("Validating loan: {}", loan.getId());
-            RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId));
+            RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId, loansTakenToday));
             log.info("Risk validation response: {}", response);
             return response;
         } catch (RuntimeException e) {
