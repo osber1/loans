@@ -1,16 +1,15 @@
 package io.osvaldas.backoffice.domain.loans
 
-import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
 import static io.osvaldas.api.loans.Status.PENDING
 import static io.osvaldas.api.loans.Status.REJECTED
-import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs
-import static java.util.Collections.emptySet
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.support.TransactionTemplate
 
 import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.api.exceptions.ClientNotActiveException
@@ -24,7 +23,6 @@ import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.domain.clients.ClientService
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig
 import io.osvaldas.backoffice.repositories.LoanRepository
-import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Subject
 
@@ -39,14 +37,25 @@ class LoanServiceSpec extends AbstractSpec {
 
     PropertiesConfig config = Stub()
 
-    RiskCheckerClient riskCheckerClient = Stub()
+    RiskCheckerClient riskCheckerClient = Mock()
 
     LoanRepository loanRepository = Mock {
         save(_ as Loan) >> loan
+        findById(LOAN_ID) >> { of(loan) }
+        findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> empty()
+    }
+
+    TransactionTemplate transactionTemplate = Stub {
+        executeWithoutResult(_) >> { args -> args[0].accept(Stub(TransactionStatus)) }
     }
 
     @Subject
-    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient)
+    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils,
+        riskCheckerClient, transactionTemplate)
+
+    void setup() {
+        loan.status = PENDING
+    }
 
     void 'should save loan'() {
         when:
@@ -55,15 +64,15 @@ class LoanServiceSpec extends AbstractSpec {
             1 * loanRepository.save(loan) >> loan
     }
 
-    void 'should return loans list when there are loans'() {
+    void 'should return loans list with postpones fetched when there are loans'() {
         given:
             clientService.getClient(CLIENT_ID) >> registeredClientWithLoan
         when:
             Collection loans = loanService.getLoans(CLIENT_ID)
         then:
-            loans.size() == 1
+            loans == [loan]
         and:
-            loans == [loan] as Set
+            1 * loanRepository.findAllWithPostponesByClientId(CLIENT_ID) >> [loan]
     }
 
     void 'should return empty list when there are no loans'() {
@@ -72,16 +81,30 @@ class LoanServiceSpec extends AbstractSpec {
         when:
             Collection loans = loanService.getLoans(CLIENT_ID)
         then:
-            loans == emptySet()
+            loans.empty
+        and:
+            1 * loanRepository.findAllWithPostponesByClientId(CLIENT_ID) >> []
     }
 
-    void 'should return loan when it exists'() {
+    void 'should throw exception when getting loans of non existing client'() {
+        given:
+            clientService.getClient(CLIENT_ID) >> { throw new NotFoundException(CLIENT_NOT_FOUND) }
+        when:
+            loanService.getLoans(CLIENT_ID)
+        then:
+            NotFoundException e = thrown()
+            e.message == CLIENT_NOT_FOUND
+        and:
+            0 * loanRepository.findAllWithPostponesByClientId(_)
+    }
+
+    void 'should return loan with postpones fetched when it exists'() {
         when:
             Loan loan = loanService.getLoan(LOAN_ID)
         then:
             loan.id == LOAN_ID
         and:
-            1 * loanRepository.findById(LOAN_ID) >> of(loan)
+            1 * loanRepository.findWithPostponesById(LOAN_ID) >> of(loan)
     }
 
     void 'should throw exception when trying to get non existing loan'() {
@@ -91,7 +114,26 @@ class LoanServiceSpec extends AbstractSpec {
             NotFoundException e = thrown()
             e.message == "Loan with id ${LOAN_ID} does not exist."
         and:
-            1 * loanRepository.findById(LOAN_ID) >> empty()
+            1 * loanRepository.findWithPostponesById(LOAN_ID) >> empty()
+    }
+
+    void 'should return locked loan when getting it for update'() {
+        when:
+            Loan lockedLoan = loanService.getLoanForUpdate(LOAN_ID)
+        then:
+            lockedLoan == loan
+        and:
+            1 * loanRepository.findForUpdateById(LOAN_ID) >> of(loan)
+    }
+
+    void 'should throw exception when trying to get non existing loan for update'() {
+        when:
+            loanService.getLoanForUpdate(LOAN_ID)
+        then:
+            NotFoundException e = thrown()
+            e.message == "Loan with id ${LOAN_ID} does not exist."
+        and:
+            1 * loanRepository.findForUpdateById(LOAN_ID) >> empty()
     }
 
     void 'should throw exception when amount limit is exceeded'() {
@@ -107,6 +149,8 @@ class LoanServiceSpec extends AbstractSpec {
         then:
             ValidationRuleException e = thrown()
             e.message == AMOUNT_EXCEEDS
+        and:
+            addedLoan.status == REJECTED
     }
 
     void 'should throw exception when max amount and forbidden time'() {
@@ -156,7 +200,6 @@ class LoanServiceSpec extends AbstractSpec {
     void 'should take loan when validation pass'() {
         given:
             clientService.getClient(CLIENT_ID) >> activeClientWithId
-            clientService.save(activeClientWithId) >> activeClientWithLoan
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(true, 'Risk validation passed.')
@@ -165,19 +208,64 @@ class LoanServiceSpec extends AbstractSpec {
             loanService.validate(takenLoan, CLIENT_ID)
         then:
             takenLoan == loan
+        and:
+            takenLoan.status == OPEN
     }
 
-    void 'should reject last pending loan when new is taken'() {
+    void 'should change status of managed loan without merging the passed instance'() {
         given:
-            Client client = buildClient(CLIENT_ID, [(buildLoan(100.0, PENDING))] as Set, ACTIVE)
-            clientService.getClient(CLIENT_ID) >> client
+            Loan detachedLoan = buildLoan(100.0, PENDING)
+            Loan managedLoan = buildLoan(100.0, PENDING)
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(true, 'Risk validation passed.')
         when:
-            loanService.addLoan(loan, CLIENT_ID)
+            loanService.validate(detachedLoan, CLIENT_ID)
         then:
-            REJECTED == client.loans.findAll { it.id == 1 }.first().status
+            2 * loanRepository.findById(LOAN_ID) >> of(managedLoan)
+            0 * loanRepository.save(_)
+        and:
+            managedLoan.status == OPEN
+            detachedLoan.status == OPEN
+    }
+
+    void 'should not evaluate loan when its status was changed concurrently'() {
+        given:
+            Loan staleLoan = buildLoan(100.0, PENDING)
+        when:
+            loanService.validate(staleLoan, CLIENT_ID)
+        then:
+            1 * loanRepository.findById(LOAN_ID) >> of(buildLoan(100.0, OPEN))
+            0 * riskCheckerClient.validate(_)
+        and:
+            BadRequestException e = thrown()
+            e.message == LoanService.LOAN_STATUS_CHANGED.formatted(LOAN_ID, OPEN, [PENDING, NOT_EVALUATED])
+        and:
+            staleLoan.status == PENDING
+    }
+
+    void 'should reject last pending loan when new is taken'() {
+        given:
+            Loan pendingLoan = buildLoan(100.0, PENDING)
+            clientService.getClient(CLIENT_ID) >> activeClientWithId
+        when:
+            loanService.addLoan(buildLoanWithoutId(100.0), CLIENT_ID)
+        then:
+            1 * loanRepository.findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> of(pendingLoan)
+        and:
+            pendingLoan.status == REJECTED
+    }
+
+    void 'should not reject last loan when it is not pending'() {
+        given:
+            Loan openLoan = buildLoan(100.0, OPEN)
+            clientService.getClient(CLIENT_ID) >> activeClientWithId
+        when:
+            loanService.addLoan(buildLoanWithoutId(100.0), CLIENT_ID)
+        then:
+            1 * loanRepository.findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> of(openLoan)
+        and:
+            openLoan.status == OPEN
     }
 
     void 'should throw exception when client is not active'() {
@@ -194,18 +282,15 @@ class LoanServiceSpec extends AbstractSpec {
         when:
             TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(CLIENT_ID)
         then:
-            todayTakenLoansCount.takenLoansCount() == 1
+            todayTakenLoansCount.takenLoansCount() == 3
         and:
-            1 * loanRepository.findAll(_ as Specification) >> [loan]
+            1 * loanRepository.count(_ as Specification) >> 3L
+            0 * loanRepository.findAll(_ as Specification)
     }
 
     void 'should return #result.size() loans when status is #status'() {
         given:
-            1 * loanRepository.findAll { Specification s ->
-                with(s) {
-                    loanStatusIs(status)
-                }
-            } >> result
+            1 * loanRepository.findAllWithClientByStatus(status) >> result
         expect:
             loanService.getLoansByStatus(status) == result
         where:

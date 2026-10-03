@@ -143,4 +143,13 @@
         <rollback/>
     </changeSet>
 
+    <!-- Optimistic locking for Loan (@Version). Envers does not audit the version column, so loan_aud is unchanged. -->
+    <changeSet id="loan-add-version" author="osvaldas">
+        <addColumn tableName="loan">
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

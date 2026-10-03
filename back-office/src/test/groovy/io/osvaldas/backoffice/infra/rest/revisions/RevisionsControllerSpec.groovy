@@ -54,4 +54,22 @@ class RevisionsControllerSpec extends AbstractControllerSpec {
             List.of(objectMapper.readValue(response.contentAsString, LoanResponse[]))*.status() == [OPEN, CLOSED]
     }
 
+    void 'should return loan revisions with postpones when open-in-view is disabled'() {
+        given:
+            Loan loan = buildLoanWithoutId(10.0, OPEN)
+            loan.postponeLoan(7, 1.5)
+            Loan savedLoan = loanRepository.save(loan)
+        when:
+            MockHttpServletResponse response = mockMvc
+                .perform(get('/api/v1/revisions/loans/{loanId}', savedLoan.id)
+                    .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            List<LoanResponse> revisions = List.of(objectMapper.readValue(response.contentAsString, LoanResponse[]))
+            revisions.size() == 1
+            revisions.first().loanPostpones()*.interestRate() == [15.00]
+    }
+
 }

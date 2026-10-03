@@ -3,6 +3,7 @@ package io.osvaldas.backoffice.infra.rest.revisions;
 import java.util.List;
 
 import org.springframework.data.history.Revision;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +38,11 @@ public class RevisionsController {
             .toList();
     }
 
+    /**
+     * Read-only transaction keeps the audit reader's session open while lazy, audited loan postpones are mapped
+     * (open-in-view is disabled).
+     */
+    @Transactional(readOnly = true)
     @GetMapping("loans/{loanId}")
     public List<LoanResponse> getLoansRevisions(@PathVariable long loanId) {
         return loanRepository.findRevisions(loanId).stream()
