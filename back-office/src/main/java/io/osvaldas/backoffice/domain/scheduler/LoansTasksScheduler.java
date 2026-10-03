@@ -21,11 +21,6 @@ public class LoansTasksScheduler {
 
     private final LoanService loanService;
 
-    /**
-     * Re-evaluates loans whose risk validation did not complete (e.g. risk-checker was unavailable).
-     * Runs every 10 minutes by default (override with {@code scheduler.evaluateNotEvaluatedLoans.cron}).
-     * {@code lockAtMostFor} is generous because every loan triggers a remote risk-checker call.
-     */
     @Scheduled(cron = "${scheduler.evaluateNotEvaluatedLoans.cron:0 */10 * * * *}")
     @SchedulerLock(name = "evaluateNotEvaluatedLoans", lockAtLeastFor = "PT5S", lockAtMostFor = "PT10M")
     public void evaluateNotEvaluatedLoans() {

@@ -49,10 +49,6 @@ public class LoanService {
 
     static final String LOAN_STATUS_CHANGED = "Loan with id %s has status %s, expected one of %s.";
 
-    /**
-     * Statuses from which a loan may be (re-)evaluated: a freshly taken loan is {@code PENDING},
-     * a loan whose previous evaluation failed (e.g. risk-checker unavailable) is {@code NOT_EVALUATED}.
-     */
     private static final Set<Status> EVALUABLE_STATUSES = EnumSet.of(PENDING, NOT_EVALUATED);
 
     private final ClientService clientService;
@@ -78,9 +74,6 @@ public class LoanService {
             .orElseThrow(() -> new NotFoundException(LOAN_NOT_FOUND.formatted(id)));
     }
 
-    /**
-     * Loads the loan with a row lock, so that concurrent modifications (e.g. postpones) are serialized.
-     */
     @Transactional(propagation = MANDATORY)
     public Loan getLoanForUpdate(long id) {
         return loanRepository.findForUpdateById(id)
@@ -107,10 +100,6 @@ public class LoanService {
         return new TodayTakenLoansCount(Math.toIntExact(loansTakenToday));
     }
 
-    /**
-     * Intentionally not transactional: the remote risk validation must not hold a database transaction.
-     * Each status transition runs in its own short transaction instead.
-     */
     public void validate(Loan loan, String clientId) {
         changeStatus(loan, EVALUABLE_STATUSES, NOT_EVALUATED);
         RiskValidationResponse response = sendValidationRequest(loan, clientId);
@@ -179,11 +168,6 @@ public class LoanService {
         throw new ValidationRuleException(message);
     }
 
-    /**
-     * Guarded status transition: re-reads the loan in its own transaction, verifies it is still in one of the
-     * expected statuses and updates the managed entity (optimistic locking via {@code @Version}, audited).
-     * The passed (possibly detached) instance is never merged, only its in-memory status is kept in sync.
-     */
     private void changeStatus(Loan loan, Set<Status> expectedStatuses, Status newStatus) {
         long id = loan.getId();
         transactionTemplate.executeWithoutResult(tx -> {

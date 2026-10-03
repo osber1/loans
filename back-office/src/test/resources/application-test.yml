@@ -1,5 +1,3 @@
-# Test-only overrides. Everything else (incl. spring.jpa.open-in-view: false) comes from the main application.yml,
-# this file is activated via @ActiveProfiles('test') so tests run against the production configuration.
 spring:
   datasource:
     url: jdbc:tc:postgresql:16.2-alpine:///databasename

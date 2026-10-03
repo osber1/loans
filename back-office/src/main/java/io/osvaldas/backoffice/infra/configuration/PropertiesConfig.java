@@ -26,9 +26,6 @@ public class PropertiesConfig {
     @Positive
     private Integer postponeDays;
 
-    /**
-     * Multiplier applied to the interest rate on every postpone, so it must not decrease the rate.
-     */
     @NotNull
     @DecimalMin("1")
     private BigDecimal interestIncrementFactor;

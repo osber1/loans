@@ -33,10 +33,6 @@ public class PostponeService {
         return loan.getLastLoanPostpone();
     }
 
-    /**
-     * The loan is loaded with a row lock and stays managed: concurrent postpones of the same loan are serialized
-     * (no lost update), and the new postpone is persisted by cascade on commit, so no explicit save is needed.
-     */
     private Loan getOpenLoan(long id) {
         return Optional.of(loanService.getLoanForUpdate(id))
             .filter(savedLoan -> OPEN == savedLoan.getStatus())

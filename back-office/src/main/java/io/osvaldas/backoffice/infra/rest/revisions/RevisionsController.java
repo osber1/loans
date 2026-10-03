@@ -38,10 +38,6 @@ public class RevisionsController {
             .toList();
     }
 
-    /**
-     * Read-only transaction keeps the audit reader's session open while lazy, audited loan postpones are mapped
-     * (open-in-view is disabled).
-     */
     @Transactional(readOnly = true)
     @GetMapping("loans/{loanId}")
     public List<LoanResponse> getLoansRevisions(@PathVariable long loanId) {
