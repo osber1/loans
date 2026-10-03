@@ -2,7 +2,9 @@ package io.osvaldas.backoffice.infra.rest.clients
 
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.DELETED
+import static io.osvaldas.api.clients.Status.REGISTERED
 import static org.springframework.http.HttpStatus.BAD_REQUEST
+import static org.springframework.http.HttpStatus.CONFLICT
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.MediaType.APPLICATION_JSON
@@ -18,6 +20,7 @@ import groovy.json.JsonBuilder
 import io.osvaldas.api.clients.ClientRegisterRequest
 import io.osvaldas.api.clients.ClientResponse
 import io.osvaldas.api.clients.ClientUpdateRequest
+import io.osvaldas.api.clients.Status
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Client
 import spock.lang.Shared
@@ -116,16 +119,47 @@ class ClientControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    void 'should throw when updating client with incorrect version'() {
+    void 'should return conflict when updating client with incorrect version'() {
         given:
             clientRepository.save(registeredClientWithId)
         and:
             sendUpdateRequest()
         when:
-            sendUpdateRequest()
+            MockHttpServletResponse response = sendUpdateRequest().response
         then:
-            Exception e = thrown()
-            e.message.contains('Row was already updated or deleted by another transaction for entity')
+            response.status == CONFLICT.value()
+        and:
+            response.contentAsString.contains('The resource was modified by another request.')
+        and:
+            with(clientRepository.findById(registeredClientWithId.id).get()) {
+                version == 1L
+            }
+    }
+
+    void 'should not change status and personal code when updating client'() {
+        given:
+            clientRepository.save(registeredClientWithId)
+        when:
+            MockHttpServletResponse response = mockMvc.perform(put('/api/v1/clients')
+                .content(new JsonBuilder(buildUpdateClientRequest(ACTIVE, '99999999999')) as String)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            with(objectMapper.readValue(response.contentAsString, ClientResponse)) {
+                firstName() == editedName
+                status() == REGISTERED
+                personalCode() == CLIENT_PERSONAL_CODE
+                createdAt() != null
+                updatedAt() != null
+                version() == 1L
+            }
+        and:
+            with(clientRepository.findById(registeredClientWithId.id).get()) {
+                status == REGISTERED
+                personalCode == CLIENT_PERSONAL_CODE
+            }
     }
 
     void 'should get list of clients when they exists'() {
@@ -211,15 +245,15 @@ class ClientControllerSpec extends AbstractControllerSpec {
         new ClientRegisterRequest(NAME, SURNAME, CLIENT_EMAIL, CLIENT_PHONE_NUMBER, CLIENT_PERSONAL_CODE)
     }
 
-    private ClientUpdateRequest buildUpdateClientRequest() {
+    private ClientUpdateRequest buildUpdateClientRequest(Status status = ACTIVE, String personalCode = CLIENT_PERSONAL_CODE) {
         new ClientUpdateRequest(
             CLIENT_ID,
             editedName,
             editedSurname,
-            ACTIVE,
+            status,
             CLIENT_EMAIL,
             CLIENT_PHONE_NUMBER,
-            CLIENT_PERSONAL_CODE,
+            personalCode,
             0)
     }
 
