@@ -9,7 +9,9 @@ import static java.util.Optional.of
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 
@@ -65,23 +67,23 @@ class ClientServiceSpec extends AbstractSpec {
             0 * eventPublisher.publishEvent(_)
     }
 
-    void 'should return clients list when there are clients'() {
+    void 'should return clients page when there are clients'() {
         when:
-            Collection clients = clientService.getClients(0, 2)
+            Page<Client> clients = clientService.getClients(0, 2)
         then:
-            clients.size() == 2
+            clients.content == [registeredClientWithId, registeredClientWithId]
+            clients.totalElements == 5
         and:
-            clients == [registeredClientWithId, registeredClientWithId]
-        and:
-            1 * clientRepository.findAll(_ as Pageable)
-                >> new PageImpl<>([registeredClientWithId, registeredClientWithId], Pageable.unpaged(), 1)
+            1 * clientRepository.findAll({ Pageable pageable ->
+                pageable.pageNumber == 0 && pageable.pageSize == 2 && pageable.sort == Sort.by('lastName').descending()
+            }) >> new PageImpl<>([registeredClientWithId, registeredClientWithId], PageRequest.of(0, 2), 5)
     }
 
-    void 'should return empty list when there are no clients'() {
+    void 'should return empty page when there are no clients'() {
         when:
-            Collection clients = clientService.getClients(0, 2)
+            Page<Client> clients = clientService.getClients(0, 2)
         then:
-            clients == []
+            clients.content == []
         and:
             1 * clientRepository.findAll(_ as Pageable) >> Page.empty()
     }
@@ -201,15 +203,15 @@ class ClientServiceSpec extends AbstractSpec {
             0 * clientRepository.saveAndFlush(_)
     }
 
-    void 'should return all clients by status'() {
+    void 'should return page of clients by status'() {
         when:
-            Collection clients = clientService.getClientsByStatus(ACTIVE)
+            Page<Client> clients = clientService.getClientsByStatus(ACTIVE, 1, 10)
         then:
-            clients.size() == 1
+            clients.content == [registeredClientWithId]
+            clients.totalElements == 11
         and:
-            clients == [registeredClientWithId]
-        and:
-            1 * clientRepository.findAll(_ as Specification) >> [registeredClientWithId]
+            1 * clientRepository.findAll(_ as Specification, { Pageable pageable -> pageable.pageNumber == 1 && pageable.pageSize == 10 })
+                >> new PageImpl<>([registeredClientWithId], PageRequest.of(1, 10), 11)
     }
 
 }

@@ -176,6 +176,44 @@ class ClientControllerSpec extends AbstractControllerSpec {
             response.status == OK.value()
         and:
             List.of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == 2
+            response.getHeader('X-Total-Count') == '2'
+    }
+
+    void 'should return requested page of clients with total count'() {
+        given:
+            clientRepository.save(buildClient('123123123', [] as Set, ACTIVE))
+            clientRepository.save(buildClient('890890890', [] as Set, ACTIVE).tap { personalCode = '89089089000' })
+            clientRepository.save(buildClient('456456456', [] as Set, REGISTERED).tap { personalCode = '45645645600' })
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get(url)
+                .param('page', '1')
+                .param('size', '1')
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+        and:
+            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == 1
+            response.getHeader('X-Total-Count') == totalCount
+        where:
+            url                                    || totalCount
+            '/api/v1/clients'                      || '3'
+            '/api/v1/clients/status?status=ACTIVE' || '2'
+    }
+
+    void 'should reject page size #size when listing clients from #url'() {
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get(url)
+                .param('size', size)
+                .contentType(APPLICATION_JSON))
+                .andReturn().response
+        then:
+            response.status == BAD_REQUEST.value()
+        where:
+            url                                    | size
+            '/api/v1/clients'                      | '0'
+            '/api/v1/clients'                      | '1001'
+            '/api/v1/clients/status?status=ACTIVE' | '1001'
     }
 
     void 'should get list of clients by status'() {
@@ -190,6 +228,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             response.status == OK.value()
         and:
             List.of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == listSize
+            response.getHeader('X-Total-Count') == "${listSize}"
         where:
             status  || listSize
             ACTIVE  || 1

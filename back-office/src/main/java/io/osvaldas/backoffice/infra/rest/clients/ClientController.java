@@ -2,6 +2,8 @@ package io.osvaldas.backoffice.infra.rest.clients;
 
 import java.util.Collection;
 
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +32,8 @@ import lombok.AllArgsConstructor;
 @RequestMapping("api/v1")
 public class ClientController {
 
+    static final String TOTAL_COUNT_HEADER = "X-Total-Count";
+
     private final ClientService service;
 
     private final ClientMapper clientMapper;
@@ -41,14 +45,18 @@ public class ClientController {
     }
 
     @GetMapping("clients")
-    public Collection<ClientResponse> getClients(@RequestParam(defaultValue = "0") @Min(0) int page,
-                                                 @RequestParam(defaultValue = "20") @Min(1) @Max(1000) int size) {
-        return clientMapper.map(service.getClients(page, size));
+    @Operation(description = "Returns a page of clients. The total number of clients is returned in the X-Total-Count header.")
+    public ResponseEntity<Collection<ClientResponse>> getClients(@RequestParam(defaultValue = "0") @Min(0) int page,
+                                                                 @RequestParam(defaultValue = "20") @Min(1) @Max(1000) int size) {
+        return toPagedResponse(service.getClients(page, size));
     }
 
     @GetMapping("clients/status")
-    public Collection<ClientResponse> getClientsByStatus(@RequestParam Status status) {
-        return clientMapper.map(service.getClientsByStatus(status));
+    @Operation(description = "Returns a page of clients with the given status. The total number of matching clients is returned in the X-Total-Count header.")
+    public ResponseEntity<Collection<ClientResponse>> getClientsByStatus(@RequestParam Status status,
+                                                                         @RequestParam(defaultValue = "0") @Min(0) int page,
+                                                                         @RequestParam(defaultValue = "20") @Min(1) @Max(1000) int size) {
+        return toPagedResponse(service.getClientsByStatus(status, page, size));
     }
 
     @GetMapping("clients/{id}")
@@ -81,5 +89,11 @@ public class ClientController {
     @Operation(deprecated = true, description = "Deprecated: kept for activation links in already sent emails. Use POST clients/{id}/active.")
     public void activateClientFromEmailLink(@PathVariable String id) {
         service.activateClient(id);
+    }
+
+    private ResponseEntity<Collection<ClientResponse>> toPagedResponse(Page<Client> clients) {
+        return ResponseEntity.ok()
+            .header(TOTAL_COUNT_HEADER, String.valueOf(clients.getTotalElements()))
+            .body(clientMapper.map(clients.getContent()));
     }
 }

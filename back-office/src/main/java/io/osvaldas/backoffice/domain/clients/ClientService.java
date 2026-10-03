@@ -6,11 +6,10 @@ import static io.osvaldas.api.util.ExceptionMessages.CLIENT_ALREADY_EXIST;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -53,14 +52,13 @@ public class ClientService {
     }
 
     @Transactional(readOnly = true)
-    public Collection<Client> getClients(int page, int size) {
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by("lastName").descending());
-        return clientRepository.findAll(pageRequest).getContent();
+    public Page<Client> getClients(int page, int size) {
+        return clientRepository.findAll(pageRequest(page, size));
     }
 
     @Transactional(readOnly = true)
-    public List<Client> getClientsByStatus(Status status) {
-        return clientRepository.findAll(clientStatusIs(status));
+    public Page<Client> getClientsByStatus(Status status, int page, int size) {
+        return clientRepository.findAll(clientStatusIs(status), pageRequest(page, size));
     }
 
     @Transactional(readOnly = true)
@@ -108,6 +106,10 @@ public class ClientService {
     private void changeClientStatus(String id, Status status) {
         log.info("Changing client: {} status to: {}", id, status);
         findClient(id).setStatus(status);
+    }
+
+    private static Pageable pageRequest(int page, int size) {
+        return PageRequest.of(page, size, Sort.by("lastName").descending());
     }
 
     private Client findClient(String id) {
