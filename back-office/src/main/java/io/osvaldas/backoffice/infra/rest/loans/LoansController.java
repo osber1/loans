@@ -42,8 +42,8 @@ public class LoansController {
     }
 
     @GetMapping("loans/today")
-    public TodayTakenLoansCount getTodayTakenLoansCount(@RequestParam String clientId) {
-        return service.getTodayTakenLoansCount(clientId);
+    public TodayTakenLoansCount getTodayTakenLoansCount(@RequestParam String clientId, @RequestParam long loanId) {
+        return service.getTodayTakenLoansCount(clientId, loanId);
     }
 
     @CacheEvict(value = "LoanResponse", allEntries = true)

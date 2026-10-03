@@ -31,7 +31,7 @@ public class LoanLimitValidator implements ValidationRule {
 
     @Override
     public void validate(RiskValidationTarget target) {
-        TodayTakenLoansCount count = client.getLoansTakenTodayCount(target.getClientId());
+        TodayTakenLoansCount count = client.getLoansTakenTodayCount(target.getClientId(), target.getLoanId());
         if (count == null) {
             log.error("Back-office returned no taken loans count for client {}.", target.getClientId());
             throw new BackOfficeResponseException(NO_LOANS_COUNT);

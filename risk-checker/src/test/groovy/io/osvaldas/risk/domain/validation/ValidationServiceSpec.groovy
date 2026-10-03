@@ -38,7 +38,7 @@ class ValidationServiceSpec extends AbstractSpec {
         then:
             response.success()
         and:
-            1 * validator.validate(new RiskValidationTarget(amount, clientId))
+            1 * validator.validate(new RiskValidationTarget(amount, clientId, loanId))
     }
 
     void 'should return failed validation when validation rule rejects loan'() {

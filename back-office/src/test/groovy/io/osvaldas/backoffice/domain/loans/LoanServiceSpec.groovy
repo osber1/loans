@@ -241,7 +241,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should get today taken loans count'() {
         when:
-            TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(CLIENT_ID)
+            TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(CLIENT_ID, LOAN_ID)
         then:
             todayTakenLoansCount.takenLoansCount() == 3
         and:

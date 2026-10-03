@@ -5,6 +5,9 @@
     "queryParameters": {
       "clientId": {
         "equalTo": "backOfficeErrorClientId"
+      },
+      "loanId": {
+        "equalTo": "1"
       }
     }
   },

@@ -190,34 +190,39 @@ class LoansControllerSpec extends AbstractControllerSpec {
             response.contentAsString.contains(CLIENT_NOT_ACTIVE)
     }
 
-    void 'should return loans taken today count'() {
+    void 'should return loans taken today before given loan'() {
         given:
-            clientRepository.save(buildClient(CLIENT_ID, [buildLoanWithoutId(100.0)] as Set, ACTIVE))
+            Loan takenLoan = clientRepository.save(buildClient(CLIENT_ID, [buildLoanWithoutId(100.0)] as Set, ACTIVE))
+                .loans.first()
         when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
-                .param('clientId', CLIENT_ID)
-                .contentType(APPLICATION_JSON))
-                .andReturn().response
+            MockHttpServletResponse response = getTodayTakenLoansCount(takenLoan.id + 1)
         then:
             response.status == OK.value()
         and:
-            response.contentAsString.contains('1')
+            objectMapper.readValue(response.contentAsString, TodayTakenLoansCount).takenLoansCount() == 1
     }
 
-    void 'should count only open loans taken today'() {
+    void 'should count only open and still evaluated loans taken today before given loan'() {
         given:
             Set<Loan> loans = [OPEN, NOT_EVALUATED, REJECTED, PENDING, CLOSED]
                 .collect { buildLoanWithoutId(100.0, it) } as Set
             clientRepository.save(buildClient(CLIENT_ID, loans, ACTIVE))
         when:
+            MockHttpServletResponse response = getTodayTakenLoansCount(loans*.id.max() + 1)
+        then:
+            response.status == OK.value()
+        and:
+            objectMapper.readValue(response.contentAsString, TodayTakenLoansCount).takenLoansCount() == 3
+    }
+
+    void 'should reject loans taken today count request without loan id'() {
+        when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
                 .param('clientId', CLIENT_ID)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
-            response.status == OK.value()
-        and:
-            objectMapper.readValue(response.contentAsString, TodayTakenLoansCount).takenLoansCount() == 1
+            response.status == BAD_REQUEST.value()
     }
 
     void 'should return loan with postpones when open-in-view is disabled'() {
@@ -282,6 +287,14 @@ class LoansControllerSpec extends AbstractControllerSpec {
                 .withHeader(CONTENT_TYPE, APPLICATION_JSON.toString())
                 .withStatus(200)
                 .withBody(toJson(response))))
+    }
+
+    private MockHttpServletResponse getTodayTakenLoansCount(long loanId) {
+        mockMvc.perform(get('/api/v1/loans/today')
+            .param('clientId', CLIENT_ID)
+            .param('loanId', loanId as String)
+            .contentType(APPLICATION_JSON))
+            .andReturn().response
     }
 
     private MockHttpServletResponse postLoanRequest(LoanRequest request, String id) {

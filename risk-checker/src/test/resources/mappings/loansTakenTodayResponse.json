@@ -5,6 +5,9 @@
     "queryParameters": {
       "clientId": {
         "equalTo": "clientId"
+      },
+      "loanId": {
+        "equalTo": "1"
       }
     }
   },

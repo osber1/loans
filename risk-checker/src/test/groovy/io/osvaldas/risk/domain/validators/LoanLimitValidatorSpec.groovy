@@ -14,6 +14,8 @@ import spock.lang.Subject
 
 class LoanLimitValidatorSpec extends AbstractSpec {
 
+    static final long LOAN_ID = 7
+
     PropertiesConfig config = Stub {
         loanLimitPerDay >> 2
     }
@@ -23,22 +25,22 @@ class LoanLimitValidatorSpec extends AbstractSpec {
     @Subject
     LoanLimitValidator loanLimitValidator = new LoanLimitValidator(config, client)
 
-    void 'should pass validation when #count other loans taken today and limit is 2'() {
+    void 'should pass validation when #count earlier loans are active today and limit is 2'() {
         given:
-            client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(count)
+            client.getLoansTakenTodayCount(clientId, LOAN_ID) >> new TodayTakenLoansCount(count)
         when:
-            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
+            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId, loanId: LOAN_ID))
         then:
             notThrown(LoanLimitException)
         where:
             count << [0, 1]
     }
 
-    void 'should throw exception when #count other loans taken today and limit is 2'() {
+    void 'should throw exception when #count earlier loans are active today and limit is 2'() {
         given:
-            client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(count)
+            client.getLoansTakenTodayCount(clientId, LOAN_ID) >> new TodayTakenLoansCount(count)
         when:
-            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
+            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId, loanId: LOAN_ID))
         then:
             LoanLimitException e = thrown()
             e.message == LOAN_LIMIT_EXCEEDS
@@ -48,9 +50,9 @@ class LoanLimitValidatorSpec extends AbstractSpec {
 
     void 'should fail when back-office returns no count'() {
         given:
-            client.getLoansTakenTodayCount(clientId) >> null
+            client.getLoansTakenTodayCount(clientId, LOAN_ID) >> null
         when:
-            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
+            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId, loanId: LOAN_ID))
         then:
             BackOfficeResponseException e = thrown()
             e.message == LoanLimitValidator.NO_LOANS_COUNT

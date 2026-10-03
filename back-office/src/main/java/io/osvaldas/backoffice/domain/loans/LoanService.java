@@ -9,12 +9,14 @@ import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_ACTIVE;
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.clientIdIs;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreatedAtOrAfter;
-import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs;
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanIdLessThan;
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIn;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,8 +87,8 @@ public class LoanService {
     }
 
     @Transactional(readOnly = true)
-    public TodayTakenLoansCount getTodayTakenLoansCount(String clientId) {
-        long loansTakenToday = getLoanTakenTodayCount(clientId, timeUtils.getCurrentDateTime().truncatedTo(DAYS));
+    public TodayTakenLoansCount getTodayTakenLoansCount(String clientId, long loanId) {
+        long loansTakenToday = getLoanTakenTodayCount(clientId, loanId, timeUtils.getCurrentDateTime().truncatedTo(DAYS));
         return new TodayTakenLoansCount(Math.toIntExact(loansTakenToday));
     }
 
@@ -121,10 +123,11 @@ public class LoanService {
         }
     }
 
-    private long getLoanTakenTodayCount(String clientId, ZonedDateTime startOfDay) {
+    private long getLoanTakenTodayCount(String clientId, long loanId, ZonedDateTime startOfDay) {
         Specification<Loan> specification = clientIdIs(clientId)
             .and(loanCreatedAtOrAfter(startOfDay))
-            .and(loanStatusIs(OPEN));
+            .and(loanStatusIn(EnumSet.of(PENDING, NOT_EVALUATED, OPEN)))
+            .and(loanIdLessThan(loanId));
         return loanRepository.count(specification);
     }
 

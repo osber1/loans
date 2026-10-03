@@ -15,6 +15,6 @@ public interface BackOfficeClient {
     LoanResponse getLoan(@PathVariable long loanId);
 
     @GetMapping("api/v1/loans/today")
-    TodayTakenLoansCount getLoansTakenTodayCount(@RequestParam String clientId);
+    TodayTakenLoansCount getLoansTakenTodayCount(@RequestParam String clientId, @RequestParam long loanId);
 
 }
