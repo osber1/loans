@@ -33,7 +33,5 @@ public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificat
     @Lock(PESSIMISTIC_WRITE)
     Optional<Loan> findForUpdateById(long id);
 
-    Optional<Loan> findFirstByClientIdOrderByIdDesc(String clientId);
-
     List<Loan> findAllByClient(Client client);
 }

@@ -15,7 +15,6 @@ import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.api.exceptions.ClientNotActiveException
 import io.osvaldas.api.exceptions.NotFoundException
 import io.osvaldas.api.exceptions.ValidationRuleException
-import io.osvaldas.api.loans.TodayTakenLoansCount
 import io.osvaldas.api.risk.validation.RiskValidationRequest
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.api.util.TimeUtils
@@ -48,7 +47,6 @@ class LoanServiceSpec extends AbstractSpec {
     LoanRepository loanRepository = Mock {
         save(_ as Loan) >> loan
         findById(LOAN_ID) >> { of(loan) }
-        findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> empty()
     }
 
     @Subject
@@ -140,7 +138,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should throw exception when amount limit is exceeded'() {
         given:
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(false, AMOUNT_EXCEEDS)
@@ -157,7 +155,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should throw exception when max amount and forbidden time'() {
         given:
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(false, RISK_TOO_HIGH)
@@ -185,7 +183,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should throw exception when failed to call feign client'() {
         given:
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest) >> { throw new BadRequestException('') }
         and:
@@ -203,7 +201,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should take loan when validation pass'() {
         given:
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> activeClientWithId
         and:
             riskCheckerClient.validate(_ as RiskValidationRequest)
                 >> new RiskValidationResponse(true, 'Risk validation passed.')
@@ -216,33 +214,9 @@ class LoanServiceSpec extends AbstractSpec {
             takenLoan.status == OPEN
     }
 
-    void 'should reject last pending loan when new is taken'() {
-        given:
-            Loan pendingLoan = buildLoan(100.0, PENDING)
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
-        when:
-            loanService.addLoan(buildLoanWithoutId(100.0), CLIENT_ID)
-        then:
-            1 * loanRepository.findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> of(pendingLoan)
-        and:
-            pendingLoan.status == REJECTED
-    }
-
-    void 'should not reject last loan when it is not pending'() {
-        given:
-            Loan openLoan = buildLoan(100.0, OPEN)
-            clientService.getClient(CLIENT_ID) >> activeClientWithId
-        when:
-            loanService.addLoan(buildLoanWithoutId(100.0), CLIENT_ID)
-        then:
-            1 * loanRepository.findFirstByClientIdOrderByIdDesc(CLIENT_ID) >> of(openLoan)
-        and:
-            openLoan.status == OPEN
-    }
-
     void 'should throw exception when client is not active'() {
         given:
-            clientService.getClient(CLIENT_ID) >> registeredClientWithId
+            clientService.getClientForUpdate(CLIENT_ID) >> registeredClientWithId
         when:
             loanService.addLoan(loan, CLIENT_ID)
         then:
@@ -250,14 +224,15 @@ class LoanServiceSpec extends AbstractSpec {
             e.message == CLIENT_NOT_ACTIVE
     }
 
-    void 'should get today taken loans count'() {
+    void 'should send loans taken today with validation request'() {
         when:
-            TodayTakenLoansCount todayTakenLoansCount = loanService.getTodayTakenLoansCount(CLIENT_ID)
+            loanService.validate(loan, CLIENT_ID)
         then:
-            todayTakenLoansCount.takenLoansCount() == 3
-        and:
             1 * loanRepository.count(_ as Specification) >> 3L
             0 * loanRepository.findAll(_ as Specification)
+        then:
+            1 * riskCheckerClient.validate(new RiskValidationRequest(LOAN_ID, CLIENT_ID, 3L))
+                >> new RiskValidationResponse(true, 'Risk validation passed.')
     }
 
     void 'should return #result.size() loans when status is #status'() {

@@ -10,12 +10,14 @@ import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_FOUND;
 import static io.osvaldas.backoffice.infra.configuration.BeansConfig.LOAN_RESPONSE_CACHE;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.clientIdIs;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreatedAtOrAfter;
-import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIs;
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanIdLessThan;
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIn;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +30,6 @@ import io.osvaldas.api.exceptions.ClientNotActiveException;
 import io.osvaldas.api.exceptions.NotFoundException;
 import io.osvaldas.api.exceptions.ValidationRuleException;
 import io.osvaldas.api.loans.Status;
-import io.osvaldas.api.loans.TodayTakenLoansCount;
 import io.osvaldas.api.risk.validation.RiskValidationRequest;
 import io.osvaldas.api.risk.validation.RiskValidationResponse;
 import io.osvaldas.api.util.TimeUtils;
@@ -84,14 +85,7 @@ public class LoanService {
     public Loan addLoan(Loan loan, String clientId) {
         log.info("Adding loan for client: {}", clientId);
         Client client = getActiveClient(clientId);
-        rejectPreviousPendingLoan(clientId);
         return addLoanToClient(client, loan);
-    }
-
-    @Transactional(readOnly = true)
-    public TodayTakenLoansCount getTodayTakenLoansCount(String clientId) {
-        long loansTakenToday = getLoanTakenTodayCount(clientId, timeUtils.getCurrentDateTime().truncatedTo(DAYS));
-        return new TodayTakenLoansCount(Math.toIntExact(loansTakenToday));
     }
 
     public void validate(Loan loan, String clientId) {
@@ -113,15 +107,16 @@ public class LoanService {
     }
 
     private Client getActiveClient(String clientId) {
-        return Optional.of(getClient(clientId))
+        return Optional.of(clientService.getClientForUpdate(clientId))
             .filter(c -> ACTIVE == c.getStatus())
             .orElseThrow(() -> new ClientNotActiveException(CLIENT_NOT_ACTIVE));
     }
 
     private RiskValidationResponse sendValidationRequest(Loan loan, String clientId) {
+        long loansTakenToday = getLoanTakenTodayCount(clientId, loan.getId(), timeUtils.getCurrentDateTime().truncatedTo(DAYS));
         try {
             log.info("Validating loan: {}", loan.getId());
-            RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId));
+            RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId, loansTakenToday));
             log.info("Risk validation response: {}", response);
             return response;
         } catch (RuntimeException e) {
@@ -130,10 +125,11 @@ public class LoanService {
         }
     }
 
-    private long getLoanTakenTodayCount(String clientId, ZonedDateTime startOfDay) {
+    private long getLoanTakenTodayCount(String clientId, long loanId, ZonedDateTime startOfDay) {
         Specification<Loan> specification = clientIdIs(clientId)
             .and(loanCreatedAtOrAfter(startOfDay))
-            .and(loanStatusIs(OPEN));
+            .and(loanStatusIn(EnumSet.of(PENDING, NOT_EVALUATED, OPEN)))
+            .and(loanIdLessThan(loanId));
         return loanRepository.count(specification);
     }
 
@@ -141,15 +137,6 @@ public class LoanService {
         loan.setInterestAndReturnDate(config.getInterestRate(), timeUtils.getCurrentDateTime());
         loan.setClient(client);
         return loanRepository.save(loan);
-    }
-
-    private void rejectPreviousPendingLoan(String clientId) {
-        loanRepository.findFirstByClientIdOrderByIdDesc(clientId)
-            .filter(loan -> PENDING == loan.getStatus())
-            .ifPresent(loan -> {
-                log.info("Rejecting previous pending loan: {}", loan.getId());
-                loan.setStatus(REJECTED);
-            });
     }
 
     private Client getClient(String clientId) {

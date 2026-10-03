@@ -1,5 +1,6 @@
 package io.osvaldas.backoffice.repositories.specifications
 
+import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
 import static io.osvaldas.api.loans.Status.PENDING
 
@@ -58,15 +59,26 @@ class LoanSpecificationsSpec extends AbstractDatabaseSpec {
             repository.count(LoanSpecifications.loanCreatedAtOrAfter(createdAt)) == 1
     }
 
-    void 'should return list size of #listSize when status is #status'() {
+    void 'should return list size of #listSize when statuses are #statuses'() {
         when:
-            List<Loan> loans = repository.findAll(LoanSpecifications.loanStatusIs(status))
+            List<Loan> loans = repository.findAll(LoanSpecifications.loanStatusIn(statuses))
         then:
             loans.size() == listSize
         where:
-            status  || listSize
-            OPEN    || 1
-            PENDING || 0
+            statuses                 || listSize
+            [OPEN]                   || 1
+            [PENDING, NOT_EVALUATED] || 0
+    }
+
+    void 'should return list size of #listSize when id is below #description'() {
+        when:
+            List<Loan> loans = repository.findAll(LoanSpecifications.loanIdLessThan(loan.id + offset))
+        then:
+            loans.size() == listSize
+        where:
+            offset || listSize | description
+            1      || 1        | 'next loan id'
+            0      || 0        | 'loan own id'
     }
 
 }

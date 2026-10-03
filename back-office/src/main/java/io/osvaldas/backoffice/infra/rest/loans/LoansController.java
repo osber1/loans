@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.osvaldas.api.loans.LoanRequest;
 import io.osvaldas.api.loans.LoanResponse;
-import io.osvaldas.api.loans.TodayTakenLoansCount;
 import io.osvaldas.backoffice.domain.loans.LoanService;
 import io.osvaldas.backoffice.repositories.entities.Loan;
 import io.osvaldas.backoffice.repositories.mapper.LoanMapper;
@@ -40,11 +39,6 @@ public class LoansController {
     @GetMapping("loans")
     public Collection<LoanResponse> getClientHistory(@RequestParam String clientId) {
         return loanMapper.map(service.getLoans(clientId));
-    }
-
-    @GetMapping("loans/today")
-    public TodayTakenLoansCount getTodayTakenLoansCount(@RequestParam String clientId) {
-        return service.getTodayTakenLoansCount(clientId);
     }
 
     @PostMapping("loans")

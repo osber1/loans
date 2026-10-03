@@ -5,6 +5,7 @@ import static io.osvaldas.api.clients.Status.DELETED;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_ALREADY_EXIST;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
+import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
 import java.util.Objects;
 
@@ -59,6 +60,12 @@ public class ClientService {
     @Transactional(readOnly = true)
     public Client getClient(String id) {
         return findClient(id);
+    }
+
+    @Transactional(propagation = MANDATORY)
+    public Client getClientForUpdate(String id) {
+        return clientRepository.findForUpdateById(id)
+            .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND.formatted(id)));
     }
 
     @Transactional

@@ -1,13 +1,9 @@
 package io.osvaldas.risk.domain.validators
 
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS
-import static org.springframework.http.HttpStatus.BAD_GATEWAY
 
 import io.osvaldas.api.exceptions.ValidationRuleException.LoanLimitException
-import io.osvaldas.api.loans.TodayTakenLoansCount
 import io.osvaldas.risk.AbstractSpec
-import io.osvaldas.risk.domain.validation.BackOfficeClient
-import io.osvaldas.risk.domain.validation.BackOfficeResponseException
 import io.osvaldas.risk.infra.configuration.PropertiesConfig
 import io.osvaldas.risk.repositories.risk.RiskValidationTarget
 import spock.lang.Subject
@@ -18,16 +14,12 @@ class LoanLimitValidatorSpec extends AbstractSpec {
         loanLimitPerDay >> 2
     }
 
-    BackOfficeClient client = Stub()
-
     @Subject
-    LoanLimitValidator loanLimitValidator = new LoanLimitValidator(config, client)
+    LoanLimitValidator loanLimitValidator = new LoanLimitValidator(config)
 
     void 'should pass validation when #count other loans taken today and limit is 2'() {
-        given:
-            client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(count)
         when:
-            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
+            loanLimitValidator.validate(new RiskValidationTarget(loansTakenToday: count))
         then:
             notThrown(LoanLimitException)
         where:
@@ -35,26 +27,13 @@ class LoanLimitValidatorSpec extends AbstractSpec {
     }
 
     void 'should throw exception when #count other loans taken today and limit is 2'() {
-        given:
-            client.getLoansTakenTodayCount(clientId) >> new TodayTakenLoansCount(count)
         when:
-            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
+            loanLimitValidator.validate(new RiskValidationTarget(loansTakenToday: count))
         then:
             LoanLimitException e = thrown()
             e.message == LOAN_LIMIT_EXCEEDS
         where:
             count << [2, 6]
-    }
-
-    void 'should fail when back-office returns no count'() {
-        given:
-            client.getLoansTakenTodayCount(clientId) >> null
-        when:
-            loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
-        then:
-            BackOfficeResponseException e = thrown()
-            e.message == LoanLimitValidator.NO_LOANS_COUNT
-            e.httpStatus == BAD_GATEWAY
     }
 
 }

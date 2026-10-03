@@ -1,12 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/api/v1/loans/today",
-    "queryParameters": {
-      "clientId": {
-        "equalTo": "backOfficeErrorClientId"
-      }
-    }
+    "url": "/api/v1/loans/6"
   },
   "response": {
     "status": 503,

@@ -4,7 +4,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS
-import static io.osvaldas.risk.domain.validators.LoanLimitValidator.NO_LOANS_COUNT
 import static io.osvaldas.risk.infra.exception.ApiExceptionHandler.BACK_OFFICE_ERROR
 import static io.osvaldas.risk.infra.exception.ApiExceptionHandler.BACK_OFFICE_UNAVAILABLE
 import static java.time.Clock.fixed
@@ -33,6 +32,10 @@ import spock.lang.Shared
 @SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 class RiskValidationControllerSpec extends AbstractControllerSpec {
 
+    static final long BELOW_LIMIT = 1
+
+    static final long AT_LIMIT = 2
+
     @Shared
     long validLoanId = 1
 
@@ -49,19 +52,10 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
     long slowLoanId = 5
 
     @Shared
+    long unavailableLoanId = 6
+
+    @Shared
     String validClientId = 'clientId'
-
-    @Shared
-    String tooMuchLoansClientId = 'tooMuchLoansClientId'
-
-    @Shared
-    String backOfficeErrorClientId = 'backOfficeErrorClientId'
-
-    @Shared
-    String noCountClientId = 'noCountClientId'
-
-    @Shared
-    String loansTakenTodayPath = '/api/v1/loans/today'
 
     void setup() {
         testClockDelegate.changeDelegate(fixed(parse('2022-10-12T10:10:10.00Z'), of('UTC')))
@@ -69,7 +63,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
 
     void 'should return success when amount is not too high'() {
         given:
-            RiskValidationRequest request = new RiskValidationRequest(validLoanId, validClientId)
+            RiskValidationRequest request = new RiskValidationRequest(validLoanId, validClientId, BELOW_LIMIT)
         when:
             MockHttpServletResponse response = postValidationRequest(request)
         then:
@@ -82,7 +76,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
 
     void 'should fail when amount is too high'() {
         given:
-            RiskValidationRequest request = new RiskValidationRequest(tooHighAmountLoanId, validClientId)
+            RiskValidationRequest request = new RiskValidationRequest(tooHighAmountLoanId, validClientId, BELOW_LIMIT)
         when:
             MockHttpServletResponse response = postValidationRequest(request)
         then:
@@ -94,9 +88,9 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    void 'should not call back-office loan limit check when local rule rejects loan'() {
+    void 'should reject too high amount before checking loan limit'() {
         given:
-            RiskValidationRequest request = new RiskValidationRequest(tooHighAmountLoanId, tooMuchLoansClientId)
+            RiskValidationRequest request = new RiskValidationRequest(tooHighAmountLoanId, validClientId, AT_LIMIT)
         when:
             MockHttpServletResponse response = postValidationRequest(request)
         then:
@@ -104,12 +98,13 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
                 message() == AMOUNT_EXCEEDS
             }
         and:
-            wireMock.verifyThat(0, getRequestedFor(urlPathEqualTo(loansTakenTodayPath)))
+            wireMock.verifyThat(1, getRequestedFor(urlPathEqualTo("/api/v1/loans/${tooHighAmountLoanId}")))
+            wireMock.serveEvents.size() == 1
     }
 
     void 'should fail when loan limit is reached'() {
         given:
-            RiskValidationRequest request = new RiskValidationRequest(validLoanId, tooMuchLoansClientId)
+            RiskValidationRequest request = new RiskValidationRequest(validLoanId, validClientId, AT_LIMIT)
         when:
             MockHttpServletResponse response = postValidationRequest(request)
         then:
@@ -125,7 +120,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
         given:
             testClockDelegate.changeDelegate(fixed(parse('2022-10-12T04:10:10.00Z'), of('UTC')))
         and:
-            RiskValidationRequest request = new RiskValidationRequest(maxAmountLoanId, validClientId)
+            RiskValidationRequest request = new RiskValidationRequest(maxAmountLoanId, validClientId, BELOW_LIMIT)
         when:
             MockHttpServletResponse response = postValidationRequest(request)
         then:
@@ -137,9 +132,9 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    void 'should return #status when back-office fails for loan #loanId and client #clientId'() {
+    void 'should return #status when back-office fails for loan #loanId'() {
         given:
-            RiskValidationRequest request = new RiskValidationRequest(loanId, clientId)
+            RiskValidationRequest request = new RiskValidationRequest(loanId, validClientId, BELOW_LIMIT)
         when:
             MockHttpServletResponse response = postValidationRequest(request)
         then:
@@ -150,11 +145,10 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             problem.status == status.value()
             problem.detail == detail
         where:
-            loanId                | clientId                || status              | detail
-            backOfficeErrorLoanId | validClientId           || BAD_GATEWAY         | BACK_OFFICE_ERROR
-            validLoanId           | backOfficeErrorClientId || SERVICE_UNAVAILABLE | BACK_OFFICE_UNAVAILABLE
-            slowLoanId            | validClientId           || SERVICE_UNAVAILABLE | BACK_OFFICE_UNAVAILABLE
-            validLoanId           | noCountClientId         || BAD_GATEWAY         | NO_LOANS_COUNT
+            loanId                || status              | detail
+            backOfficeErrorLoanId || BAD_GATEWAY         | BACK_OFFICE_ERROR
+            unavailableLoanId     || SERVICE_UNAVAILABLE | BACK_OFFICE_UNAVAILABLE
+            slowLoanId            || SERVICE_UNAVAILABLE | BACK_OFFICE_UNAVAILABLE
     }
 
     void 'should return bad request when request is invalid: #description'() {
@@ -168,15 +162,21 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
         and:
             wireMock.serveEvents.empty
         where:
-            body                                                           | description
-            new JsonBuilder([loanId: validLoanId]) as String               | 'missing client id'
-            new JsonBuilder([loanId: validLoanId, clientId: '']) as String | 'empty client id'
-            new JsonBuilder([clientId: validClientId]) as String           | 'missing loan id'
-            '{not json'                                                    | 'malformed body'
+            body                                                                | description
+            [loanId: validLoanId, loansTakenToday: 0]                           | 'missing client id'
+            [loanId: validLoanId, clientId: '', loansTakenToday: 0]             | 'empty client id'
+            [clientId: validClientId, loansTakenToday: 0]                       | 'missing loan id'
+            [loanId: validLoanId, clientId: validClientId]                      | 'missing loans taken today'
+            [loanId: validLoanId, clientId: validClientId, loansTakenToday: -1] | 'negative loans taken today'
+            '{not json'                                                         | 'malformed body'
     }
 
     MockHttpServletResponse postValidationRequest(RiskValidationRequest request) {
         postValidationRequest(new JsonBuilder(request) as String)
+    }
+
+    MockHttpServletResponse postValidationRequest(Map body) {
+        postValidationRequest(new JsonBuilder(body) as String)
     }
 
     MockHttpServletResponse postValidationRequest(String body) {

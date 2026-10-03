@@ -6,10 +6,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.containing
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import static io.osvaldas.api.clients.Status.ACTIVE
-import static io.osvaldas.api.loans.Status.CLOSED
-import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
-import static io.osvaldas.api.loans.Status.PENDING
 import static io.osvaldas.api.loans.Status.REJECTED
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpStatus.BAD_REQUEST
@@ -32,7 +29,6 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import groovy.json.JsonBuilder
 import io.osvaldas.api.loans.LoanRequest
 import io.osvaldas.api.loans.LoanResponse
-import io.osvaldas.api.loans.TodayTakenLoansCount
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Client
@@ -188,36 +184,6 @@ class LoansControllerSpec extends AbstractControllerSpec {
             response.status == BAD_REQUEST.value()
         and:
             response.contentAsString.contains(CLIENT_NOT_ACTIVE)
-    }
-
-    void 'should return loans taken today count'() {
-        given:
-            clientRepository.save(buildClient(CLIENT_ID, [buildLoanWithoutId(100.0)] as Set, ACTIVE))
-        when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
-                .param('clientId', CLIENT_ID)
-                .contentType(APPLICATION_JSON))
-                .andReturn().response
-        then:
-            response.status == OK.value()
-        and:
-            response.contentAsString.contains('1')
-    }
-
-    void 'should count only open loans taken today'() {
-        given:
-            Set<Loan> loans = [OPEN, NOT_EVALUATED, REJECTED, PENDING, CLOSED]
-                .collect { buildLoanWithoutId(100.0, it) } as Set
-            clientRepository.save(buildClient(CLIENT_ID, loans, ACTIVE))
-        when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans/today')
-                .param('clientId', CLIENT_ID)
-                .contentType(APPLICATION_JSON))
-                .andReturn().response
-        then:
-            response.status == OK.value()
-        and:
-            objectMapper.readValue(response.contentAsString, TodayTakenLoansCount).takenLoansCount() == 1
     }
 
     void 'should return loan with postpones when open-in-view is disabled'() {
