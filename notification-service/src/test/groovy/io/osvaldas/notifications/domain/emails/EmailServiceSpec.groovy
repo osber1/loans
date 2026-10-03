@@ -2,6 +2,7 @@ package io.osvaldas.notifications.domain.emails
 
 import static com.icegreen.greenmail.util.ServerSetupTest.SMTP
 
+import org.springframework.mail.MailException
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
@@ -52,6 +53,17 @@ class EmailServiceSpec extends AbstractEmailSpec {
                 subject == emailSubject
                 content == "${emailContent}"
             }
+    }
+
+    void 'should preserve cause when email sending fails'() {
+        given:
+            greenMail.stop()
+        when:
+            emailService.send(receiverEmail, emailContent)
+        then:
+            IllegalStateException e = thrown()
+            e.message == 'Failed to send email.'
+            e.cause instanceof MailException
     }
 
 }
