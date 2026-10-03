@@ -23,6 +23,30 @@ check {
     dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
+jacocoTestCoverageVerification {
+    // Enums, records and exceptions have no logic; their generated lines would only pad or sink the ratio
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(it) {
+            exclude(
+                '**/exceptions/**',
+                '**/Status.class',
+                '**/*Request.class',
+                '**/*Response.class',
+                '**/EmailMessage.class'
+            )
+        }
+    }))
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = '0.7'.toBigDecimal()
+            }
+        }
+    }
+}
+
 jacocoTestReport {
     dependsOn test
     reports {
