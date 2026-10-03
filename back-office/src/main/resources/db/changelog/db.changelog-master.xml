@@ -55,6 +55,9 @@
             <column name="return_date" type="timestamp with time zone"/>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="client_id" type="varchar(255)"/>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <createTable tableName="loan_aud">
@@ -122,6 +125,20 @@
         <addForeignKeyConstraint baseColumnNames="rev" baseTableName="loan_postpone_aud"
                                  constraintName="FKi11mvh4xh7v3cx5340wredmal" referencedColumnNames="rev"
                                  referencedTableName="revinfo"/>
+
+        <createIndex tableName="loan" indexName="idx_loan_client_id_status_created_at">
+            <column name="client_id"/>
+            <column name="status"/>
+            <column name="created_at"/>
+        </createIndex>
+
+        <createIndex tableName="loan" indexName="idx_loan_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="loan_postpone" indexName="idx_loan_postpone_loan_id">
+            <column name="loan_id"/>
+        </createIndex>
         <rollback/>
     </changeSet>
 
@@ -141,28 +158,6 @@
             </column>
         </createTable>
         <rollback/>
-    </changeSet>
-
-    <changeSet id="loan-add-version" author="osvaldas">
-        <addColumn tableName="loan">
-            <column name="version" type="BIGINT" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
-    </changeSet>
-
-    <changeSet id="loan-add-indexes" author="osvaldas">
-        <createIndex tableName="loan" indexName="idx_loan_client_id_status_created_at">
-            <column name="client_id"/>
-            <column name="status"/>
-            <column name="created_at"/>
-        </createIndex>
-        <createIndex tableName="loan" indexName="idx_loan_status">
-            <column name="status"/>
-        </createIndex>
-        <createIndex tableName="loan_postpone" indexName="idx_loan_postpone_loan_id">
-            <column name="loan_id"/>
-        </createIndex>
     </changeSet>
 
 </databaseChangeLog>
