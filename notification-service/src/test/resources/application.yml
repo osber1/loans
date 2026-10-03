@@ -1,9 +1,3 @@
-spring:
-  web:
-    error:
-      include-message: always
-      include-binding-errors: always
-
 email:
   senderAddress: hello@osber.com
   subject: Confirm your email

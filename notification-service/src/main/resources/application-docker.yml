@@ -3,7 +3,3 @@ spring:
     host: rabbitmq
   mail:
     host: mailhog
-
-logging:
-  file:
-    name: /logs/notification-service.log
