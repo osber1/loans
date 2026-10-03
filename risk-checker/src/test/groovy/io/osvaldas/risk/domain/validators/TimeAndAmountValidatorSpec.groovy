@@ -1,5 +1,6 @@
 package io.osvaldas.risk.domain.validators
 
+import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
 import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH
 
 import io.osvaldas.api.exceptions.ValidationRuleException
@@ -51,7 +52,7 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
             timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: 90000000000000.00))
         then:
             AmountException e = thrown()
-            e.message == amountExceeds
+            e.message == AMOUNT_EXCEEDS
     }
 
     void 'should not throw time exception when amount is below max amount in forbidden time'() {

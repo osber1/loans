@@ -2,6 +2,8 @@ package io.osvaldas.risk.infra.rest.validation
 
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
+import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS
 import static io.osvaldas.risk.infra.exception.ApiExceptionHandler.BACK_OFFICE_ERROR
 import static io.osvaldas.risk.infra.exception.ApiExceptionHandler.BACK_OFFICE_UNAVAILABLE
 import static java.time.Clock.fixed
@@ -84,7 +86,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
         and:
             with(readValidationResponse(response)) {
                 !success()
-                message() == amountExceeds
+                message() == AMOUNT_EXCEEDS
             }
     }
 
@@ -95,7 +97,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             MockHttpServletResponse response = postValidationRequest(request)
         then:
             with(readValidationResponse(response)) {
-                message() == amountExceeds
+                message() == AMOUNT_EXCEEDS
             }
         and:
             wireMock.verifyThat(0, getRequestedFor(urlPathEqualTo(loansTakenTodayPath)))
@@ -111,7 +113,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
         and:
             with(readValidationResponse(response)) {
                 !success()
-                message() == loanLimitExceeds
+                message() == LOAN_LIMIT_EXCEEDS
             }
     }
 

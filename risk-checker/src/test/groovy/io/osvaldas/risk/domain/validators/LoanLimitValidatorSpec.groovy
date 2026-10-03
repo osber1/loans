@@ -1,5 +1,7 @@
 package io.osvaldas.risk.domain.validators
 
+import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS
+
 import io.osvaldas.api.exceptions.ValidationRuleException.LoanLimitException
 import io.osvaldas.api.loans.TodayTakenLoansCount
 import io.osvaldas.risk.AbstractSpec
@@ -37,7 +39,7 @@ class LoanLimitValidatorSpec extends AbstractSpec {
             loanLimitValidator.validate(new RiskValidationTarget(clientId: clientId))
         then:
             LoanLimitException e = thrown()
-            e.message == loanLimitExceeds
+            e.message == LOAN_LIMIT_EXCEEDS
         where:
             count << [2, 6]
     }

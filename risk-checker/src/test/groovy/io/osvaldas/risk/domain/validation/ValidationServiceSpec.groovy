@@ -1,5 +1,7 @@
 package io.osvaldas.risk.domain.validation
 
+import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
+
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException
 import io.osvaldas.api.loans.LoanResponse
 import io.osvaldas.api.loans.Status
@@ -43,10 +45,10 @@ class ValidationServiceSpec extends AbstractSpec {
         when:
             RiskValidationResponse response = validationService.validate(request)
         then:
-            1 * validator.validate(_ as RiskValidationTarget) >> { throw new AmountException(amountExceeds) }
+            1 * validator.validate(_ as RiskValidationTarget) >> { throw new AmountException(AMOUNT_EXCEEDS) }
         and:
             !response.success()
-            response.message() == amountExceeds
+            response.message() == AMOUNT_EXCEEDS
     }
 
     void 'should propagate infrastructure failures instead of rejecting loan'() {

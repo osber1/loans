@@ -1,7 +1,5 @@
 package io.osvaldas.risk.infra.rest
 
-import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
-import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS
 import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH
 
 import java.time.Clock
@@ -30,12 +28,6 @@ abstract class AbstractControllerSpec extends Specification {
 
     @Shared
     String riskTooHigh = RISK_TOO_HIGH.formatted('00:00', '06:00')
-
-    @Shared
-    String amountExceeds = AMOUNT_EXCEEDS
-
-    @Shared
-    String loanLimitExceeds = LOAN_LIMIT_EXCEEDS
 
     @Autowired
     MockMvc mockMvc

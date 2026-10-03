@@ -1,5 +1,7 @@
 package io.osvaldas.risk.domain.validators
 
+import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
+
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException
 import io.osvaldas.risk.AbstractSpec
 import io.osvaldas.risk.domain.validation.ValidationRule
@@ -30,7 +32,7 @@ class RiskValidatorSpec extends AbstractSpec {
         when:
             riskValidator.validate(target)
         then:
-            1 * firstRule.validate(target) >> { throw new AmountException(amountExceeds) }
+            1 * firstRule.validate(target) >> { throw new AmountException(AMOUNT_EXCEEDS) }
             0 * secondRule.validate(_)
         and:
             thrown(AmountException)
