@@ -27,6 +27,8 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
 
     static String routingKeys = 'internal.notification.routing-key'
 
+    static String deadLetterQueueName = 'notification.dlq'
+
     @ServiceConnection
     static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.13.1-management-alpine')
 
@@ -37,14 +39,21 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
         mailhogContainer.start()
         rabbitMQContainer.start()
 
-        rabbitMQContainer.execInContainer('rabbitmqadmin', 'declare', 'queue', "name=$queueName")
-        rabbitMQContainer.execInContainer('rabbitmqadmin', 'declare', 'exchange', "name=$exchangeName", 'type=direct')
-        rabbitMQContainer.execInContainer('rabbitmqadmin', 'declare', 'binding',
-            "source=$exchangeName",
-            "destination=$queueName",
-            "routing_key=$routingKeys",
-            'destination_type=queue',
-            'arguments={}')
+        rabbitMQContainer.with {
+            execInContainer('rabbitmqadmin', 'declare', 'queue', "name=$queueName")
+            execInContainer('rabbitmqadmin', 'declare', 'exchange', "name=$exchangeName", 'type=direct')
+            execInContainer('rabbitmqadmin', 'declare', 'binding',
+                "source=$exchangeName",
+                "destination=$queueName",
+                "routing_key=$routingKeys",
+                'destination_type=queue',
+                'arguments={}')
+            // Mirrors the dead-letter queue and notification-dlx policy from loans-infra
+            execInContainer('rabbitmqadmin', 'declare', 'queue', "name=$deadLetterQueueName")
+            execInContainer('rabbitmqctl', 'set_policy', 'notification-dlx', '^notification\\.queue$',
+                '{"dead-letter-exchange":"","dead-letter-routing-key":"' + deadLetterQueueName + '"}',
+                '--apply-to', 'queues')
+        }
     }
 
     @DynamicPropertySource
