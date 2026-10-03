@@ -14,7 +14,7 @@ class MobilePhoneValidatorSpec extends Specification {
             validator.isValid(phoneNumber, Stub(ConstraintValidatorContext)) == result
         where:
             phoneNumber   || result
-            null          || false
+            null          || true
             ''            || false
             'phoneNumber' || false
             '11111111111' || false

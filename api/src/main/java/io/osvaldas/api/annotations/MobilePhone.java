@@ -1,5 +1,6 @@
 package io.osvaldas.api.annotations;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -8,8 +9,12 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
+/**
+ * The annotated string must be a mobile phone number. {@code null} is valid, combine with {@code @NotBlank} to require a value.
+ */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.RECORD_COMPONENT})
 @Constraint(validatedBy = MobilePhoneValidator.class)
 public @interface MobilePhone {
 
