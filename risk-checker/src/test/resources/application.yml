@@ -4,18 +4,8 @@ application:
   forbiddenHourFrom: 0
   forbiddenHourTo: 6
 
-back-office:
-  url: ${wiremock.server.baseUrl:http://localhost:8080}
-
 spring:
   web:
     error:
       include-message: always
       include-binding-errors: always
-  cloud:
-    openfeign:
-      client:
-        config:
-          back-office:
-            connectTimeout: 1000
-            readTimeout: 1000

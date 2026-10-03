@@ -95,7 +95,7 @@ public class LoanService {
             Optional.of(response)
                 .filter(RiskValidationResponse::success)
                 .ifPresentOrElse(r -> approveAndSave(loan),
-                    () -> rejectLoanAndThrow(loan, response.message()));
+                    () -> rejectLoanAndThrow(loan, response));
         } finally {
             Optional.ofNullable(cacheManager.getCache(LOAN_RESPONSE_CACHE))
                 .ifPresent(cache -> cache.evict(loan.getId()));
@@ -116,7 +116,7 @@ public class LoanService {
         long loansTakenToday = getLoanTakenTodayCount(clientId, loan.getId(), timeUtils.getCurrentDateTime().truncatedTo(DAYS));
         try {
             log.info("Validating loan: {}", loan.getId());
-            RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId, loansTakenToday));
+            RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId, loan.getAmount(), loansTakenToday));
             log.info("Risk validation response: {}", response);
             return response;
         } catch (RuntimeException e) {
@@ -148,9 +148,9 @@ public class LoanService {
         setStatusAndSave(loan, OPEN);
     }
 
-    private void rejectLoanAndThrow(Loan loan, String message) {
+    private void rejectLoanAndThrow(Loan loan, RiskValidationResponse response) {
         setStatusAndSave(loan, REJECTED);
-        throw new ValidationRuleException(message);
+        throw ValidationRuleException.of(response.reason(), response.message());
     }
 
     private void setStatusAndSave(Loan loan, Status status) {

@@ -50,7 +50,10 @@ class LoansTasksSchedulerSpec extends AbstractSpec {
         and:
             noExceptionThrown()
         where:
-            exception << [new ValidationRuleException(LOAN_LIMIT_EXCEEDS), new IllegalStateException('boom')]
+            exception << [
+                new ValidationRuleException.LoanLimitException(LOAN_LIMIT_EXCEEDS),
+                new IllegalStateException('boom'),
+            ]
     }
 
     private Loan buildLoanWithClient(long loanId) {

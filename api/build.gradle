@@ -30,6 +30,7 @@ jacocoTestCoverageVerification {
             exclude(
                 '**/exceptions/**',
                 '**/Status.class',
+                '**/RiskRejectionReason.class',
                 '**/*Request.class',
                 '**/*Response.class',
                 '**/EmailMessage.class'
