@@ -75,15 +75,8 @@ public class ClientController {
         service.deleteClient(id);
     }
 
-    @PostMapping("clients/{id}/active")
-    @Operation(description = "Activates the client.")
-    public void activateClient(@PathVariable String id) {
-        service.activateClient(id);
-    }
-
     @GetMapping("clients/{id}/active")
-    @Operation(description = "Activates the client from the link in the activation email.")
-    public void activateClientFromEmailLink(@PathVariable String id) {
+    public void activateClient(@PathVariable String id) {
         service.activateClient(id);
     }
 
