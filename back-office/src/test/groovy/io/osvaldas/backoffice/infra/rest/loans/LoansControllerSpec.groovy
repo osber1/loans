@@ -98,6 +98,22 @@ class LoansControllerSpec extends AbstractControllerSpec {
             REJECTED == loanRepository.findAll().last().status
     }
 
+    void 'should reject term of #term months with a problem response'() {
+        given:
+            clientRepository.save(activeClientWithId)
+        when:
+            MockHttpServletResponse response = postLoanRequest(new LoanRequest(100.0, term), CLIENT_ID)
+        then:
+            response.status == BAD_REQUEST.value()
+            response.contentType.startsWith('application/problem+json')
+        and:
+            objectMapper.readValue(response.contentAsString, Map).errors.any { it.startsWith('termInMonths: ') }
+        and:
+            loanRepository.findAll().empty
+        where:
+            term << [361, 2000000000, 0]
+    }
+
     void 'should fail when client is not active'() {
         given:
             clientRepository.save(registeredClientWithId)
