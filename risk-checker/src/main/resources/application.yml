@@ -35,3 +35,23 @@ application:
   maxAmount: 100
   forbiddenHourFrom: 0
   forbiddenHourTo: 6
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker,k8s
+
+logging:
+  file:
+    name: ""
+  structured:
+    format:
+      console: logstash
+    json:
+      rename:
+        logger_name: class
+      add:
+        hostname: ${HOSTNAME:}
+        app: ${spring.application.name}
+        profiles: ${spring.profiles.active:}

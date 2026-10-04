@@ -82,8 +82,7 @@ subprojects {
     plugins.withId('org.springframework.boot') {
         dependencies {
             implementation(
-                libs.spring.boot.starter.bootstrap,
-                libs.logstash
+                libs.spring.boot.starter.bootstrap
             )
         }
     }
