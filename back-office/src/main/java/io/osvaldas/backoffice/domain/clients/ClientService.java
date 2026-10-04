@@ -9,7 +9,6 @@ import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
 import java.util.Objects;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.osvaldas.api.clients.Status;
+import io.osvaldas.api.email.EmailMessage;
 import io.osvaldas.api.exceptions.BadRequestException;
 import io.osvaldas.api.exceptions.NotFoundException;
+import io.osvaldas.backoffice.domain.notifications.NotificationOutboxService;
 import io.osvaldas.backoffice.repositories.ClientRepository;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
 
-    private final ApplicationEventPublisher eventPublisher;
+    private final NotificationOutboxService notificationOutbox;
 
     @Transactional
     public Client registerClient(Client client) {
@@ -43,7 +44,7 @@ public class ClientService {
         client.setRandomId();
         Client savedClient = clientRepository.saveAndFlush(client);
         log.info("Client registered: {}", savedClient.getId());
-        eventPublisher.publishEvent(new ClientRegisteredEvent(savedClient.getId(), savedClient.getFullName(), savedClient.getEmail()));
+        notificationOutbox.enqueue(new EmailMessage(savedClient.getId(), savedClient.getFullName(), savedClient.getEmail()));
         return savedClient;
     }
 

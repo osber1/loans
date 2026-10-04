@@ -159,4 +159,29 @@
         <rollback/>
     </changeSet>
 
+    <changeSet id="notification-outbox" author="osvaldas">
+        <createSequence incrementBy="1" sequenceName="notification_outbox_seq" startValue="1"/>
+        <createTable tableName="notification_outbox">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_notification_outbox"/>
+            </column>
+            <column name="client_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="full_name" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="published_at" type="timestamp with time zone"/>
+        </createTable>
+        <sql>CREATE INDEX idx_notification_outbox_pending ON notification_outbox (id) WHERE published_at IS NULL</sql>
+        <rollback>
+            <dropTable tableName="notification_outbox"/>
+            <dropSequence sequenceName="notification_outbox_seq"/>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

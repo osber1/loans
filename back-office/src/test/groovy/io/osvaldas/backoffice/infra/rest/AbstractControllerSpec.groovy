@@ -35,6 +35,7 @@ import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.SharedPostgres
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.LoanRepository
+import io.osvaldas.backoffice.repositories.NotificationOutboxRepository
 import spock.lang.Shared
 
 @Testcontainers
@@ -73,6 +74,9 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     LoanRepository loanRepository
 
     @Autowired
+    NotificationOutboxRepository notificationOutboxRepository
+
+    @Autowired
     CacheManager cacheManager
 
     static {
@@ -81,6 +85,7 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     }
 
     void cleanup() {
+        notificationOutboxRepository.deleteAll()
         loanRepository.deleteAll()
         clientRepository.deleteAll()
         cacheManager.cacheNames
