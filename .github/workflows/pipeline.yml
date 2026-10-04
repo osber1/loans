@@ -49,6 +49,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew check sonar
 
+      - name: Verify Error Prone did not rewrite any sources
+        run: git diff --exit-code
+
       - name: Upload build reports
         if: failure()
         uses: actions/upload-artifact@v7

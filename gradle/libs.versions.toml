@@ -1,7 +1,6 @@
 [versions]
 spring_boot = "4.1.1"
 spring_cloud_release = "2025.1.3"
-spring_cloud_contract = "5.0.3"
 mapstruct = "1.6.3"
 spock = "2.4-groovy-5.0"
 cucumber = "8.0.3"
@@ -14,7 +13,6 @@ spring_dependency = { id = "io.spring.dependency-management", version = "1.1.7" 
 spotbugs = { id = "com.github.spotbugs", version = "6.5.12" }
 sonarqube = { id = "org.sonarqube", version = "7.5.0.8588" }
 errorprone = { id = "net.ltgt.errorprone", version = "5.1.1" }
-dependency_check = { id = "org.owasp.dependencycheck", version = "13.0.0" }
 
 [libraries]
 spring_boot_starter_web = { module = "org.springframework.boot:spring-boot-starter-web" }
@@ -28,7 +26,6 @@ spring_boot_starter_actuator = { module = "org.springframework.boot:spring-boot-
 spring_boot_starter_data_redis = { module = "org.springframework.boot:spring-boot-starter-data-redis" }
 spring_data_envers = { module = "org.springframework.data:spring-data-envers" }
 spring_boot_starter_bootstrap = { module = "org.springframework.cloud:spring-cloud-starter-bootstrap" }
-spring_boot_cloud_stub_runner = { module = "org.springframework.cloud:spring-cloud-starter-contract-stub-runner", version.ref = "spring_cloud_contract" }
 spring_boot_configuration_processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring_boot_testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 spring_boot_starter_data_jpa_test = { module = "org.springframework.boot:spring-boot-starter-data-jpa-test" }
