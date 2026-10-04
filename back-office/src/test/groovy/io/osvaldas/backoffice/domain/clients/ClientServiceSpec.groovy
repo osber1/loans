@@ -6,7 +6,6 @@ import static io.osvaldas.api.clients.Status.REGISTERED
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -15,9 +14,11 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 
+import io.osvaldas.api.email.EmailMessage
 import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.api.exceptions.NotFoundException
 import io.osvaldas.backoffice.AbstractSpec
+import io.osvaldas.backoffice.domain.notifications.NotificationOutboxService
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.entities.Client
 import spock.lang.Subject
@@ -28,10 +29,10 @@ class ClientServiceSpec extends AbstractSpec {
 
     ClientRepository clientRepository = Mock()
 
-    ApplicationEventPublisher eventPublisher = Mock()
+    NotificationOutboxService notificationOutbox = Mock()
 
     @Subject
-    ClientService clientService = new ClientService(clientRepository, eventPublisher)
+    ClientService clientService = new ClientService(clientRepository, notificationOutbox)
 
     void 'should throw exception when registering client with existing personal code'() {
         when:
@@ -42,10 +43,10 @@ class ClientServiceSpec extends AbstractSpec {
         and:
             1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> true
             0 * clientRepository.saveAndFlush(_)
-            0 * eventPublisher.publishEvent(_)
+            0 * notificationOutbox.enqueue(_)
     }
 
-    void 'should register new client and publish registration event when client with new personal code'() {
+    void 'should register new client and enqueue registration email when client with new personal code'() {
         when:
             Client registeredClient = clientService.registerClient(registeredClientWithoutId)
         then:
@@ -53,10 +54,10 @@ class ClientServiceSpec extends AbstractSpec {
         and:
             1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> false
             1 * clientRepository.saveAndFlush(registeredClientWithoutId) >> registeredClientWithId
-            1 * eventPublisher.publishEvent(new ClientRegisteredEvent(CLIENT_ID, NAME + ' ' + SURNAME, CLIENT_EMAIL))
+            1 * notificationOutbox.enqueue(new EmailMessage(CLIENT_ID, NAME + ' ' + SURNAME, CLIENT_EMAIL))
     }
 
-    void 'should not publish registration event when saving client fails'() {
+    void 'should not enqueue registration email when saving client fails'() {
         when:
             clientService.registerClient(registeredClientWithoutId)
         then:
@@ -64,7 +65,7 @@ class ClientServiceSpec extends AbstractSpec {
         and:
             1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> false
             1 * clientRepository.saveAndFlush(registeredClientWithoutId) >> { throw new IllegalStateException() }
-            0 * eventPublisher.publishEvent(_)
+            0 * notificationOutbox.enqueue(_)
     }
 
     void 'should return clients page when there are clients'() {

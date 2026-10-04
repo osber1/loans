@@ -23,6 +23,7 @@ import io.osvaldas.api.clients.ClientUpdateRequest
 import io.osvaldas.api.clients.Status
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Client
+import io.osvaldas.backoffice.repositories.entities.NotificationOutbox
 import spock.lang.Shared
 
 class ClientControllerSpec extends AbstractControllerSpec {
@@ -48,6 +49,21 @@ class ClientControllerSpec extends AbstractControllerSpec {
                 email() == clientRequest.email()
                 phoneNumber() == clientRequest.phoneNumber()
             }
+    }
+
+    void 'should store and relay the activation email when registering a client'() {
+        given:
+            ClientRegisterRequest clientRequest = buildRegisterClientRequest()
+        when:
+            MvcResult result = sendRegistrationClientRequest(clientRequest)
+        then:
+            result.response.status == OK.value()
+        and:
+            List<NotificationOutbox> outbox = notificationOutboxRepository.findAll()
+            outbox.size() == 1
+            outbox.first().clientId == objectMapper.readValue(result.response.contentAsString, ClientResponse).id()
+            outbox.first().email == clientRequest.email()
+            outbox.first().publishedAt != null
     }
 
     @SuppressWarnings('LineLength')

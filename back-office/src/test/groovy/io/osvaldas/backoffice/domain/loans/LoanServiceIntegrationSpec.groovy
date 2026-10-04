@@ -31,6 +31,7 @@ import io.osvaldas.api.risk.validation.RiskRejectionReason
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.backoffice.domain.clients.ClientService
+import io.osvaldas.backoffice.domain.notifications.NotificationOutboxService
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig
 import io.osvaldas.backoffice.repositories.AbstractDatabaseSpec
 import io.osvaldas.backoffice.repositories.ClientRepository
@@ -58,6 +59,9 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
 
     @SpringBean
     RiskCheckerClient riskCheckerClient = Mock()
+
+    @SpringBean
+    NotificationOutboxService notificationOutbox = Mock()
 
     @Subject
     @Autowired

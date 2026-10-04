@@ -16,5 +16,7 @@ rabbitmq:
     internal-notification: internal.notification.routing-key
 
 scheduler:
+  relayNotificationOutbox:
+    enabled: false
   evaluateNotEvaluatedLoans:
     enabled: false
