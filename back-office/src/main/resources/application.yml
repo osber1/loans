@@ -87,3 +87,4 @@ scheduler:
   evaluateNotEvaluatedLoans:
     enabled: true
     cron: "0 */10 * * * *"
+    minAge: PT5M

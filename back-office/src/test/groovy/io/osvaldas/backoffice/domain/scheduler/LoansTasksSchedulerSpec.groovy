@@ -3,6 +3,8 @@ package io.osvaldas.backoffice.domain.scheduler
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 
+import java.time.Duration
+
 import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.domain.loans.LoanService
@@ -12,6 +14,8 @@ import spock.lang.Subject
 
 class LoansTasksSchedulerSpec extends AbstractSpec {
 
+    static final Duration MIN_AGE = Duration.ofMinutes(5)
+
     @Shared
     Loan loan = buildLoan(100.0).tap {
         it.client = buildClient(CLIENT_ID, [it] as Set, ACTIVE)
@@ -20,11 +24,11 @@ class LoansTasksSchedulerSpec extends AbstractSpec {
     LoanService loanService = Mock()
 
     @Subject
-    LoansTasksScheduler scheduler = new LoansTasksScheduler(loanService)
+    LoansTasksScheduler scheduler = new LoansTasksScheduler(loanService, MIN_AGE)
 
     void 'should evaluate #invocations times when there are #result.size() loans'() {
         given:
-            loanService.getLoansByStatus(NOT_EVALUATED) >> result
+            loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE) >> result
         when:
             scheduler.evaluateNotEvaluatedLoans()
         then:
@@ -40,7 +44,7 @@ class LoansTasksSchedulerSpec extends AbstractSpec {
             Loan failingLoan = buildLoanWithClient(1)
             Loan secondLoan = buildLoanWithClient(2)
             Loan thirdLoan = buildLoanWithClient(3)
-            loanService.getLoansByStatus(NOT_EVALUATED) >> [failingLoan, secondLoan, thirdLoan]
+            loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE) >> [failingLoan, secondLoan, thirdLoan]
         when:
             scheduler.evaluateNotEvaluatedLoans()
         then:

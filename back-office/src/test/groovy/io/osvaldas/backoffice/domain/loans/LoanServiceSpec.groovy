@@ -7,6 +7,8 @@ import static io.osvaldas.api.loans.Status.REJECTED
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
+import java.time.Duration
+
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
 import org.springframework.data.jpa.domain.Specification
@@ -260,9 +262,9 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should return #result.size() loans when status is #status'() {
         given:
-            1 * loanRepository.findAllWithClientByStatus(status) >> result
+            1 * loanRepository.findAllWithClientByStatusAndCreatedAtBefore(status, DATE.minusMinutes(5)) >> result
         expect:
-            loanService.getLoansByStatus(status) == result
+            loanService.getLoansByStatusOlderThan(status, Duration.ofMinutes(5)) == result
         where:
             result             | status
             []                 | NOT_EVALUATED

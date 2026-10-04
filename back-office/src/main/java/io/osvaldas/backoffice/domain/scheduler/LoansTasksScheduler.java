@@ -2,6 +2,9 @@ package io.osvaldas.backoffice.domain.scheduler;
 
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED;
 
+import java.time.Duration;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -9,22 +12,28 @@ import org.springframework.stereotype.Component;
 import io.osvaldas.api.exceptions.ValidationRuleException;
 import io.osvaldas.backoffice.domain.loans.LoanService;
 import io.osvaldas.backoffice.repositories.entities.Loan;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "scheduler.evaluateNotEvaluatedLoans", name = "enabled", havingValue = "true")
 public class LoansTasksScheduler {
 
     private final LoanService loanService;
 
+    private final Duration minAge;
+
+    public LoansTasksScheduler(LoanService loanService,
+                               @Value("${scheduler.evaluateNotEvaluatedLoans.minAge:PT5M}") Duration minAge) {
+        this.loanService = loanService;
+        this.minAge = minAge;
+    }
+
     @Scheduled(cron = "${scheduler.evaluateNotEvaluatedLoans.cron:0 */10 * * * *}")
     @SchedulerLock(name = "evaluateNotEvaluatedLoans", lockAtLeastFor = "PT5S", lockAtMostFor = "PT10M")
     public void evaluateNotEvaluatedLoans() {
-        loanService.getLoansByStatus(NOT_EVALUATED)
+        loanService.getLoansByStatusOlderThan(NOT_EVALUATED, minAge)
             .forEach(this::evaluate);
     }
 

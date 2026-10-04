@@ -15,6 +15,7 @@ import static io.osvaldas.backoffice.repositories.specifications.LoanSpecificati
 import static java.time.temporal.ChronoUnit.DAYS;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -102,8 +103,8 @@ public class LoanService {
         }
     }
 
-    public List<Loan> getLoansByStatus(Status status) {
-        return loanRepository.findAllWithClientByStatus(status);
+    public List<Loan> getLoansByStatusOlderThan(Status status, Duration minAge) {
+        return loanRepository.findAllWithClientByStatusAndCreatedAtBefore(status, timeUtils.getCurrentDateTime().minus(minAge));
     }
 
     private Client getActiveClient(String clientId) {
