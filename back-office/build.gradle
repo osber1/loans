@@ -41,8 +41,9 @@ dependencies {
         libs.testcontainers.spock,
         libs.testcontainers.postgresql,
         libs.testcontainers.rabbitmq,
-        libs.spring.boot.cloud.stub.runner,
-        libs.spring.boot.starter.data.jpa.test
+        libs.spring.boot.cache.test,
+        libs.spring.boot.starter.data.jpa.test,
+        libs.wiremock
     )
 }
 

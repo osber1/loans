@@ -14,33 +14,36 @@ spring:
     url: jdbc:postgresql://localhost:5432/loans
     username: root
     password: root
-    driverClassName: org.postgresql.Driver
     hikari.auto-commit: false
 
   jpa:
     open-in-view: false
     hibernate.ddl-auto: none
-    #    show-sql: true
-    properties:
-      #      javax:
-      #        persistence:
-      #          schema-generation:
-      #            create-source: metadata
-      #            scripts:
-      #              action: create
-      #              create-target: create.sql
-      hibernate:
-        #        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  cache:
-    type: redis
+  task:
+    scheduling:
+      thread-name-prefix: cronJob-
+      pool:
+        size: 3
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          risk-checker:
+            connect-timeout: 2000
+            read-timeout: 5000
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
 
   rabbitmq:
     host: localhost
+    connection-timeout: 2s
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
   web:
     error:
       include-message: always
@@ -71,7 +74,6 @@ info:
     version: v1.0
   techstack:
     java: Java 25
-    springBoot: 3.2.4
 
 application:
   timeZone: Europe/Vilnius
@@ -89,7 +91,9 @@ scheduler:
     enabled: true
     delay: PT5S
     retention: P7D
+    purgeCron: "0 0 * * * *"
   evaluateNotEvaluatedLoans:
     enabled: true
     cron: "0 */10 * * * *"
     minAge: PT5M
+    batchSize: 100

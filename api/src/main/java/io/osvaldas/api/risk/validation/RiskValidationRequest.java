@@ -1,6 +1,7 @@
 package io.osvaldas.api.risk.validation;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ public record RiskValidationRequest(
     @NotNull Long loanId,
     @NotEmpty String clientId,
     @NotNull @Positive BigDecimal amount,
-    @NotNull @PositiveOrZero Long loansTakenToday) {
+    @NotNull @PositiveOrZero Long loansTakenToday,
+    ZonedDateTime requestedAt) {
 
 }

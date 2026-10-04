@@ -22,6 +22,8 @@ public interface NotificationOutboxRepository extends JpaRepository<Notification
         """, nativeQuery = true)
     List<NotificationOutbox> lockPending(int limit);
 
+    long countByPublishedAtIsNull();
+
     @Modifying
     @Query("DELETE FROM NotificationOutbox o WHERE o.publishedAt < :publishedBefore")
     int deletePublishedBefore(ZonedDateTime publishedBefore);

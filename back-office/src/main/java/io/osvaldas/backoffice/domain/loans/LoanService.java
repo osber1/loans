@@ -3,13 +3,13 @@ package io.osvaldas.backoffice.domain.loans;
 import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED;
 import static io.osvaldas.api.loans.Status.OPEN;
-import static io.osvaldas.api.loans.Status.PENDING;
 import static io.osvaldas.api.loans.Status.REJECTED;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_ACTIVE;
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_FOUND;
 import static io.osvaldas.backoffice.infra.configuration.BeansConfig.LOAN_RESPONSE_CACHE;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.clientIdIs;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreatedAtOrAfter;
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreatedBefore;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanIdLessThan;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIn;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.cache.CacheManager;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,11 +60,6 @@ public class LoanService {
 
     private final CacheManager cacheManager;
 
-    @Transactional
-    public Loan save(Loan loan) {
-        return loanRepository.save(loan);
-    }
-
     @Transactional(readOnly = true)
     public Loan getLoan(long id) {
         return loanRepository.findWithPostponesById(id)
@@ -91,7 +87,6 @@ public class LoanService {
 
     public void validate(Loan loan, String clientId) {
         try {
-            setStatusAndSave(loan, NOT_EVALUATED);
             RiskValidationResponse response = sendValidationRequest(loan, clientId);
             Optional.of(response)
                 .filter(RiskValidationResponse::success)
@@ -103,8 +98,9 @@ public class LoanService {
         }
     }
 
-    public List<Loan> getLoansByStatusOlderThan(Status status, Duration minAge) {
-        return loanRepository.findAllWithClientByStatusAndCreatedAtBefore(status, timeUtils.getCurrentDateTime().minus(minAge));
+    public List<Loan> getLoansByStatusOlderThan(Status status, Duration minAge, long afterId, int limit) {
+        return loanRepository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
+            status, timeUtils.getCurrentDateTime().minus(minAge), afterId, Limit.of(limit));
     }
 
     private Client getActiveClient(String clientId) {
@@ -114,22 +110,28 @@ public class LoanService {
     }
 
     private RiskValidationResponse sendValidationRequest(Loan loan, String clientId) {
-        long loansTakenToday = getLoanTakenTodayCount(clientId, loan.getId(), timeUtils.getCurrentDateTime().truncatedTo(DAYS));
-        try {
-            log.info("Validating loan: {}", loan.getId());
-            RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId, loan.getAmount(), loansTakenToday));
-            log.info("Risk validation response: {}", response);
-            return response;
-        } catch (RuntimeException e) {
-            log.error("Error validating loan: {}", loan.getId());
-            throw e;
-        }
+        ZonedDateTime requestedAt = requestedAt(loan);
+        long loansTakenToday = getLoanTakenTodayCount(clientId, loan.getId(), requestedAt);
+        log.info("Validating loan: {}", loan.getId());
+        RiskValidationResponse response = riskCheckerClient.validate(
+            new RiskValidationRequest(loan.getId(), clientId, loan.getAmount(), loansTakenToday, requestedAt));
+        log.info("Risk validation response: {}", response);
+        return response;
     }
 
-    private long getLoanTakenTodayCount(String clientId, long loanId, ZonedDateTime startOfDay) {
+    private ZonedDateTime requestedAt(Loan loan) {
+        ZonedDateTime now = timeUtils.getCurrentDateTime();
+        return Optional.ofNullable(loan.getCreatedAt())
+            .map(createdAt -> createdAt.withZoneSameInstant(now.getZone()))
+            .orElse(now);
+    }
+
+    private long getLoanTakenTodayCount(String clientId, long loanId, ZonedDateTime requestedAt) {
+        ZonedDateTime startOfDay = requestedAt.truncatedTo(DAYS);
         Specification<Loan> specification = clientIdIs(clientId)
             .and(loanCreatedAtOrAfter(startOfDay))
-            .and(loanStatusIn(EnumSet.of(PENDING, NOT_EVALUATED, OPEN)))
+            .and(loanCreatedBefore(startOfDay.plusDays(1)))
+            .and(loanStatusIn(EnumSet.of(NOT_EVALUATED, OPEN)))
             .and(loanIdLessThan(loanId));
         return loanRepository.count(specification);
     }
@@ -151,7 +153,7 @@ public class LoanService {
 
     private void rejectLoanAndThrow(Loan loan, RiskValidationResponse response) {
         setStatusAndSave(loan, REJECTED);
-        throw ValidationRuleException.of(response.reason(), response.message());
+        throw new ValidationRuleException(response.reason(), response.message());
     }
 
     private void setStatusAndSave(Loan loan, Status status) {

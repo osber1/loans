@@ -2,15 +2,16 @@ package io.osvaldas.backoffice.domain.loans
 
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
-import static io.osvaldas.api.loans.Status.PENDING
 import static io.osvaldas.api.loans.Status.REJECTED
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
 import java.time.Duration
+import java.time.ZonedDateTime
 
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
+import org.springframework.data.domain.Limit
 import org.springframework.data.jpa.domain.Specification
 
 import io.osvaldas.api.exceptions.BadRequestException
@@ -34,10 +35,11 @@ class LoanServiceSpec extends AbstractSpec {
 
     TimeUtils timeUtils = Stub {
         currentDateTime >> DATE
-        hourOfDay >> 10
     }
 
     PropertiesConfig config = Stub()
+
+    RiskValidationRequest sentRequest
 
     RiskCheckerClient riskCheckerClient = Mock()
 
@@ -49,7 +51,6 @@ class LoanServiceSpec extends AbstractSpec {
 
     LoanRepository loanRepository = Mock {
         save(_ as Loan) >> loan
-        findById(LOAN_ID) >> { of(loan) }
     }
 
     @Subject
@@ -57,14 +58,7 @@ class LoanServiceSpec extends AbstractSpec {
         cacheManager)
 
     void setup() {
-        loan.status = PENDING
-    }
-
-    void 'should save loan'() {
-        when:
-            loanService.save(loan)
-        then:
-            1 * loanRepository.save(loan) >> loan
+        loan.status = NOT_EVALUATED
     }
 
     void 'should return loans list with postpones fetched when there are loans'() {
@@ -151,7 +145,6 @@ class LoanServiceSpec extends AbstractSpec {
             loanService.validate(addedLoan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
-            e instanceof ValidationRuleException.AmountException
             e.reason == RiskRejectionReason.AMOUNT_EXCEEDS
             e.message == AMOUNT_EXCEEDS
         and:
@@ -170,7 +163,6 @@ class LoanServiceSpec extends AbstractSpec {
             loanService.validate(addedLoan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
-            e instanceof ValidationRuleException.TimeException
             e.reason == RiskRejectionReason.FORBIDDEN_TIME
             e.message == RISK_TOO_HIGH
     }
@@ -185,7 +177,6 @@ class LoanServiceSpec extends AbstractSpec {
             loanService.validate(loan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
-            e instanceof ValidationRuleException.LoanLimitException
             e.reason == RiskRejectionReason.LOAN_LIMIT_EXCEEDS
             e.message == LOAN_LIMIT_EXCEEDS
     }
@@ -256,15 +247,31 @@ class LoanServiceSpec extends AbstractSpec {
             1 * loanRepository.count(_ as Specification) >> 3L
             0 * loanRepository.findAll(_ as Specification)
         then:
-            1 * riskCheckerClient.validate(new RiskValidationRequest(LOAN_ID, CLIENT_ID, loan.amount, 3L))
+            1 * riskCheckerClient.validate(new RiskValidationRequest(LOAN_ID, CLIENT_ID, loan.amount, 3L, DATE))
                 >> RiskValidationResponse.passed()
+    }
+
+    void 'should send the time the loan was requested instead of the evaluation time'() {
+        given:
+            ZonedDateTime requestedAt = DATE.minusDays(2).withHour(23)
+            loan.createdAt = requestedAt
+        when:
+            loanService.validate(loan, CLIENT_ID)
+        then:
+            1 * riskCheckerClient.validate(_ as RiskValidationRequest) >> { RiskValidationRequest request ->
+                sentRequest = request
+                RiskValidationResponse.passed()
+            }
+        and:
+            sentRequest.requestedAt().toInstant() == requestedAt.toInstant()
     }
 
     void 'should return #result.size() loans when status is #status'() {
         given:
-            1 * loanRepository.findAllWithClientByStatusAndCreatedAtBefore(status, DATE.minusMinutes(5)) >> result
+            1 * loanRepository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
+                status, DATE.minusMinutes(5), 7L, Limit.of(50)) >> result
         expect:
-            loanService.getLoansByStatusOlderThan(status, Duration.ofMinutes(5)) == result
+            loanService.getLoansByStatusOlderThan(status, Duration.ofMinutes(5), 7L, 50) == result
         where:
             result             | status
             []                 | NOT_EVALUATED

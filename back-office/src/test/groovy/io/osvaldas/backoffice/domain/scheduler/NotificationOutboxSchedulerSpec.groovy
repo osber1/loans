@@ -15,12 +15,20 @@ class NotificationOutboxSchedulerSpec extends AbstractSpec {
     @Subject
     NotificationOutboxScheduler scheduler = new NotificationOutboxScheduler(outboxService, RETENTION)
 
-    void 'should relay pending notifications and purge old published ones'() {
+    void 'should relay pending notifications'() {
         when:
             scheduler.relayNotificationOutbox()
         then:
             1 * outboxService.relayPending() >> 2
+            0 * outboxService.purgePublished(_)
+    }
+
+    void 'should purge published notifications older than the retention period'() {
+        when:
+            scheduler.purgeNotificationOutbox()
+        then:
             1 * outboxService.purgePublished(RETENTION) >> 1
+            0 * outboxService.relayPending()
     }
 
 }

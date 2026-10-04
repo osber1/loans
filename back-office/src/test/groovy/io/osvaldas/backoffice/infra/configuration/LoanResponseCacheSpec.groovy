@@ -45,7 +45,7 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
     static final RiskValidationResponse VALIDATION_FAILED =
         RiskValidationResponse.rejected(RiskRejectionReason.AMOUNT_EXCEEDS, AMOUNT_EXCEEDS)
 
-    static final String UNTYPED_CACHE_NAME = 'UntypedCache'
+    static final String UNCONFIGURED_CACHE_NAME = 'UnconfiguredCache'
 
     static final long CACHED_LOAN_ID = 42
 
@@ -94,16 +94,9 @@ class LoanResponseCacheSpec extends AbstractControllerSpec {
             cache.get(CACHED_LOAN_ID).get() == loanResponse
     }
 
-    void 'should read back loan response from cache without typed configuration'() {
-        given:
-            Cache cache = cacheManager.getCache(UNTYPED_CACHE_NAME)
-        when:
-            cache.put(CACHED_LOAN_ID, loanResponse)
-        then:
-            cache.get(CACHED_LOAN_ID).get() == loanResponse
-            cache.get(CACHED_LOAN_ID, LoanResponse) == loanResponse
-        cleanup:
-            cache.clear()
+    void 'should not create caches that are not configured'() {
+        expect:
+            cacheManager.getCache(UNCONFIGURED_CACHE_NAME) == null
     }
 
     void 'should serve loan from redis cache on repeated request'() {

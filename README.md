@@ -86,7 +86,7 @@ The scenarios read the activation email from Mailhog (`http://localhost:8025`, o
 [Error Prone](https://errorprone.info) and [Error Prone Support](https://error-prone.picnic.tech) run on every
 Java compilation with the rule set in `config/error-prone/rules.gradle` and apply their suggested fixes
 (including Refaster rules) to the sources in place, so the code stays clean without extra steps. Review and commit
-the resulting diff after a build.
+the resulting diff after a build. CI fails when the build leaves a diff, so the fixes cannot be forgotten.
 
 ## CI
 

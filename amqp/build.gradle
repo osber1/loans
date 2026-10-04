@@ -1,6 +1,33 @@
+plugins {
+    id 'jacoco'
+}
+
 dependencies {
     implementation(
         libs.spring.boot.starter.amqp,
         libs.spring.boot.starter.validation
     )
+
+    testImplementation(
+        libs.groovy,
+        libs.spock.core
+    )
+
+    testRuntimeOnly(
+        libs.junit.platform.launcher
+    )
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = providers.environmentVariable('CI').isPresent()
+        csv.required = false
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }

@@ -1,3 +1,0 @@
-logging:
-  file:
-    name: /logs/risk-checker.log

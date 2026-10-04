@@ -4,12 +4,10 @@ import static io.osvaldas.api.clients.Status.REGISTERED;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
-import static java.util.Comparator.comparingLong;
 import static java.util.UUID.randomUUID;
 
 import java.time.ZonedDateTime;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -80,20 +78,11 @@ public class Client {
     @Version
     private Long version;
 
-    public void addLoan(Loan loan) {
-        loans.add(loan);
-    }
-
     public void setRandomId() {
         setId(randomUUID().toString());
     }
 
     public String getFullName() {
         return this.firstName + " " + this.lastName;
-    }
-
-    public Optional<Loan> getLastLoan() {
-        return getLoans().stream()
-            .max(comparingLong(Loan::getId));
     }
 }
