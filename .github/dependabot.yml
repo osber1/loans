@@ -17,7 +17,6 @@ updates:
           - "tech.picnic*"
           - "com.github.spotbugs*"
           - "org.sonarqube*"
-          - "org.owasp*"
           - "net.ltgt*"
       testing:
         patterns:

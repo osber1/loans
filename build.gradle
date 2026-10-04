@@ -1,12 +1,8 @@
 plugins {
-    id 'groovy'
-    id 'checkstyle'
-    id 'codenarc'
-    alias(libs.plugins.spring.dependency)
-    alias(libs.plugins.spotbugs)
+    alias(libs.plugins.spring.dependency) apply false
+    alias(libs.plugins.spotbugs) apply false
     alias(libs.plugins.sonarqube)
-    alias(libs.plugins.errorprone)
-    alias(libs.plugins.dependency.check)
+    alias(libs.plugins.errorprone) apply false
 }
 
 apply from: 'config/error-prone/rules.gradle'
@@ -38,7 +34,6 @@ subprojects {
     apply plugin: 'com.github.spotbugs'
     apply plugin: 'org.sonarqube'
     apply plugin: 'net.ltgt.errorprone'
-    apply plugin: 'org.owasp.dependencycheck'
 
     java {
         toolchain {
@@ -80,9 +75,7 @@ subprojects {
 
         testImplementation(
             libs.spring.boot.starter.test,
-            libs.spring.boot.webmvc.test,
-            libs.spring.boot.cache.test,
-            libs.wiremock
+            libs.spring.boot.webmvc.test
         )
     }
 
