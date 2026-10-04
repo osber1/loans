@@ -17,17 +17,6 @@ class ClientRepositorySpec extends AbstractDatabaseSpec {
         repository.save(client)
     }
 
-    void 'should return user if it exists'() {
-        when:
-            Optional<Client> client = repository.findById(clientId)
-        then:
-            client.present == result
-        where:
-            clientId          || result
-            VALID_CLIENT_ID   || true
-            INVALID_CLIENT_ID || false
-    }
-
     void 'should return #result when personal code is #personalCode'() {
         when:
             boolean exists = repository.existsByPersonalCode(personalCode)

@@ -14,6 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletResponse
@@ -22,6 +23,9 @@ import org.springframework.test.context.ContextConfiguration
 import groovy.json.JsonBuilder
 import io.osvaldas.api.risk.validation.RiskValidationRequest
 import io.osvaldas.api.risk.validation.RiskValidationResponse
+import io.osvaldas.risk.domain.validation.ValidationRule
+import io.osvaldas.risk.domain.validators.LoanLimitValidator
+import io.osvaldas.risk.domain.validators.TimeAndAmountValidator
 import io.osvaldas.risk.infra.rest.AbstractControllerSpec
 import spock.lang.Shared
 
@@ -44,6 +48,9 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
 
     @Shared
     String validClientId = 'clientId'
+
+    @Autowired
+    List<ValidationRule> rules
 
     void setup() {
         testClockDelegate.changeDelegate(fixed(parse('2022-10-12T10:10:10.00Z'), of('UTC')))
@@ -78,17 +85,6 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    void 'should reject too high amount before checking loan limit'() {
-        given:
-            RiskValidationRequest request = buildRequest(TOO_HIGH_AMOUNT, AT_LIMIT)
-        when:
-            MockHttpServletResponse response = postValidationRequest(request)
-        then:
-            with(readValidationResponse(response)) {
-                reason() == AMOUNT_EXCEEDS_REASON
-            }
-    }
-
     void 'should fail when loan limit is reached'() {
         given:
             RiskValidationRequest request = buildRequest(VALID_AMOUNT, AT_LIMIT)
@@ -119,6 +115,11 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
                 reason() == FORBIDDEN_TIME
                 message() == riskTooHigh
             }
+    }
+
+    void 'should apply local validation rules in order'() {
+        expect:
+            rules*.class == [TimeAndAmountValidator, LoanLimitValidator]
     }
 
     void 'should return bad request when request is invalid: #description'() {

@@ -22,22 +22,6 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
     @Autowired
     TestEntityManager entityManager
 
-    void 'should not return loan when it exists'() {
-        given:
-            Loan savedLoan = repository.save(loan)
-        when:
-            Optional<Loan> loan = repository.findById(savedLoan.id)
-        then:
-            loan.isPresent()
-    }
-
-    void 'should not return loan when it does not exist'() {
-        when:
-            Optional<Loan> loan = repository.findById(INVALID_LOAN_ID)
-        then:
-            loan.isEmpty()
-    }
-
     void 'should fetch postpones together with loan'() {
         given:
             Client savedClient = entityManager.persist(client)

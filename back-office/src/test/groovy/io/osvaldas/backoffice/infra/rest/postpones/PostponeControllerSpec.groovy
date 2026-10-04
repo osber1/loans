@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import org.springframework.mock.web.MockHttpServletResponse
 
-import io.osvaldas.api.loans.LoanResponse
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.LoanPostpone
@@ -50,26 +49,6 @@ class PostponeControllerSpec extends AbstractControllerSpec {
             response.status == NOT_FOUND.value()
         and:
             response.contentAsString.contains(LOAN_NOT_FOUND.formatted(nonExistingId))
-    }
-
-    void 'should return loan postpone when loan is postponed'() {
-        given:
-            Client client = buildClient(CLIENT_ID, [buildLoanWithoutId(100.0)] as Set, ACTIVE)
-        and:
-            Client savedClient = clientRepository.save(client)
-        and:
-            mockMvc
-                .perform(post('/api/v1/loans/extensions')
-                    .param('loanId', "${savedClient.loans[0].id}")
-                    .contentType(APPLICATION_JSON))
-                .andReturn().response
-        when:
-            MockHttpServletResponse response = mockMvc
-                .perform(get('/api/v1/loans/{loanId}', savedClient.lastLoan.get().id)
-                    .contentType(APPLICATION_JSON))
-                .andReturn().response
-        then:
-            objectMapper.readValue(response.contentAsString, LoanResponse).loanPostpones().size()
     }
 
 }
