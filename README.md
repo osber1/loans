@@ -89,8 +89,7 @@ the resulting diff after a build.
 ## CI
 
 `.github/workflows/pipeline.yml` runs `./gradlew check sonar`, uploads coverage to Codecov, scans the repository
-with Trivy and, on `master`, logs in to DockerHub and builds the application images. `.github/workflows/ai_pr_review.yml` runs
-PR-Agent on pull requests. Required repository secrets:
+with Trivy and, on `master`, logs in to DockerHub and builds the application images. Required repository secrets:
 
 | Secret               | Used by                       |
 |----------------------|-------------------------------|
@@ -98,7 +97,6 @@ PR-Agent on pull requests. Required repository secrets:
 | `CODECOV_TOKEN`      | Codecov upload                |
 | `DOCKERHUB_USERNAME` | DockerHub login (master only) |
 | `DOCKERHUB_TOKEN`    | DockerHub login (master only) |
-| `OPENAI_KEY`         | PR-Agent review               |
 
 `GITHUB_TOKEN` is provided by GitHub Actions.
 
