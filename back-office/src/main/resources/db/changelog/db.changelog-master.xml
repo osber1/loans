@@ -184,4 +184,19 @@
         </rollback>
     </changeSet>
 
+    <changeSet id="client-activation-token" author="osvaldas">
+        <addColumn tableName="client">
+            <column name="activation_token_hash" type="VARCHAR(64)"/>
+            <column name="activation_token_expires_at" type="timestamp with time zone"/>
+        </addColumn>
+        <addColumn tableName="notification_outbox">
+            <column name="activation_token" type="VARCHAR(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="client" columnName="activation_token_hash"/>
+            <dropColumn tableName="client" columnName="activation_token_expires_at"/>
+            <dropColumn tableName="notification_outbox" columnName="activation_token"/>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

@@ -1,6 +1,7 @@
 package io.osvaldas.backoffice.infra.configuration;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -29,5 +30,8 @@ public class PropertiesConfig {
     @NotNull
     @DecimalMin("1")
     private BigDecimal interestIncrementFactor;
+
+    @NotNull
+    private Duration activationTokenTtl = Duration.ofDays(7);
 
 }

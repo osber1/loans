@@ -14,7 +14,10 @@ class NotificationConsumerSpec extends Specification {
     String clientId = 'clientId'
 
     @Shared
-    String link = 'http://localhost:8080/api/v1/clients/%s/active'
+    String link = 'http://localhost:8080/api/v1/clients/%s/activation?token=%s'
+
+    @Shared
+    String token = 'activation-token'
 
     @Shared
     String fullName = 'Name Surname'
@@ -23,7 +26,7 @@ class NotificationConsumerSpec extends Specification {
     String email = 'user@email.com'
 
     @Shared
-    EmailMessage emailMessage = new EmailMessage(clientId, fullName, email)
+    EmailMessage emailMessage = new EmailMessage(clientId, fullName, email, token)
 
     EmailSender emailSender = Mock()
 
@@ -40,9 +43,9 @@ class NotificationConsumerSpec extends Specification {
         then:
             1 * emailSender.send(email, _ as EmailContent) >> { String receiver, EmailContent content ->
                 assert content.html().contains(fullName)
-                assert content.html().contains(link.formatted(clientId))
+                assert content.html().contains(link.formatted(clientId, token))
                 assert content.plainText().contains(fullName)
-                assert content.plainText().contains(link.formatted(clientId))
+                assert content.plainText().contains(link.formatted(clientId, token))
             }
     }
 

@@ -33,16 +33,19 @@ public class NotificationOutbox {
     @Column(nullable = false)
     private String email;
 
+    private String activationToken;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
     private ZonedDateTime publishedAt;
 
-    public NotificationOutbox(String clientId, String fullName, String email) {
+    public NotificationOutbox(String clientId, String fullName, String email, String activationToken) {
         this.clientId = clientId;
         this.fullName = fullName;
         this.email = email;
+        this.activationToken = activationToken;
     }
 
 }

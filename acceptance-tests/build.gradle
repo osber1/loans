@@ -18,6 +18,7 @@ tasks.named('test') {
 }
 
 Provider<String> acceptanceBaseUri = providers.gradleProperty('acceptance.baseUri')
+Provider<String> acceptanceMailhogUri = providers.gradleProperty('acceptance.mailhogUri')
 
 tasks.register('acceptanceTest', Test) {
     description = 'Runs the Cucumber acceptance tests against a running back-office (default http://localhost:8080).'
@@ -29,6 +30,9 @@ tasks.register('acceptanceTest', Test) {
 
     if (acceptanceBaseUri.isPresent()) {
         systemProperty 'acceptance.baseUri', acceptanceBaseUri.get()
+    }
+    if (acceptanceMailhogUri.isPresent()) {
+        systemProperty 'acceptance.mailhogUri', acceptanceMailhogUri.get()
     }
 
     outputs.upToDateWhen { false }

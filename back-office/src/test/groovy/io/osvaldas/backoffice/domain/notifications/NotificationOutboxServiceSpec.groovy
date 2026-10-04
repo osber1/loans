@@ -17,6 +17,8 @@ import spock.lang.Subject
 
 class NotificationOutboxServiceSpec extends AbstractSpec {
 
+    static final String TOKEN = 'activation-token'
+
     static final String EXCHANGE = 'internal.exchange'
 
     static final String ROUTING_KEY = 'internal.notification.routing-key'
@@ -48,7 +50,7 @@ class NotificationOutboxServiceSpec extends AbstractSpec {
         given:
             NotificationOutbox saved
         when:
-            service.enqueue(new EmailMessage(CLIENT_ID, NAME, CLIENT_EMAIL))
+            service.enqueue(new EmailMessage(CLIENT_ID, NAME, CLIENT_EMAIL, TOKEN))
         then:
             1 * repository.save(_ as NotificationOutbox) >> { NotificationOutbox row -> saved = row }
             1 * eventPublisher.publishEvent(new NotificationEnqueuedEvent())
@@ -56,21 +58,22 @@ class NotificationOutboxServiceSpec extends AbstractSpec {
             saved.clientId == CLIENT_ID
             saved.fullName == NAME
             saved.email == CLIENT_EMAIL
+            saved.activationToken == TOKEN
             saved.publishedAt == null
     }
 
     void 'should publish pending messages in order and mark them as published'() {
         given:
-            NotificationOutbox first = new NotificationOutbox('first', NAME, CLIENT_EMAIL)
-            NotificationOutbox second = new NotificationOutbox('second', NAME, CLIENT_EMAIL)
+            NotificationOutbox first = new NotificationOutbox('first', NAME, CLIENT_EMAIL, TOKEN)
+            NotificationOutbox second = new NotificationOutbox('second', NAME, CLIENT_EMAIL, TOKEN)
         when:
             int published = service.relayPending()
         then:
             1 * repository.lockPending(NotificationOutboxService.BATCH_SIZE) >> [first, second]
         and:
-            1 * messageProducer.publish(new EmailMessage('first', NAME, CLIENT_EMAIL), EXCHANGE, ROUTING_KEY)
+            1 * messageProducer.publish(new EmailMessage('first', NAME, CLIENT_EMAIL, TOKEN), EXCHANGE, ROUTING_KEY)
         and:
-            1 * messageProducer.publish(new EmailMessage('second', NAME, CLIENT_EMAIL), EXCHANGE, ROUTING_KEY)
+            1 * messageProducer.publish(new EmailMessage('second', NAME, CLIENT_EMAIL, TOKEN), EXCHANGE, ROUTING_KEY)
         and:
             published == 2
             first.publishedAt == DATE
@@ -79,8 +82,8 @@ class NotificationOutboxServiceSpec extends AbstractSpec {
 
     void 'should keep messages pending and stop at the first failure when the broker is unavailable'() {
         given:
-            NotificationOutbox first = new NotificationOutbox('first', NAME, CLIENT_EMAIL)
-            NotificationOutbox second = new NotificationOutbox('second', NAME, CLIENT_EMAIL)
+            NotificationOutbox first = new NotificationOutbox('first', NAME, CLIENT_EMAIL, TOKEN)
+            NotificationOutbox second = new NotificationOutbox('second', NAME, CLIENT_EMAIL, TOKEN)
         when:
             int published = service.relayPending()
         then:
@@ -95,14 +98,14 @@ class NotificationOutboxServiceSpec extends AbstractSpec {
 
     void 'should keep messages published before a failure'() {
         given:
-            NotificationOutbox first = new NotificationOutbox('first', NAME, CLIENT_EMAIL)
-            NotificationOutbox second = new NotificationOutbox('second', NAME, CLIENT_EMAIL)
+            NotificationOutbox first = new NotificationOutbox('first', NAME, CLIENT_EMAIL, TOKEN)
+            NotificationOutbox second = new NotificationOutbox('second', NAME, CLIENT_EMAIL, TOKEN)
         when:
             int published = service.relayPending()
         then:
             1 * repository.lockPending(_) >> [first, second]
-            1 * messageProducer.publish(new EmailMessage('first', NAME, CLIENT_EMAIL), _, _)
-            1 * messageProducer.publish(new EmailMessage('second', NAME, CLIENT_EMAIL), _, _) >> {
+            1 * messageProducer.publish(new EmailMessage('first', NAME, CLIENT_EMAIL, TOKEN), _, _)
+            1 * messageProducer.publish(new EmailMessage('second', NAME, CLIENT_EMAIL, TOKEN), _, _) >> {
                 throw new IllegalStateException('rabbit is down')
             }
         and:

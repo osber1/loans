@@ -2,6 +2,8 @@ package io.osvaldas.backoffice.domain.clients;
 
 import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.clients.Status.DELETED;
+import static io.osvaldas.api.clients.Status.REGISTERED;
+import static io.osvaldas.api.util.ExceptionMessages.ACTIVATION_LINK_INVALID;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_ALREADY_EXIST;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
@@ -21,7 +23,9 @@ import io.osvaldas.api.clients.Status;
 import io.osvaldas.api.email.EmailMessage;
 import io.osvaldas.api.exceptions.BadRequestException;
 import io.osvaldas.api.exceptions.NotFoundException;
+import io.osvaldas.api.util.TimeUtils;
 import io.osvaldas.backoffice.domain.notifications.NotificationOutboxService;
+import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;
 import io.osvaldas.backoffice.repositories.ClientRepository;
 import io.osvaldas.backoffice.repositories.entities.Client;
 import lombok.RequiredArgsConstructor;
@@ -36,15 +40,22 @@ public class ClientService {
 
     private final NotificationOutboxService notificationOutbox;
 
+    private final TimeUtils timeUtils;
+
+    private final PropertiesConfig config;
+
     @Transactional
     public Client registerClient(Client client) {
         if (clientRepository.existsByPersonalCode(client.getPersonalCode())) {
             throw new BadRequestException(CLIENT_ALREADY_EXIST);
         }
         client.setRandomId();
+        String activationToken = ActivationTokens.newToken();
+        client.setActivationTokenHash(ActivationTokens.hash(activationToken));
+        client.setActivationTokenExpiresAt(timeUtils.getCurrentDateTime().plus(config.getActivationTokenTtl()));
         Client savedClient = clientRepository.saveAndFlush(client);
         log.info("Client registered: {}", savedClient.getId());
-        notificationOutbox.enqueue(new EmailMessage(savedClient.getId(), savedClient.getFullName(), savedClient.getEmail()));
+        notificationOutbox.enqueue(new EmailMessage(savedClient.getId(), savedClient.getFullName(), savedClient.getEmail(), activationToken));
         return savedClient;
     }
 
@@ -90,13 +101,22 @@ public class ClientService {
     }
 
     @Transactional
-    public void activateClient(String id) {
-        changeClientStatus(id, ACTIVE);
+    public void activateClient(String id, String token) {
+        Client client = findClient(id);
+        if (!canBeActivatedWith(client, token)) {
+            throw new BadRequestException(ACTIVATION_LINK_INVALID);
+        }
+        log.info("Activating client: {}", id);
+        client.setStatus(ACTIVE);
+        client.setActivationTokenHash(null);
+        client.setActivationTokenExpiresAt(null);
     }
 
-    @Transactional
-    public Client save(Client client) {
-        return clientRepository.save(client);
+    private boolean canBeActivatedWith(Client client, String token) {
+        return REGISTERED == client.getStatus()
+            && client.getActivationTokenExpiresAt() != null
+            && client.getActivationTokenExpiresAt().isAfter(timeUtils.getCurrentDateTime())
+            && ActivationTokens.matches(token, client.getActivationTokenHash());
     }
 
     private void changeClientStatus(String id, Status status) {

@@ -10,6 +10,8 @@ public final class ExceptionMessages {
 
     public static final String CLIENT_NOT_ACTIVE = "Client is not active.";
 
+    public static final String ACTIVATION_LINK_INVALID = "Activation link is invalid or has expired.";
+
     public static final String CLIENT_ALREADY_EXIST = "Client with personal code already exists.";
 
     public static final String RISK_TOO_HIGH = "Risk is too high, because you are trying to get loan between %s and %s and you want to borrow the max amount!";

@@ -38,7 +38,7 @@ public class NotificationOutboxService {
 
     @Transactional(propagation = MANDATORY)
     public void enqueue(EmailMessage message) {
-        repository.save(new NotificationOutbox(message.clientId(), message.fullName(), message.email()));
+        repository.save(new NotificationOutbox(message.clientId(), message.fullName(), message.email(), message.activationToken()));
         eventPublisher.publishEvent(new NotificationEnqueuedEvent());
     }
 
@@ -64,7 +64,7 @@ public class NotificationOutboxService {
     private boolean publish(NotificationOutbox row) {
         try {
             messageProducer.publish(
-                new EmailMessage(row.getClientId(), row.getFullName(), row.getEmail()),
+                new EmailMessage(row.getClientId(), row.getFullName(), row.getEmail(), row.getActivationToken()),
                 rabbitProperties.getExchanges().getInternal(),
                 rabbitProperties.getRoutingKeys().getInternalNotification());
             return true;

@@ -24,6 +24,9 @@ class IntegrationSpec extends AbstractIntegrationSpec {
     String clientId = 'clientId'
 
     @Shared
+    String token = 'activation-token'
+
+    @Shared
     String fullName = 'Name Surname'
 
     @Shared
@@ -47,7 +50,7 @@ class IntegrationSpec extends AbstractIntegrationSpec {
 
     void 'should send email when message is consumed'() {
         given:
-            EmailMessage message = new EmailMessage(clientId, fullName, receiverEmail)
+            EmailMessage message = new EmailMessage(clientId, fullName, receiverEmail, token)
         when:
             amqpTemplate.convertAndSend(exchangeName, routingKeys, message)
         then:
@@ -60,7 +63,7 @@ class IntegrationSpec extends AbstractIntegrationSpec {
                 assert headers.Subject == [emailSubject]
                 String body = messages[0].Content.Body
                 assert body.contains("Hi ${fullName},")
-                assert body.contains("/api/v1/clients/${clientId}/active")
+                assert body.contains("/api/v1/clients/${clientId}/activation?token=${token}")
                 assert body.contains('text/plain')
                 assert body.contains('text/html')
             }
@@ -68,7 +71,7 @@ class IntegrationSpec extends AbstractIntegrationSpec {
 
     void 'should dead-letter a message that keeps failing instead of retrying it forever'() {
         given:
-            EmailMessage message = new EmailMessage(clientId, fullName, 'not an email address')
+            EmailMessage message = new EmailMessage(clientId, fullName, 'not an email address', token)
         when:
             amqpTemplate.convertAndSend(exchangeName, routingKeys, message)
         then:
