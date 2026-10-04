@@ -1,6 +1,8 @@
 package io.osvaldas.backoffice.infra.rest.loans;
 
 import static io.osvaldas.backoffice.infra.configuration.BeansConfig.LOAN_RESPONSE_CACHE;
+import static org.springframework.http.HttpStatus.ACCEPTED;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.Collection;
 
@@ -57,8 +59,8 @@ public class LoansController {
                 throw e;
             }
             log.warn("Risk checker is unavailable, loan {} will be evaluated later", takenLoan.getId(), e);
-            return ResponseEntity.accepted().body(loanMapper.map(takenLoan));
+            return ResponseEntity.status(ACCEPTED).body(loanMapper.map(takenLoan));
         }
-        return ResponseEntity.ok(loanMapper.map(takenLoan));
+        return ResponseEntity.status(OK).body(loanMapper.map(takenLoan));
     }
 }
