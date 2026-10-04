@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -29,7 +30,10 @@ public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificat
     List<Loan> findAllWithPostponesByClientId(String clientId);
 
     @EntityGraph(attributePaths = "client")
-    List<Loan> findAllWithClientByStatusAndCreatedAtBefore(Status status, ZonedDateTime createdBefore);
+    List<Loan> findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(Status status,
+                                                                                         ZonedDateTime createdBefore,
+                                                                                         long afterId,
+                                                                                         Limit limit);
 
     @Lock(PESSIMISTIC_WRITE)
     Optional<Loan> findForUpdateById(long id);

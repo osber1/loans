@@ -184,4 +184,27 @@
         </rollback>
     </changeSet>
 
+    <changeSet id="loan-version" author="osvaldas">
+        <addColumn tableName="loan">
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="loan" columnName="version"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="loan-pending-to-not-evaluated" author="osvaldas">
+        <update tableName="loan">
+            <column name="status" value="NOT_EVALUATED"/>
+            <where>status = 'PENDING'</where>
+        </update>
+        <update tableName="loan_aud">
+            <column name="status" value="NOT_EVALUATED"/>
+            <where>status = 'PENDING'</where>
+        </update>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>

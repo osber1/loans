@@ -2,7 +2,7 @@ package io.osvaldas.backoffice.repositories.specifications
 
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
-import static io.osvaldas.api.loans.Status.PENDING
+import static io.osvaldas.api.loans.Status.REJECTED
 
 import java.time.ZonedDateTime
 
@@ -87,7 +87,7 @@ class LoanSpecificationsSpec extends AbstractDatabaseSpec {
         where:
             statuses                 || listSize
             [OPEN]                   || 1
-            [PENDING, NOT_EVALUATED] || 0
+            [REJECTED, NOT_EVALUATED] || 0
     }
 
     void 'should return list size of #listSize when id is below #description'() {

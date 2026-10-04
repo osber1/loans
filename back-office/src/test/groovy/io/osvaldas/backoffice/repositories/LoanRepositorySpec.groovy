@@ -2,11 +2,14 @@ package io.osvaldas.backoffice.repositories
 
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
-import static io.osvaldas.api.loans.Status.PENDING
+import static io.osvaldas.api.loans.Status.REJECTED
 import static java.time.ZonedDateTime.now
+
+import java.time.ZonedDateTime
 
 import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Limit
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 
 import io.osvaldas.backoffice.repositories.entities.Client
@@ -48,8 +51,7 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
             entityManager.flush()
             entityManager.clear()
         when:
-            List<Loan> loans =
-                repository.findAllWithClientByStatusAndCreatedAtBefore(NOT_EVALUATED, now().plusMinutes(1))
+            List<Loan> loans = findNotEvaluated(now().plusMinutes(1))
         then:
             loans.size() == 1
             Hibernate.isInitialized(loans.first().client)
@@ -64,9 +66,28 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
             entityManager.flush()
             entityManager.clear()
         expect:
-            repository.findAllWithClientByStatusAndCreatedAtBefore(NOT_EVALUATED, now().minusMinutes(1)).empty
-            repository.findAllWithClientByStatusAndCreatedAtBefore(PENDING, now().plusMinutes(1)).empty
-            repository.findAllWithClientByStatusAndCreatedAtBefore(NOT_EVALUATED, now().plusMinutes(1)).size() == 1
+            findNotEvaluated(now().minusMinutes(1)).empty
+            repository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
+                REJECTED, now().plusMinutes(1), 0, Limit.of(10)).empty
+            findNotEvaluated(now().plusMinutes(1)).size() == 1
+    }
+
+    void 'should fetch the next batch of loans in id order after the given id'() {
+        given:
+            Client savedClient = entityManager.persist(client)
+            List<Loan> saved = (1..5).collect { saveLoan(savedClient, NOT_EVALUATED) }
+            entityManager.flush()
+            entityManager.clear()
+        expect:
+            findNotEvaluated(now().plusMinutes(1), 0, 2)*.id == saved[0..1]*.id
+            findNotEvaluated(now().plusMinutes(1), saved[1].id, 2)*.id == saved[2..3]*.id
+            findNotEvaluated(now().plusMinutes(1), saved[3].id, 2)*.id == [saved[4].id]
+            findNotEvaluated(now().plusMinutes(1), saved[4].id, 2).empty
+    }
+
+    private List<Loan> findNotEvaluated(ZonedDateTime createdBefore, long afterId = 0, int limit = 10) {
+        repository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
+            NOT_EVALUATED, createdBefore, afterId, Limit.of(limit))
     }
 
     private Loan saveLoan(Client loanClient, io.osvaldas.api.loans.Status loanStatus) {

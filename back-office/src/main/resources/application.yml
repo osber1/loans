@@ -36,6 +36,14 @@ spring:
   cache:
     type: redis
 
+  cloud:
+    openfeign:
+      client:
+        config:
+          risk-checker:
+            connect-timeout: 2000
+            read-timeout: 5000
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
 
@@ -92,3 +100,4 @@ scheduler:
     enabled: true
     cron: "0 */10 * * * *"
     minAge: PT5M
+    batchSize: 100

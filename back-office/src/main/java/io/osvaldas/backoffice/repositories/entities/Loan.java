@@ -1,6 +1,6 @@
 package io.osvaldas.backoffice.repositories.entities;
 
-import static io.osvaldas.api.loans.Status.PENDING;
+import static io.osvaldas.api.loans.Status.NOT_EVALUATED;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
@@ -25,6 +25,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,11 +54,14 @@ public class Loan {
     private ZonedDateTime returnDate;
 
     @Enumerated(STRING)
-    private Status status = PENDING;
+    private Status status = NOT_EVALUATED;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
+
+    @Version
+    private Long version;
 
     @OneToMany(mappedBy = "loan", cascade = ALL, fetch = LAZY)
     private Set<LoanPostpone> loanPostpones = new HashSet<>();

@@ -4,7 +4,6 @@ import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.loans.Status.CLOSED
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
-import static io.osvaldas.api.loans.Status.PENDING
 import static io.osvaldas.api.loans.Status.REJECTED
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS
 import static java.time.ZoneOffset.UTC
@@ -24,6 +23,7 @@ import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
 
@@ -101,7 +101,7 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
             timeUtils.currentDateTime >> noon.plusHours(1)
             Client owner = clientRepository.save(client)
             Client otherClient = clientRepository.save(buildOtherClient())
-            [OPEN, NOT_EVALUATED, PENDING, REJECTED, CLOSED].each { saveLoan(owner, it) }
+            [OPEN, NOT_EVALUATED, REJECTED, CLOSED].each { saveLoan(owner, it) }
             saveLoan(owner, OPEN, noon.minusDays(1))
             saveLoan(otherClient, OPEN)
             Loan evaluatedLoan = saveLoan(owner, NOT_EVALUATED)
@@ -114,7 +114,7 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
                 passedValidation()
             }
         and:
-            sentRequest.loansTakenToday() == 3L
+            sentRequest.loansTakenToday() == 2L
             sentRequest.requestedAt().toInstant() == noon.toInstant()
     }
 
@@ -176,6 +176,23 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
         and:
             sentRequest.loansTakenToday() == 1L
             sentRequest.requestedAt().toInstant() == requestedAt.toInstant()
+    }
+
+    void 'should not overwrite a loan that was evaluated by someone else in the meantime'() {
+        given:
+            timeUtils.currentDateTime >> noon
+            riskCheckerClient.validate(_ as RiskValidationRequest) >>> [passedValidation(), passedValidation()]
+            Client owner = clientRepository.save(client)
+            Long loanId = saveLoan(owner, NOT_EVALUATED).id
+            Loan firstCopy = loanRepository.findById(loanId).get()
+            Loan secondCopy = loanRepository.findById(loanId).get()
+        when:
+            loanService.validate(firstCopy, VALID_CLIENT_ID)
+            loanService.validate(secondCopy, VALID_CLIENT_ID)
+        then:
+            thrown(ObjectOptimisticLockingFailureException)
+        and:
+            loanRepository.findById(loanId).get().status == OPEN
     }
 
     void 'should make parallel loan request of the same client wait until earlier one is committed'() {
