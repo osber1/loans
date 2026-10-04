@@ -16,24 +16,33 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.rabbitmq.RabbitMQContainer
 import org.testcontainers.spock.Testcontainers
+import org.wiremock.spring.ConfigureWireMock
+import org.wiremock.spring.EnableWireMock
+import org.wiremock.spring.InjectWireMock
+
+import com.github.tomakehurst.wiremock.WireMockServer
 
 import tools.jackson.databind.ObjectMapper
 
 import io.osvaldas.api.clients.ClientRegisterRequest
 import io.osvaldas.api.loans.LoanRequest
 import io.osvaldas.backoffice.AbstractSpec
+import io.osvaldas.backoffice.SharedPostgres
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.LoanRepository
 import spock.lang.Shared
 
-@SpringBootTest
 @Testcontainers
 @ActiveProfiles('test')
 @AutoConfigureMockMvc
+@EnableWireMock([@ConfigureWireMock(baseUrlProperties = 'risk.checker.url')])
+@ContextConfiguration(classes = TestClockConfig)
+@SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 abstract class AbstractControllerSpec extends AbstractSpec {
 
     @Shared
@@ -43,6 +52,13 @@ abstract class AbstractControllerSpec extends AbstractSpec {
     @Shared
     @ServiceConnection
     static GenericContainer redis = new GenericContainer<>('redis:7.2.4-alpine').withExposedPorts(6379)
+
+    @Shared
+    @ServiceConnection
+    static GenericContainer postgres = SharedPostgres.INSTANCE
+
+    @InjectWireMock
+    WireMockServer wireMock
 
     @Autowired
     MockMvc mockMvc

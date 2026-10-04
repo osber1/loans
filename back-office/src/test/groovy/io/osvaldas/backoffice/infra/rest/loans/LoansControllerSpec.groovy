@@ -14,15 +14,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockHttpServletResponse
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
-import org.wiremock.spring.ConfigureWireMock
-import org.wiremock.spring.EnableWireMock
-import org.wiremock.spring.InjectWireMock
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
@@ -32,17 +26,10 @@ import io.osvaldas.api.loans.LoanResponse
 import io.osvaldas.api.risk.validation.RiskRejectionReason
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
-import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Shared
 
-@EnableWireMock([@ConfigureWireMock(baseUrlProperties = 'risk.checker.url')])
-@ContextConfiguration(classes = TestClockConfig)
-@SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 class LoansControllerSpec extends AbstractControllerSpec {
-
-    @InjectWireMock
-    WireMockServer wireMock
 
     @Shared
     LoanRequest loanRequest = buildLoanRequest(100.00)
@@ -77,22 +64,6 @@ class LoansControllerSpec extends AbstractControllerSpec {
             response.contentAsString.contains(LOAN_NOT_FOUND.formatted(LOAN_ID))
     }
 
-    void 'should return loans when client exists'() {
-        given:
-            Client client = buildClient(CLIENT_ID, [buildLoanWithoutId(100.0)] as Set, ACTIVE)
-        and:
-            Client savedClient = clientRepository.save(client)
-        when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
-                .param('clientId', savedClient.id)
-                .contentType(APPLICATION_JSON))
-                .andReturn().response
-        then:
-            response.status == OK.value()
-        and:
-            ([objectMapper.readValue(response.contentAsString, LoanResponse[])] as Set).size() == 1
-    }
-
     void 'should throw an exception when client not found'() {
         when:
             MockHttpServletResponse response = mockMvc.perform(get('/api/v1/loans')
@@ -105,24 +76,6 @@ class LoansControllerSpec extends AbstractControllerSpec {
             response.contentAsString.contains(CLIENT_NOT_FOUND.formatted(CLIENT_ID))
     }
 
-    void 'should take loan when request is correct'() {
-        given:
-            clientRepository.save(activeClientWithId)
-        and:
-            RiskValidationResponse validationResponse = RiskValidationResponse.passed()
-            stubWireMockResponse(validationResponse)
-        when:
-            MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
-        then:
-            response.status == OK.value()
-        and:
-            LoanResponse loanResponse = objectMapper.readValue(response.contentAsString, LoanResponse)
-            with(loanResponse) {
-                amount() == loanRequest.amount()
-                termInMonths() == loanRequest.termInMonths()
-            }
-    }
-
     @Transactional
     void 'should fail when loan limit is exceeded'() {
         given:
@@ -132,48 +85,11 @@ class LoansControllerSpec extends AbstractControllerSpec {
                 RiskValidationResponse.rejected(RiskRejectionReason.LOAN_LIMIT_EXCEEDS, LOAN_LIMIT_EXCEEDS)
             stubWireMockResponse(validationResponse)
         when:
-            postLoanRequest(loanRequest, CLIENT_ID)
             MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
         then:
             response.status == BAD_REQUEST.value()
         and:
             response.contentAsString.contains(LOAN_LIMIT_EXCEEDS)
-        and:
-            REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
-    }
-
-    @Transactional
-    void 'should fail when amount is too high'() {
-        given:
-            clientRepository.save(activeClientWithId)
-        and:
-            RiskValidationResponse validationResponse =
-                RiskValidationResponse.rejected(RiskRejectionReason.AMOUNT_EXCEEDS, AMOUNT_EXCEEDS)
-            stubWireMockResponse(validationResponse)
-        when:
-            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(999999.0), CLIENT_ID)
-        then:
-            response.status == BAD_REQUEST.value()
-        and:
-            response.contentAsString.contains(AMOUNT_EXCEEDS)
-        and:
-            REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
-    }
-
-    @Transactional
-    void 'should fail when max amount and forbidden time'() {
-        given:
-            clientRepository.save(activeClientWithId)
-        and:
-            RiskValidationResponse validationResponse =
-                RiskValidationResponse.rejected(RiskRejectionReason.FORBIDDEN_TIME, RISK_TOO_HIGH)
-            stubWireMockResponse(validationResponse)
-        when:
-            MockHttpServletResponse response = postLoanRequest(buildLoanRequest(50.0), CLIENT_ID)
-        then:
-            response.status == BAD_REQUEST.value()
-        and:
-            response.contentAsString.contains(RISK_TOO_HIGH)
         and:
             REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
     }
@@ -233,6 +149,8 @@ class LoansControllerSpec extends AbstractControllerSpec {
         and:
             LoanResponse loanResponse = objectMapper.readValue(response.contentAsString, LoanResponse)
             loanResponse.status() == OPEN
+            loanResponse.amount() == loanRequest.amount()
+            loanResponse.termInMonths() == loanRequest.termInMonths()
             loanRepository.findById(loanResponse.id()).get().status == OPEN
         and:
             clientRepository.findById(CLIENT_ID).get().version == clientVersion

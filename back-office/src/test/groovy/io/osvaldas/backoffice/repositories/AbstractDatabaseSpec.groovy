@@ -15,10 +15,9 @@ import org.springframework.cloud.openfeign.FeignAutoConfiguration
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.containers.GenericContainer
-import org.testcontainers.postgresql.PostgreSQLContainer
-import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.spock.Testcontainers
 
+import io.osvaldas.backoffice.SharedPostgres
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec.TestCacheConfig
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.Loan
@@ -35,11 +34,7 @@ abstract class AbstractDatabaseSpec extends Specification {
 
     @Shared
     @ServiceConnection
-    static GenericContainer postgreSQLContainer = new PostgreSQLContainer('postgres:17.6-alpine')
-        .withDatabaseName('loans')
-        .withUsername('root')
-        .withPassword('root')
-        .waitingFor(Wait.forListeningPort())
+    static GenericContainer postgreSQLContainer = SharedPostgres.INSTANCE
 
     static final ZonedDateTime DATE = generateDate(2022)
 
@@ -58,10 +53,6 @@ abstract class AbstractDatabaseSpec extends Specification {
     Client client = createClient()
 
     Loan loan = createLoan()
-
-    static {
-        postgreSQLContainer.start()
-    }
 
     static ZonedDateTime generateDate(int year) {
         ZonedDateTime.of(

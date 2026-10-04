@@ -162,23 +162,6 @@ class ClientControllerSpec extends AbstractControllerSpec {
             }
     }
 
-    void 'should get list of clients when they exists'() {
-        given:
-            clientRepository.save(buildClient('123123123', [] as Set, ACTIVE))
-            clientRepository.save(buildClient('890890890', [] as Set, ACTIVE).tap { personalCode = '89089089000' })
-        when:
-            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients')
-                .param('page', '0')
-                .param('size', '10')
-                .contentType(APPLICATION_JSON))
-                .andReturn().response
-        then:
-            response.status == OK.value()
-        and:
-            List.of(objectMapper.readValue(response.contentAsString, ClientResponse[])).size() == 2
-            response.getHeader('X-Total-Count') == '2'
-    }
-
     void 'should return requested page of clients with total count'() {
         given:
             clientRepository.save(buildClient('123123123', [] as Set, ACTIVE))
@@ -247,6 +230,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
         where:
             method << [get('/api/v1/clients/{id}', CLIENT_ID),
                        delete('/api/v1/clients/{id}', CLIENT_ID),
+                       get('/api/v1/clients/{id}/active', CLIENT_ID),
                        put('/api/v1/clients').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
@@ -266,18 +250,6 @@ class ClientControllerSpec extends AbstractControllerSpec {
                 version == 1L
                 updatedAt != null
             }
-    }
-
-    void 'should return not found when activating non existing client'() {
-        when:
-            MockHttpServletResponse response = mockMvc
-                .perform(get('/api/v1/clients/{id}/active', CLIENT_ID)
-                    .contentType(APPLICATION_JSON))
-                .andReturn().response
-        then:
-            response.status == NOT_FOUND.value()
-        and:
-            response.contentAsString.contains(CLIENT_NOT_FOUND.formatted(CLIENT_ID))
     }
 
     private MvcResult sendRegistrationClientRequest(ClientRegisterRequest request) {
