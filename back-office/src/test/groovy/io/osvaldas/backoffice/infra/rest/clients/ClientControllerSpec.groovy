@@ -20,7 +20,6 @@ import groovy.json.JsonBuilder
 import io.osvaldas.api.clients.ClientRegisterRequest
 import io.osvaldas.api.clients.ClientResponse
 import io.osvaldas.api.clients.ClientUpdateRequest
-import io.osvaldas.api.clients.Status
 import io.osvaldas.backoffice.infra.rest.AbstractControllerSpec
 import io.osvaldas.backoffice.repositories.entities.Client
 import io.osvaldas.backoffice.repositories.entities.NotificationOutbox
@@ -86,6 +85,32 @@ class ClientControllerSpec extends AbstractControllerSpec {
             buildClientRequest(NAME, SURNAME, CLIENT_PERSONAL_CODE, null, CLIENT_PHONE_NUMBER)         || 'Email must be not empty.'
             buildClientRequest(NAME, SURNAME, CLIENT_PERSONAL_CODE, 'test', CLIENT_PHONE_NUMBER)       || 'must be a well-formed email address'
             buildClientRequest(NAME, SURNAME, CLIENT_PERSONAL_CODE, CLIENT_EMAIL, null)                || 'Phone number must be not empty.'
+    }
+
+    void 'should describe every invalid field in a problem response'() {
+        given:
+            ClientRegisterRequest clientRequest =
+                buildClientRequest(null, null, CLIENT_PERSONAL_CODE, CLIENT_EMAIL, CLIENT_PHONE_NUMBER)
+        when:
+            MockHttpServletResponse response = sendRegistrationClientRequest(clientRequest).response
+        then:
+            response.status == BAD_REQUEST.value()
+            response.contentType.startsWith('application/problem+json')
+        and:
+            Map problem = objectMapper.readValue(response.contentAsString, Map)
+            problem.errors as Set ==
+                ['firstName: First name must be not empty.', 'lastName: Last name must be not empty.'] as Set
+    }
+
+    void 'should describe invalid request parameters in a problem response'() {
+        when:
+            MockHttpServletResponse response = mockMvc.perform(get('/api/v1/clients').param('size', '0'))
+                .andReturn().response
+        then:
+            response.status == BAD_REQUEST.value()
+            response.contentType.startsWith('application/problem+json')
+        and:
+            objectMapper.readValue(response.contentAsString, Map).errors.any { it.startsWith('size: ') }
     }
 
     void 'should return client when it exists'() {
@@ -157,7 +182,7 @@ class ClientControllerSpec extends AbstractControllerSpec {
             clientRepository.save(registeredClientWithId)
         when:
             MockHttpServletResponse response = mockMvc.perform(put('/api/v1/clients')
-                .content(new JsonBuilder(buildUpdateClientRequest(ACTIVE, '99999999999')) as String)
+                .content(new JsonBuilder(updateRequestWithStatusAndPersonalCode) as String)
                 .contentType(APPLICATION_JSON))
                 .andReturn().response
         then:
@@ -286,17 +311,19 @@ class ClientControllerSpec extends AbstractControllerSpec {
         new ClientRegisterRequest(NAME, SURNAME, CLIENT_EMAIL, CLIENT_PHONE_NUMBER, CLIENT_PERSONAL_CODE)
     }
 
-    private ClientUpdateRequest buildUpdateClientRequest(Status status = ACTIVE,
-                                                         String personalCode = CLIENT_PERSONAL_CODE) {
-        new ClientUpdateRequest(
-            CLIENT_ID,
-            editedName,
-            editedSurname,
-            status,
-            CLIENT_EMAIL,
-            CLIENT_PHONE_NUMBER,
-            personalCode,
-            0)
+    private Map getUpdateRequestWithStatusAndPersonalCode() {
+        [id          : CLIENT_ID,
+         firstName   : editedName,
+         lastName    : editedSurname,
+         email       : CLIENT_EMAIL,
+         phoneNumber : CLIENT_PHONE_NUMBER,
+         status      : ACTIVE,
+         personalCode: '99999999999',
+         version     : 0]
+    }
+
+    private ClientUpdateRequest buildUpdateClientRequest() {
+        new ClientUpdateRequest(CLIENT_ID, editedName, editedSurname, CLIENT_EMAIL, CLIENT_PHONE_NUMBER, 0)
     }
 
 }
