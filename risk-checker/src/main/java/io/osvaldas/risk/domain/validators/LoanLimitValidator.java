@@ -2,13 +2,16 @@ package io.osvaldas.risk.domain.validators;
 
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_LIMIT_EXCEEDS;
 
+import java.util.Optional;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import io.osvaldas.api.exceptions.ValidationRuleException.LoanLimitException;
+import io.osvaldas.api.risk.validation.RiskRejectionReason;
+import io.osvaldas.api.risk.validation.RiskValidationRequest;
+import io.osvaldas.risk.domain.validation.Rejection;
 import io.osvaldas.risk.domain.validation.ValidationRule;
 import io.osvaldas.risk.infra.configuration.PropertiesConfig;
-import io.osvaldas.risk.repositories.risk.RiskValidationTarget;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -21,10 +24,11 @@ public class LoanLimitValidator implements ValidationRule {
     private final PropertiesConfig config;
 
     @Override
-    public void validate(RiskValidationTarget target) {
-        if (target.getLoansTakenToday() >= config.getLoanLimitPerDay()) {
-            throw new LoanLimitException(LOAN_LIMIT_EXCEEDS);
+    public Optional<Rejection> check(RiskValidationRequest request) {
+        if (request.loansTakenToday() >= config.getLoanLimitPerDay()) {
+            return Optional.of(new Rejection(RiskRejectionReason.LOAN_LIMIT_EXCEEDS, LOAN_LIMIT_EXCEEDS));
         }
+        return Optional.empty();
     }
 
 }

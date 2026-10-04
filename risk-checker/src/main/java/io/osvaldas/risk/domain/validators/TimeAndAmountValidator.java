@@ -1,6 +1,7 @@
 package io.osvaldas.risk.domain.validators;
 
-import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS;
+import static io.osvaldas.api.risk.validation.RiskRejectionReason.AMOUNT_EXCEEDS;
+import static io.osvaldas.api.risk.validation.RiskRejectionReason.FORBIDDEN_TIME;
 import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH;
 
 import java.math.BigDecimal;
@@ -10,12 +11,12 @@ import java.util.Optional;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import io.osvaldas.api.exceptions.ValidationRuleException.AmountException;
-import io.osvaldas.api.exceptions.ValidationRuleException.TimeException;
+import io.osvaldas.api.risk.validation.RiskValidationRequest;
+import io.osvaldas.api.util.ExceptionMessages;
 import io.osvaldas.api.util.TimeUtils;
+import io.osvaldas.risk.domain.validation.Rejection;
 import io.osvaldas.risk.domain.validation.ValidationRule;
 import io.osvaldas.risk.infra.configuration.PropertiesConfig;
-import io.osvaldas.risk.repositories.risk.RiskValidationTarget;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -30,31 +31,32 @@ public class TimeAndAmountValidator implements ValidationRule {
     private final TimeUtils timeUtils;
 
     @Override
-    public void validate(RiskValidationTarget target) {
-        checkTimeAndAmount(target.getLoanAmount(), requestHour(target));
-        checkIfAmountIsNotToHigh(target.getLoanAmount());
+    public Optional<Rejection> check(RiskValidationRequest request) {
+        return checkTimeAndAmount(request).or(() -> checkIfAmountIsNotToHigh(request.amount()));
     }
 
-    private int requestHour(RiskValidationTarget target) {
+    private int requestHour(RiskValidationRequest request) {
         ZonedDateTime now = timeUtils.getCurrentDateTime();
-        return Optional.ofNullable(target.getRequestedAt())
+        return Optional.ofNullable(request.requestedAt())
             .map(requestedAt -> requestedAt.withZoneSameInstant(now.getZone()))
             .orElse(now)
             .getHour();
     }
 
-    private void checkTimeAndAmount(BigDecimal amount, int hour) {
+    private Optional<Rejection> checkTimeAndAmount(RiskValidationRequest request) {
         int from = config.getForbiddenHourFrom();
         int to = config.getForbiddenHourTo();
-        if (isWithinWindow(hour, from, to) && amount.compareTo(config.getMaxAmount()) == 0) {
-            throw new TimeException(RISK_TOO_HIGH.formatted(formatHour(from), formatHour(to)));
+        if (isWithinWindow(requestHour(request), from, to) && request.amount().compareTo(config.getMaxAmount()) == 0) {
+            return Optional.of(new Rejection(FORBIDDEN_TIME, RISK_TOO_HIGH.formatted(formatHour(from), formatHour(to))));
         }
+        return Optional.empty();
     }
 
-    private void checkIfAmountIsNotToHigh(BigDecimal clientAmount) {
+    private Optional<Rejection> checkIfAmountIsNotToHigh(BigDecimal clientAmount) {
         if (clientAmount.compareTo(config.getMaxAmount()) > 0) {
-            throw new AmountException(AMOUNT_EXCEEDS);
+            return Optional.of(new Rejection(AMOUNT_EXCEEDS, ExceptionMessages.AMOUNT_EXCEEDS));
         }
+        return Optional.empty();
     }
 
     static boolean isWithinWindow(int hour, int from, int to) {

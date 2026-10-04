@@ -7,6 +7,7 @@ import java.time.Duration
 
 import feign.FeignException
 import io.osvaldas.api.exceptions.ValidationRuleException
+import io.osvaldas.api.risk.validation.RiskRejectionReason
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.domain.loans.LoanService
 import io.osvaldas.backoffice.repositories.entities.Loan
@@ -59,7 +60,7 @@ class LoansTasksSchedulerSpec extends AbstractSpec {
             noExceptionThrown()
         where:
             exception << [
-                new ValidationRuleException.LoanLimitException(LOAN_LIMIT_EXCEEDS),
+                new ValidationRuleException(RiskRejectionReason.LOAN_LIMIT_EXCEEDS, LOAN_LIMIT_EXCEEDS),
                 new IllegalStateException('boom'),
             ]
     }
