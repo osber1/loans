@@ -4,12 +4,16 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import static com.github.tomakehurst.wiremock.client.WireMock.containing
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import static io.osvaldas.api.clients.Status.ACTIVE
+import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
 import static io.osvaldas.api.loans.Status.REJECTED
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
+import static org.springframework.http.HttpStatus.ACCEPTED
+import static org.springframework.http.HttpStatus.BAD_GATEWAY
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -154,6 +158,53 @@ class LoansControllerSpec extends AbstractControllerSpec {
             loanRepository.findById(loanResponse.id()).get().status == OPEN
         and:
             clientRepository.findById(CLIENT_ID).get().version == clientVersion
+    }
+
+    void 'should keep the loan to be evaluated later and accept the request when risk checker is unavailable'() {
+        given:
+            clientRepository.save(activeClientWithId)
+        and:
+            wireMock.stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
+                .willReturn(aResponse().withStatus(SERVICE_UNAVAILABLE.value())))
+        when:
+            MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
+        then:
+            response.status == ACCEPTED.value()
+        and:
+            LoanResponse loanResponse = objectMapper.readValue(response.contentAsString, LoanResponse)
+            loanResponse.status() == NOT_EVALUATED
+            loanRepository.findById(loanResponse.id()).get().status == NOT_EVALUATED
+    }
+
+    void 'should keep the loan to be evaluated later when risk checker does not answer in time'() {
+        given:
+            clientRepository.save(activeClientWithId)
+        and:
+            wireMock.stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
+                .willReturn(aResponse()
+                    .withHeader(CONTENT_TYPE, APPLICATION_JSON.toString())
+                    .withFixedDelay(2000)
+                    .withBody(toJson(RiskValidationResponse.passed()))))
+        when:
+            MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
+        then:
+            response.status == ACCEPTED.value()
+        and:
+            loanRepository.findAll()*.status == [NOT_EVALUATED]
+    }
+
+    void 'should answer bad gateway and keep the loan when risk checker rejects the request itself'() {
+        given:
+            clientRepository.save(activeClientWithId)
+        and:
+            wireMock.stubFor(WireMock.post(urlPathEqualTo('/api/v1/validation'))
+                .willReturn(aResponse().withStatus(BAD_REQUEST.value())))
+        when:
+            MockHttpServletResponse response = postLoanRequest(loanRequest, CLIENT_ID)
+        then:
+            response.status == BAD_GATEWAY.value()
+        and:
+            loanRepository.findAll()*.status == [NOT_EVALUATED]
     }
 
     private Loan saveClientWithPostponedLoan() {

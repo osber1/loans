@@ -3,7 +3,6 @@ package io.osvaldas.backoffice.domain.loans;
 import static io.osvaldas.api.clients.Status.ACTIVE;
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED;
 import static io.osvaldas.api.loans.Status.OPEN;
-import static io.osvaldas.api.loans.Status.PENDING;
 import static io.osvaldas.api.loans.Status.REJECTED;
 import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_ACTIVE;
 import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_FOUND;
@@ -24,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.cache.CacheManager;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +92,6 @@ public class LoanService {
 
     public void validate(Loan loan, String clientId) {
         try {
-            setStatusAndSave(loan, NOT_EVALUATED);
             RiskValidationResponse response = sendValidationRequest(loan, clientId);
             Optional.of(response)
                 .filter(RiskValidationResponse::success)
@@ -104,8 +103,9 @@ public class LoanService {
         }
     }
 
-    public List<Loan> getLoansByStatusOlderThan(Status status, Duration minAge) {
-        return loanRepository.findAllWithClientByStatusAndCreatedAtBefore(status, timeUtils.getCurrentDateTime().minus(minAge));
+    public List<Loan> getLoansByStatusOlderThan(Status status, Duration minAge, long afterId, int limit) {
+        return loanRepository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
+            status, timeUtils.getCurrentDateTime().minus(minAge), afterId, Limit.of(limit));
     }
 
     private Client getActiveClient(String clientId) {
@@ -141,7 +141,7 @@ public class LoanService {
         Specification<Loan> specification = clientIdIs(clientId)
             .and(loanCreatedAtOrAfter(startOfDay))
             .and(loanCreatedBefore(startOfDay.plusDays(1)))
-            .and(loanStatusIn(EnumSet.of(PENDING, NOT_EVALUATED, OPEN)))
+            .and(loanStatusIn(EnumSet.of(NOT_EVALUATED, OPEN)))
             .and(loanIdLessThan(loanId));
         return loanRepository.count(specification);
     }

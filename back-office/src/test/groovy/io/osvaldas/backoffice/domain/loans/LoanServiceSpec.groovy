@@ -2,7 +2,6 @@ package io.osvaldas.backoffice.domain.loans
 
 import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 import static io.osvaldas.api.loans.Status.OPEN
-import static io.osvaldas.api.loans.Status.PENDING
 import static io.osvaldas.api.loans.Status.REJECTED
 import static java.util.Optional.empty
 import static java.util.Optional.of
@@ -12,6 +11,7 @@ import java.time.ZonedDateTime
 
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
+import org.springframework.data.domain.Limit
 import org.springframework.data.jpa.domain.Specification
 
 import io.osvaldas.api.exceptions.BadRequestException
@@ -59,7 +59,7 @@ class LoanServiceSpec extends AbstractSpec {
         cacheManager)
 
     void setup() {
-        loan.status = PENDING
+        loan.status = NOT_EVALUATED
     }
 
     void 'should save loan'() {
@@ -279,9 +279,10 @@ class LoanServiceSpec extends AbstractSpec {
 
     void 'should return #result.size() loans when status is #status'() {
         given:
-            1 * loanRepository.findAllWithClientByStatusAndCreatedAtBefore(status, DATE.minusMinutes(5)) >> result
+            1 * loanRepository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
+                status, DATE.minusMinutes(5), 7L, Limit.of(50)) >> result
         expect:
-            loanService.getLoansByStatusOlderThan(status, Duration.ofMinutes(5)) == result
+            loanService.getLoansByStatusOlderThan(status, Duration.ofMinutes(5), 7L, 50) == result
         where:
             result             | status
             []                 | NOT_EVALUATED

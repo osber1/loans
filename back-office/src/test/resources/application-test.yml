@@ -2,6 +2,14 @@ logging:
   file:
     name: build/logs/back-office.log
 
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          risk-checker:
+            read-timeout: 500
+
 rabbitmq:
   exchanges:
     internal: internal.exchange
