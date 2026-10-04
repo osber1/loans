@@ -13,6 +13,7 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import io.osvaldas.api.clients.Status;
 import jakarta.persistence.Column;
@@ -56,6 +57,13 @@ public class Client {
     @NotNull
     @Column(length = 11, unique = true)
     private String personalCode;
+
+    @NotAudited
+    @Column(length = 64)
+    private String activationTokenHash;
+
+    @NotAudited
+    private ZonedDateTime activationTokenExpiresAt;
 
     @OneToMany(mappedBy = "client", cascade = ALL, fetch = LAZY)
     private Set<Loan> loans = new HashSet<>();

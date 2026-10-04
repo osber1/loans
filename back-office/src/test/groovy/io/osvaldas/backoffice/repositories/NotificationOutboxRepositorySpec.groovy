@@ -46,7 +46,7 @@ class NotificationOutboxRepositorySpec extends AbstractDatabaseSpec {
     }
 
     private NotificationOutbox save(String clientId) {
-        entityManager.persist(new NotificationOutbox(clientId, 'Name Surname', 'user@mail.com'))
+        entityManager.persist(new NotificationOutbox(clientId, 'Name Surname', 'user@mail.com', 'token'))
     }
 
 }

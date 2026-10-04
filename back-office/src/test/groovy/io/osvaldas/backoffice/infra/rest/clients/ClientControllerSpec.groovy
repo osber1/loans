@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MvcResult
+import org.springframework.util.LinkedMultiValueMap
 
 import groovy.json.JsonBuilder
 import io.osvaldas.api.clients.ClientRegisterRequest
@@ -271,26 +272,100 @@ class ClientControllerSpec extends AbstractControllerSpec {
         where:
             method << [get('/api/v1/clients/{id}', CLIENT_ID),
                        delete('/api/v1/clients/{id}', CLIENT_ID),
-                       get('/api/v1/clients/{id}/active', CLIENT_ID),
+                       post('/api/v1/clients/{id}/activation', CLIENT_ID).param('token', 'token'),
                        put('/api/v1/clients').content(new JsonBuilder(buildUpdateClientRequest()) as String)]
     }
 
-    void 'should activate client when it exists'() {
+    void 'should activate registered client with the token that was emailed'() {
         given:
-            clientRepository.save(registeredClientWithId)
+            String clientId = registerClientAndReturnId()
+            String token = notificationOutboxRepository.findAll().first().activationToken
         when:
             MockHttpServletResponse response = mockMvc
-                .perform(get('/api/v1/clients/{id}/active', registeredClientWithId.id)
-                    .contentType(APPLICATION_JSON))
+                .perform(post('/api/v1/clients/{id}/activation', clientId).param('token', token))
                 .andReturn().response
         then:
             response.status == OK.value()
+            response.contentType.startsWith('text/html')
+            response.contentAsString.contains('Your account is activated')
         and:
-            with(clientRepository.findById(registeredClientWithId.id).get()) {
+            with(clientRepository.findById(clientId).get()) {
                 status == ACTIVE
-                version == 1L
-                updatedAt != null
+                activationTokenHash == null
+                activationTokenExpiresAt == null
             }
+    }
+
+    void 'should not activate client twice with the same token'() {
+        given:
+            String clientId = registerClientAndReturnId()
+            String token = notificationOutboxRepository.findAll().first().activationToken
+            mockMvc.perform(post('/api/v1/clients/{id}/activation', clientId).param('token', token))
+        when:
+            MockHttpServletResponse response = mockMvc
+                .perform(post('/api/v1/clients/{id}/activation', clientId).param('token', token))
+                .andReturn().response
+        then:
+            response.status == BAD_REQUEST.value()
+            response.contentAsString.contains('Activation link is invalid or has expired.')
+    }
+
+    void 'should not activate client when the token is wrong or missing'() {
+        given:
+            String clientId = registerClientAndReturnId()
+        when:
+            MockHttpServletResponse response = mockMvc
+                .perform(post('/api/v1/clients/{id}/activation', clientId).params(params))
+                .andReturn().response
+        then:
+            response.status == BAD_REQUEST.value()
+        and:
+            clientRepository.findById(clientId).get().status == REGISTERED
+        where:
+            params << [new LinkedMultiValueMap([token: ['wrong']]), new LinkedMultiValueMap()]
+    }
+
+    void 'should not bring a deleted client back to active'() {
+        given:
+            String clientId = registerClientAndReturnId()
+            String token = notificationOutboxRepository.findAll().first().activationToken
+            mockMvc.perform(delete('/api/v1/clients/{id}', clientId))
+        when:
+            MockHttpServletResponse response = mockMvc
+                .perform(post('/api/v1/clients/{id}/activation', clientId).param('token', token))
+                .andReturn().response
+        then:
+            response.status == BAD_REQUEST.value()
+        and:
+            clientRepository.findById(clientId).get().status == DELETED
+    }
+
+    void 'should only show a confirmation page and keep the client registered when the activation link is opened'() {
+        given:
+            String clientId = registerClientAndReturnId()
+            String token = notificationOutboxRepository.findAll().first().activationToken
+        when:
+            MockHttpServletResponse response = mockMvc
+                .perform(get('/api/v1/clients/{id}/activation', clientId).param('token', token))
+                .andReturn().response
+        then:
+            response.status == OK.value()
+            response.contentType.startsWith('text/html')
+            response.contentAsString.contains('<form method="post">')
+        and:
+            clientRepository.findById(clientId).get().status == REGISTERED
+    }
+
+    void 'should not expose the activation token when returning a client'() {
+        when:
+            MvcResult result = sendRegistrationClientRequest(buildRegisterClientRequest())
+        then:
+            !result.response.contentAsString.contains('ctivation')
+    }
+
+    private String registerClientAndReturnId() {
+        objectMapper.readValue(
+            sendRegistrationClientRequest(buildRegisterClientRequest()).response.contentAsString, ClientResponse).id()
     }
 
     private MvcResult sendRegistrationClientRequest(ClientRegisterRequest request) {

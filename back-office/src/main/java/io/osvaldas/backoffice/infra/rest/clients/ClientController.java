@@ -75,11 +75,6 @@ public class ClientController {
         service.deleteClient(id);
     }
 
-    @GetMapping("clients/{id}/active")
-    public void activateClient(@PathVariable String id) {
-        service.activateClient(id);
-    }
-
     private ResponseEntity<Collection<ClientResponse>> toPagedResponse(Page<Client> clients) {
         return ResponseEntity.ok()
             .header(TOTAL_COUNT_HEADER, String.valueOf(clients.getTotalElements()))

@@ -76,7 +76,9 @@ The Cucumber scenarios in `acceptance-tests` call a running back-office, so they
 ./gradlew :acceptance-tests:acceptanceTest -Pacceptance.baseUri=http://host:port # any other back-office
 ```
 
-The base URI can also be set with the `ACCEPTANCE_BASE_URI` environment variable. The HTML report is written to
+The scenarios read the activation email from Mailhog (`http://localhost:8025`, override with
+`-Pacceptance.mailhogUri=...` or `ACCEPTANCE_MAILHOG_URI`). The base URI can also be set with the
+`ACCEPTANCE_BASE_URI` environment variable. The HTML report is written to
 `acceptance-tests/build/reports/cucumber/cucumber.html`.
 
 ### Error Prone
@@ -102,7 +104,7 @@ with Trivy and, on `master`, logs in to DockerHub and builds the application ima
 
 ## Flow
 
-1) Register user and confirm email in email service.
+1) Register user and open the activation link from the email (Mailhog), then confirm the activation on the page it shows.
 2) Take loan.
 3) You can postpone loan.
 

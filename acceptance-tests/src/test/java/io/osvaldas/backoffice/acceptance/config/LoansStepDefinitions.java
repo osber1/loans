@@ -7,9 +7,14 @@ import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.osvaldas.api.clients.ClientRegisterRequest;
 import io.osvaldas.api.clients.ClientResponse;
 import io.osvaldas.api.loans.LoanResponse;
 import io.restassured.response.Response;
@@ -17,27 +22,38 @@ import io.restassured.specification.RequestSpecification;
 
 public class LoansStepDefinitions {
 
-    private static final String BASE_URI = baseUri();
+    private static final String BASE_URI = configured("acceptance.baseUri", "ACCEPTANCE_BASE_URI", "http://localhost:8080");
+
+    private static final String MAILHOG_URI = configured("acceptance.mailhogUri", "ACCEPTANCE_MAILHOG_URI", "http://localhost:8025");
+
+    private static final int EMAIL_ATTEMPTS = 20;
+
+    private static final long EMAIL_POLL_MILLIS = 500;
 
     private String clientId;
+
+    private String clientEmail;
 
     private long loanId;
 
     @Given("client is registered")
     public void clientIsRegistered() {
+        ClientRegisterRequest registerRequest = buildRegisterClientRequest();
         Response response = request()
-            .body(buildRegisterClientRequest())
+            .body(registerRequest)
             .post("/api/v1/clients");
 
         responseSuccess(response);
 
         clientId = response.as(ClientResponse.class).id();
+        clientEmail = registerRequest.email();
     }
 
     @Given("client is activated")
     public void clientIsActivated() {
         request()
-            .get("/api/v1/clients/{clientId}/active", clientId)
+            .queryParam("token", activationTokenFromEmail())
+            .post("/api/v1/clients/{clientId}/activation", clientId)
             .then().assertThat().statusCode(200);
     }
 
@@ -89,16 +105,46 @@ public class LoansStepDefinitions {
         return loans[0];
     }
 
-    private static String baseUri() {
-        String fromProperty = System.getProperty("acceptance.baseUri");
+    private String activationTokenFromEmail() {
+        Pattern link = Pattern.compile("/clients/" + Pattern.quote(clientId) + "/activation\\?token=([\\w-]+)");
+        for (int attempt = 0; attempt < EMAIL_ATTEMPTS; attempt++) {
+            List<String> bodies = given()
+                .baseUri(MAILHOG_URI)
+                .queryParam("kind", "to")
+                .queryParam("query", clientEmail)
+                .get("/api/v2/search")
+                .jsonPath()
+                .getList("items.Content.Body", String.class);
+            for (String body : bodies) {
+                Matcher matcher = link.matcher(body);
+                if (matcher.find()) {
+                    return matcher.group(1);
+                }
+            }
+            sleep();
+        }
+        throw new AssertionError("No activation email for %s found in %s".formatted(clientEmail, MAILHOG_URI));
+    }
+
+    private static void sleep() {
+        try {
+            Thread.sleep(EMAIL_POLL_MILLIS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static String configured(String property, String environmentVariable, String defaultValue) {
+        String fromProperty = System.getProperty(property);
         if (fromProperty != null && !fromProperty.isBlank()) {
             return fromProperty;
         }
-        String fromEnvironment = System.getenv("ACCEPTANCE_BASE_URI");
+        String fromEnvironment = System.getenv(environmentVariable);
         if (fromEnvironment != null && !fromEnvironment.isBlank()) {
             return fromEnvironment;
         }
-        return "http://localhost:8080";
+        return defaultValue;
     }
 
     private static RequestSpecification request() {

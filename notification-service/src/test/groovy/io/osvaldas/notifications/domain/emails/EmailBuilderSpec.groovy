@@ -11,7 +11,7 @@ class EmailBuilderSpec extends Specification {
     String name = 'Name'
 
     @Shared
-    String link = 'http://localhost:8080/api/v1/clients/clientId/active'
+    String link = 'http://localhost:8080/api/v1/clients/clientId/activation?token=token'
 
     void 'should contain name and link when message is generated'() {
         when:

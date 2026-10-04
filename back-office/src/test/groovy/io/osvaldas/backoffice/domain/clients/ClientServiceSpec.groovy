@@ -3,8 +3,12 @@ package io.osvaldas.backoffice.domain.clients
 import static io.osvaldas.api.clients.Status.ACTIVE
 import static io.osvaldas.api.clients.Status.DELETED
 import static io.osvaldas.api.clients.Status.REGISTERED
+import static io.osvaldas.api.util.ExceptionMessages.ACTIVATION_LINK_INVALID
 import static java.util.Optional.empty
 import static java.util.Optional.of
+
+import java.time.Duration
+import java.time.ZonedDateTime
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -17,8 +21,10 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException
 import io.osvaldas.api.email.EmailMessage
 import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.api.exceptions.NotFoundException
+import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.domain.notifications.NotificationOutboxService
+import io.osvaldas.backoffice.infra.configuration.PropertiesConfig
 import io.osvaldas.backoffice.repositories.ClientRepository
 import io.osvaldas.backoffice.repositories.entities.Client
 import spock.lang.Subject
@@ -27,12 +33,22 @@ class ClientServiceSpec extends AbstractSpec {
 
     static final String OTHER_PERSONAL_CODE = '99999999999'
 
+    static final String TOKEN = 'activation-token'
+
     ClientRepository clientRepository = Mock()
 
     NotificationOutboxService notificationOutbox = Mock()
 
+    TimeUtils timeUtils = Stub {
+        currentDateTime >> DATE
+    }
+
+    PropertiesConfig config = Stub {
+        activationTokenTtl >> Duration.ofDays(7)
+    }
+
     @Subject
-    ClientService clientService = new ClientService(clientRepository, notificationOutbox)
+    ClientService clientService = new ClientService(clientRepository, notificationOutbox, timeUtils, config)
 
     void 'should throw exception when registering client with existing personal code'() {
         when:
@@ -54,7 +70,73 @@ class ClientServiceSpec extends AbstractSpec {
         and:
             1 * clientRepository.existsByPersonalCode(registeredClientWithoutId.personalCode) >> false
             1 * clientRepository.saveAndFlush(registeredClientWithoutId) >> registeredClientWithId
-            1 * notificationOutbox.enqueue(new EmailMessage(CLIENT_ID, NAME + ' ' + SURNAME, CLIENT_EMAIL))
+            1 * notificationOutbox.enqueue(_ as EmailMessage) >> { EmailMessage message ->
+                assert message.clientId() == CLIENT_ID
+                assert message.fullName() == NAME + ' ' + SURNAME
+                assert message.email() == CLIENT_EMAIL
+                assert message.activationToken() != null
+            }
+    }
+
+    void 'should store only the hash and expiry of the activation token that is sent by email'() {
+        given:
+            Client client = registeredClientWithoutId
+            EmailMessage sent
+        when:
+            clientService.registerClient(client)
+        then:
+            1 * clientRepository.existsByPersonalCode(client.personalCode) >> false
+            1 * clientRepository.saveAndFlush(client) >> registeredClientWithId
+            1 * notificationOutbox.enqueue(_ as EmailMessage) >> { EmailMessage message -> sent = message }
+        and:
+            client.activationTokenHash == ActivationTokens.hash(sent.activationToken())
+            client.activationTokenHash != sent.activationToken()
+            client.activationTokenExpiresAt == DATE.plusDays(7)
+    }
+
+    void 'should activate registered client when the token matches'() {
+        given:
+            Client client = clientWithActivationToken(TOKEN, DATE.plusDays(1))
+        when:
+            clientService.activateClient(CLIENT_ID, TOKEN)
+        then:
+            1 * clientRepository.findById(CLIENT_ID) >> of(client)
+        and:
+            client.status == ACTIVE
+            client.activationTokenHash == null
+            client.activationTokenExpiresAt == null
+    }
+
+    void 'should not activate client when #reason'() {
+        given:
+            Client client = clientWithActivationToken(TOKEN, expiresAt).tap {
+                status = clientStatus
+            }
+        when:
+            clientService.activateClient(CLIENT_ID, token)
+        then:
+            1 * clientRepository.findById(CLIENT_ID) >> of(client)
+        and:
+            BadRequestException e = thrown()
+            e.message == ACTIVATION_LINK_INVALID
+            client.status == clientStatus
+        where:
+            reason                  | token       | expiresAt          | clientStatus
+            'the token is wrong'    | 'other'     | DATE.plusDays(1)   | REGISTERED
+            'the token is missing'  | null        | DATE.plusDays(1)   | REGISTERED
+            'the token has expired' | TOKEN       | DATE.minusSeconds(1) | REGISTERED
+            'the token expires now' | TOKEN       | DATE               | REGISTERED
+            'client is deleted'     | TOKEN       | DATE.plusDays(1)   | DELETED
+            'client is active'      | TOKEN       | DATE.plusDays(1)   | ACTIVE
+    }
+
+    void 'should not activate client that has no activation token'() {
+        when:
+            clientService.activateClient(CLIENT_ID, TOKEN)
+        then:
+            1 * clientRepository.findById(CLIENT_ID) >> of(registeredClientWithId)
+        and:
+            thrown(BadRequestException)
     }
 
     void 'should not enqueue registration email when saving client fails'() {
@@ -139,7 +221,6 @@ class ClientServiceSpec extends AbstractSpec {
         where:
             newStatus || action
             DELETED   || { ClientService service -> service.deleteClient(CLIENT_ID) }
-            ACTIVE    || { ClientService service -> service.activateClient(CLIENT_ID) }
     }
 
     void 'should throw exception when trying to change status of non existing client'() {
@@ -152,7 +233,7 @@ class ClientServiceSpec extends AbstractSpec {
             1 * clientRepository.findById(CLIENT_ID) >> empty()
         where:
             action << [{ ClientService service -> service.deleteClient(CLIENT_ID) },
-                       { ClientService service -> service.activateClient(CLIENT_ID) }]
+                       { ClientService service -> service.activateClient(CLIENT_ID, TOKEN) }]
     }
 
     void 'should update only editable client fields when it exists'() {
@@ -231,6 +312,13 @@ class ClientServiceSpec extends AbstractSpec {
         and:
             1 * clientRepository.findAll(_ as Specification, PageRequest.of(1, 10, Sort.by('lastName').descending()))
                 >> new PageImpl<>([registeredClientWithId], PageRequest.of(1, 10), 11)
+    }
+
+    private Client clientWithActivationToken(String token, ZonedDateTime expiresAt) {
+        buildClient(CLIENT_ID, [] as Set, REGISTERED).tap {
+            activationTokenHash = ActivationTokens.hash(token)
+            activationTokenExpiresAt = expiresAt
+        }
     }
 
 }

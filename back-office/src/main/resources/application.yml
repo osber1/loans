@@ -80,6 +80,7 @@ application:
   interestRate: 10
   interestIncrementFactor: 1.5
   postponeDays: 7
+  activationTokenTtl: P7D
 
 risk:
   checker:

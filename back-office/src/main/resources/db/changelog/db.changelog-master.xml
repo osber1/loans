@@ -26,6 +26,8 @@
             <column name="created_at" type="timestamp with time zone"/>
             <column name="updated_at" type="timestamp with time zone"/>
             <column name="version" type="BIGINT"/>
+            <column name="activation_token_hash" type="VARCHAR(64)"/>
+            <column name="activation_token_expires_at" type="timestamp with time zone"/>
         </createTable>
 
         <createTable tableName="client_aud">
@@ -176,6 +178,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="published_at" type="timestamp with time zone"/>
+            <column name="activation_token" type="VARCHAR(255)"/>
         </createTable>
         <sql>CREATE INDEX idx_notification_outbox_pending ON notification_outbox (id) WHERE published_at IS NULL</sql>
         <rollback>

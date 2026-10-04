@@ -24,6 +24,8 @@ public interface ClientMapper {
     @Mapping(target = "loans", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "activationTokenHash", ignore = true)
+    @Mapping(target = "activationTokenExpiresAt", ignore = true)
     Client mapToEntity(ClientUpdateRequest clientDto);
 
 }

@@ -12,7 +12,7 @@ class PropertiesValidationSpec extends Specification {
     static final List<String> VALID_PROPERTIES = [
         'email.senderAddress=hello@osber.com',
         'email.subject=Confirm your email',
-        'email.activationLink=http://localhost:8080/api/v1/clients/%s/active',
+        'email.activationLink=http://localhost:8080/api/v1/clients/%s/activation?token=%s',
         'rabbitmq.exchanges.internal=internal.exchange',
         'rabbitmq.queues.notification=notification.queue',
         'rabbitmq.routing-keys.internal-notification=internal.notification.routing-key',

@@ -13,7 +13,7 @@ spring:
 email:
   senderAddress: hello@osber.com
   subject: Confirm your email
-  activationLink: http://localhost:8080/api/v1/clients/%s/active
+  activationLink: http://localhost:8080/api/v1/clients/%s/activation?token=%s
 
 rabbitmq:
   exchanges:

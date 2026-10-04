@@ -1,5 +1,5 @@
 package io.osvaldas.api.email;
 
-public record EmailMessage(String clientId, String fullName, String email) {
+public record EmailMessage(String clientId, String fullName, String email, String activationToken) {
 
 }
