@@ -9,58 +9,46 @@ import static tools.jackson.databind.cfg.DateTimeFeature.WRITE_DATES_WITH_ZONE_I
 
 import javax.sql.DataSource;
 
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import io.osvaldas.api.loans.LoanResponse;
+import io.osvaldas.backoffice.domain.loans.RiskCheckerClient;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
+@EnableCaching
+@EnableScheduling
 @Configuration
+@EnableFeignClients(clients = RiskCheckerClient.class)
 @EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 public class BeansConfig {
 
     public static final String LOAN_RESPONSE_CACHE = "LoanResponse";
 
     @Bean
-    public RedisCacheConfiguration cacheConfiguration() {
-        GenericJacksonJsonRedisSerializer serializer = GenericJacksonJsonRedisSerializer.builder()
-            .customize(BeansConfig::configureCacheMapper)
-            .enableDefaultTyping(BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType("io.osvaldas.")
-                .allowIfSubType("java.math.")
-                .allowIfSubType("java.time.")
-                .allowIfSubType("java.util.")
-                .build())
-            .build();
-
-        return RedisCacheConfiguration.defaultCacheConfig()
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        JsonMapper mapper = configureCacheMapper(JsonMapper.builder()).build();
+        RedisCacheConfiguration loanResponseCache = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(ofMinutes(60))
             .disableCachingNullValues()
-            .serializeValuesWith(fromSerializer(serializer));
-    }
-
-    @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory,
-                                          RedisCacheConfiguration cacheConfiguration) {
-        JsonMapper mapper = configureCacheMapper(JsonMapper.builder()).build();
+            .serializeValuesWith(fromSerializer(new JacksonJsonRedisSerializer<>(mapper, LoanResponse.class)));
         RedisCacheWriter cacheWriter = RedisCacheWriter.create(connectionFactory, writer -> writer.immediateWrites());
 
         return RedisCacheManager.builder(cacheWriter)
-            .cacheDefaults(cacheConfiguration)
-            .withCacheConfiguration(LOAN_RESPONSE_CACHE, cacheConfiguration
-                .serializeValuesWith(fromSerializer(new JacksonJsonRedisSerializer<>(mapper, LoanResponse.class))))
+            .withCacheConfiguration(LOAN_RESPONSE_CACHE, loanResponseCache)
+            .disableCreateOnMissingCache()
             .transactionAware()
             .build();
     }
@@ -73,14 +61,6 @@ public class BeansConfig {
                 .usingDbTime()
                 .build()
         );
-    }
-
-    @Bean
-    public ThreadPoolTaskScheduler cronJobThreadPoolTaskScheduler() {
-        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(3);
-        threadPoolTaskScheduler.setThreadNamePrefix("cronJobThreadPoolTaskScheduler");
-        return threadPoolTaskScheduler;
     }
 
     private static JsonMapper.Builder configureCacheMapper(JsonMapper.Builder builder) {

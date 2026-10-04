@@ -95,7 +95,7 @@ class LoansControllerSpec extends AbstractControllerSpec {
         and:
             response.contentAsString.contains(LOAN_LIMIT_EXCEEDS)
         and:
-            REJECTED == loanRepository.findAllByClient(activeClientWithId).last().status
+            REJECTED == loanRepository.findAll().last().status
     }
 
     void 'should fail when client is not active'() {

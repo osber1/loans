@@ -16,7 +16,7 @@ class ClientSpecificationsSpec extends AbstractDatabaseSpec {
     ClientRepository repository
 
     void setup() {
-        client.addLoan(loan)
+        client.loans.add(loan)
         repository.save(client)
     }
 
