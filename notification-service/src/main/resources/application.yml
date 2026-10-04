@@ -52,3 +52,23 @@ email:
   senderAddress: hello@osber.com
   subject: Confirm your email
   activationLink: http://localhost:8080/api/v1/clients/%s/activation?token=%s
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker,k8s
+
+logging:
+  file:
+    name: ""
+  structured:
+    format:
+      console: logstash
+    json:
+      rename:
+        logger_name: class
+      add:
+        hostname: ${HOSTNAME:}
+        app: ${spring.application.name}
+        profiles: ${spring.profiles.active:}
