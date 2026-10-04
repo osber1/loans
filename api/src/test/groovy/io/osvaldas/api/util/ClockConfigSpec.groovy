@@ -23,20 +23,19 @@ class ClockConfigSpec extends Specification {
     void 'should use the business zone for the hour and the start of the day'() {
         given: 'late evening UTC, which is already after midnight in Vilnius (EEST, UTC+3)'
             Clock clock = fixed(parse('2022-10-12T22:30:00Z'), ZoneId.of('Europe/Vilnius'))
-            TimeService timeService = new TimeService(clock)
         expect:
-            timeService.currentDateTime.hour == 1
-            timeService.currentDateTime.truncatedTo(DAYS) ==
+            ZonedDateTime.now(clock).hour == 1
+            ZonedDateTime.now(clock).truncatedTo(DAYS) ==
                 ZonedDateTime.parse('2022-10-13T00:00:00+03:00[Europe/Vilnius]')
     }
 
     void 'should follow daylight saving time changes'() {
         given: 'same UTC hour, before and after the end of summer time in Vilnius'
-            TimeService summer = new TimeService(fixed(parse('2022-10-29T21:30:00Z'), of('Europe/Vilnius')))
-            TimeService winter = new TimeService(fixed(parse('2022-10-30T21:30:00Z'), of('Europe/Vilnius')))
+            Clock summer = fixed(parse('2022-10-29T21:30:00Z'), of('Europe/Vilnius'))
+            Clock winter = fixed(parse('2022-10-30T21:30:00Z'), of('Europe/Vilnius'))
         expect:
-            summer.currentDateTime.hour == 0
-            winter.currentDateTime.hour == 23
+            ZonedDateTime.now(summer).hour == 0
+            ZonedDateTime.now(winter).hour == 23
     }
 
 }

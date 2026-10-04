@@ -5,11 +5,11 @@ import static io.osvaldas.api.risk.validation.RiskRejectionReason.FORBIDDEN_TIME
 import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
 import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH
 
+import java.time.Clock
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 import io.osvaldas.api.risk.validation.RiskValidationRequest
-import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.risk.AbstractSpec
 import io.osvaldas.risk.domain.validation.Rejection
 import io.osvaldas.risk.infra.configuration.PropertiesConfig
@@ -23,8 +23,9 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
 
     ZonedDateTime now = at(10)
 
-    TimeUtils timeUtils = Stub {
-        currentDateTime >> { now }
+    Clock clock = Stub {
+        instant() >> { now.toInstant() }
+        getZone() >> { now.zone }
     }
 
     PropertiesConfig config = new PropertiesConfig(
@@ -35,7 +36,7 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
     )
 
     @Subject
-    TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, timeUtils)
+    TimeAndAmountValidator timeAndAmountValidator = new TimeAndAmountValidator(config, clock)
 
     void 'should pass when amount is not to high and correct time'() {
         expect:

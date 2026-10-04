@@ -9,6 +9,8 @@ import static io.osvaldas.api.util.ExceptionMessages.CLIENT_NOT_FOUND;
 import static io.osvaldas.backoffice.repositories.specifications.ClientSpecifications.clientStatusIs;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
+import java.time.Clock;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import org.springframework.data.domain.Page;
@@ -23,7 +25,6 @@ import io.osvaldas.api.clients.Status;
 import io.osvaldas.api.email.EmailMessage;
 import io.osvaldas.api.exceptions.BadRequestException;
 import io.osvaldas.api.exceptions.NotFoundException;
-import io.osvaldas.api.util.TimeUtils;
 import io.osvaldas.backoffice.domain.notifications.NotificationOutboxService;
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;
 import io.osvaldas.backoffice.repositories.ClientRepository;
@@ -40,7 +41,7 @@ public class ClientService {
 
     private final NotificationOutboxService notificationOutbox;
 
-    private final TimeUtils timeUtils;
+    private final Clock clock;
 
     private final PropertiesConfig config;
 
@@ -52,7 +53,7 @@ public class ClientService {
         client.setRandomId();
         String activationToken = ActivationTokens.newToken();
         client.setActivationTokenHash(ActivationTokens.hash(activationToken));
-        client.setActivationTokenExpiresAt(timeUtils.getCurrentDateTime().plus(config.getActivationTokenTtl()));
+        client.setActivationTokenExpiresAt(ZonedDateTime.now(clock).plus(config.getActivationTokenTtl()));
         Client savedClient = clientRepository.saveAndFlush(client);
         log.info("Client registered: {}", savedClient.getId());
         notificationOutbox.enqueue(new EmailMessage(savedClient.getId(), savedClient.getFullName(), savedClient.getEmail(), activationToken));
@@ -115,7 +116,7 @@ public class ClientService {
     private boolean canBeActivatedWith(Client client, String token) {
         return REGISTERED == client.getStatus()
             && client.getActivationTokenExpiresAt() != null
-            && client.getActivationTokenExpiresAt().isAfter(timeUtils.getCurrentDateTime())
+            && client.getActivationTokenExpiresAt().isAfter(ZonedDateTime.now(clock))
             && ActivationTokens.matches(token, client.getActivationTokenHash());
     }
 

@@ -3,7 +3,9 @@ package io.osvaldas.backoffice.domain.notifications;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.osvaldas.api.email.EmailMessage;
-import io.osvaldas.api.util.TimeUtils;
 import io.osvaldas.backoffice.repositories.NotificationOutboxRepository;
 import io.osvaldas.backoffice.repositories.entities.NotificationOutbox;
 import io.osvaldas.messages.RabbitMQMessageProducer;
@@ -32,7 +33,7 @@ public class NotificationOutboxService {
 
     private final RabbitProperties rabbitProperties;
 
-    private final TimeUtils timeUtils;
+    private final Clock clock;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -50,7 +51,7 @@ public class NotificationOutboxService {
             if (!publish(row)) {
                 break;
             }
-            row.setPublishedAt(timeUtils.getCurrentDateTime());
+            row.setPublishedAt(ZonedDateTime.now(clock));
             published++;
         }
         return published;
@@ -58,7 +59,7 @@ public class NotificationOutboxService {
 
     @Transactional
     public int purgePublished(Duration retention) {
-        return repository.deletePublishedBefore(timeUtils.getCurrentDateTime().minus(retention));
+        return repository.deletePublishedBefore(ZonedDateTime.now(clock).minus(retention));
     }
 
     private boolean publish(NotificationOutbox row) {
