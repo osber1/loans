@@ -14,6 +14,8 @@ import io.osvaldas.backoffice.repositories.entities.NotificationOutbox
 
 class NotificationOutboxRelayIntegrationSpec extends AbstractControllerSpec {
 
+    static final String TOKEN = 'activation-token'
+
     @Autowired
     NotificationOutboxService outboxService
 
@@ -41,7 +43,7 @@ class NotificationOutboxRelayIntegrationSpec extends AbstractControllerSpec {
             notificationOutboxRepository.findById(row.id).get().publishedAt != null
         and:
             objectMapper.readValue(rabbitTemplate.receive(QUEUE, 5000L).body, Map) ==
-                [clientId: CLIENT_ID, fullName: NAME, email: CLIENT_EMAIL]
+                [clientId: CLIENT_ID, fullName: NAME, email: CLIENT_EMAIL, activationToken: TOKEN]
     }
 
     void 'should keep the message pending when the exchange has no binding to a queue'() {
@@ -80,7 +82,7 @@ class NotificationOutboxRelayIntegrationSpec extends AbstractControllerSpec {
     }
 
     private NotificationOutbox savePendingMessage() {
-        notificationOutboxRepository.save(new NotificationOutbox(CLIENT_ID, NAME, CLIENT_EMAIL))
+        notificationOutboxRepository.save(new NotificationOutbox(CLIENT_ID, NAME, CLIENT_EMAIL, TOKEN))
     }
 
 }
