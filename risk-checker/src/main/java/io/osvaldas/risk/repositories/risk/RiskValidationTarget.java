@@ -1,6 +1,7 @@
 package io.osvaldas.risk.repositories.risk;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,5 +17,7 @@ public class RiskValidationTarget {
     private String clientId;
 
     private long loansTakenToday;
+
+    private ZonedDateTime requestedAt;
 
 }

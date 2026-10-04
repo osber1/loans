@@ -8,6 +8,7 @@ import static java.util.Optional.empty
 import static java.util.Optional.of
 
 import java.time.Duration
+import java.time.ZonedDateTime
 
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
@@ -34,10 +35,11 @@ class LoanServiceSpec extends AbstractSpec {
 
     TimeUtils timeUtils = Stub {
         currentDateTime >> DATE
-        hourOfDay >> 10
     }
 
     PropertiesConfig config = Stub()
+
+    RiskValidationRequest sentRequest
 
     RiskCheckerClient riskCheckerClient = Mock()
 
@@ -256,8 +258,23 @@ class LoanServiceSpec extends AbstractSpec {
             1 * loanRepository.count(_ as Specification) >> 3L
             0 * loanRepository.findAll(_ as Specification)
         then:
-            1 * riskCheckerClient.validate(new RiskValidationRequest(LOAN_ID, CLIENT_ID, loan.amount, 3L))
+            1 * riskCheckerClient.validate(new RiskValidationRequest(LOAN_ID, CLIENT_ID, loan.amount, 3L, DATE))
                 >> RiskValidationResponse.passed()
+    }
+
+    void 'should send the time the loan was requested instead of the evaluation time'() {
+        given:
+            ZonedDateTime requestedAt = DATE.minusDays(2).withHour(23)
+            loan.createdAt = requestedAt
+        when:
+            loanService.validate(loan, CLIENT_ID)
+        then:
+            1 * riskCheckerClient.validate(_ as RiskValidationRequest) >> { RiskValidationRequest request ->
+                sentRequest = request
+                RiskValidationResponse.passed()
+            }
+        and:
+            sentRequest.requestedAt().toInstant() == requestedAt.toInstant()
     }
 
     void 'should return #result.size() loans when status is #status'() {

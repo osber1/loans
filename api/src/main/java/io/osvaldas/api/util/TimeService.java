@@ -16,11 +16,6 @@ public class TimeService implements TimeUtils {
     private final Clock clock;
 
     @Override
-    public int getHourOfDay() {
-        return getCurrentDateTime().getHour();
-    }
-
-    @Override
     public ZonedDateTime getCurrentDateTime() {
         return now(clock);
     }

@@ -11,6 +11,7 @@ import static java.time.ZoneOffset.UTC
 import static java.util.concurrent.TimeUnit.SECONDS
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED
 
+import java.sql.Timestamp
 import java.time.ZonedDateTime
 import java.util.concurrent.Callable
 import java.util.concurrent.CountDownLatch
@@ -22,7 +23,9 @@ import java.util.concurrent.TimeoutException
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 
 import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.api.loans.Status
@@ -73,7 +76,17 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
     @Autowired
     LoanRepository loanRepository
 
+    @Autowired
+    JdbcTemplate jdbcTemplate
+
+    @Autowired
+    TransactionTemplate transactionTemplate
+
     ZonedDateTime today = ZonedDateTime.now(UTC)
+
+    ZonedDateTime noon = ZonedDateTime.parse('2022-03-15T12:00:00Z')
+
+    RiskValidationRequest sentRequest
 
     ExecutorService executor = Executors.newFixedThreadPool(PARALLEL_REQUESTS)
 
@@ -85,33 +98,84 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
 
     void 'should count only active loans of the client taken today before the evaluated loan'() {
         given:
-            timeUtils.currentDateTime >> today
+            timeUtils.currentDateTime >> noon.plusHours(1)
             Client owner = clientRepository.save(client)
             Client otherClient = clientRepository.save(buildOtherClient())
             [OPEN, NOT_EVALUATED, PENDING, REJECTED, CLOSED].each { saveLoan(owner, it) }
+            saveLoan(owner, OPEN, noon.minusDays(1))
             saveLoan(otherClient, OPEN)
             Loan evaluatedLoan = saveLoan(owner, NOT_EVALUATED)
             saveLoan(owner, OPEN)
         when:
             loanService.validate(evaluatedLoan, VALID_CLIENT_ID)
         then:
-            1 * riskCheckerClient.validate(
-                new RiskValidationRequest(evaluatedLoan.id, VALID_CLIENT_ID, evaluatedLoan.amount, 3L))
-                >> passedValidation()
+            1 * riskCheckerClient.validate(_ as RiskValidationRequest) >> { RiskValidationRequest request ->
+                sentRequest = request
+                passedValidation()
+            }
+        and:
+            sentRequest.loansTakenToday() == 3L
+            sentRequest.requestedAt().toInstant() == noon.toInstant()
     }
 
     void 'should not count loans taken on earlier days'() {
         given:
-            timeUtils.currentDateTime >> today.plusDays(1)
+            timeUtils.currentDateTime >> noon
             Client owner = clientRepository.save(client)
-            saveLoan(owner, OPEN)
+            saveLoan(owner, OPEN, noon.minusDays(1))
             Loan evaluatedLoan = saveLoan(owner, NOT_EVALUATED)
         when:
             loanService.validate(evaluatedLoan, VALID_CLIENT_ID)
         then:
-            1 * riskCheckerClient.validate(
-                new RiskValidationRequest(evaluatedLoan.id, VALID_CLIENT_ID, evaluatedLoan.amount, 0L))
-                >> passedValidation()
+            1 * riskCheckerClient.validate(_ as RiskValidationRequest) >> { RiskValidationRequest request ->
+                sentRequest = request
+                passedValidation()
+            }
+        and:
+            sentRequest.loansTakenToday() == 0L
+            sentRequest.requestedAt().toInstant() == noon.toInstant()
+    }
+
+    void 'should count the day the loan was requested when it is evaluated after midnight'() {
+        given: 'a loan requested at 23:58 that is only evaluated at 00:10 of the next day'
+            ZonedDateTime requestedAt = noon.minusDays(1).withHour(23).withMinute(58)
+            timeUtils.currentDateTime >> noon.withHour(0).withMinute(10)
+            Client owner = clientRepository.save(client)
+            saveLoan(owner, OPEN, noon.minusDays(2))
+            saveLoan(owner, OPEN, requestedAt.minusHours(12))
+            saveLoan(owner, OPEN, requestedAt.minusMinutes(30))
+            Loan evaluatedLoan = saveLoan(owner, NOT_EVALUATED, requestedAt)
+            saveLoan(owner, OPEN, noon.withHour(0).withMinute(5))
+        when:
+            loanService.validate(evaluatedLoan, VALID_CLIENT_ID)
+        then:
+            1 * riskCheckerClient.validate(_ as RiskValidationRequest) >> { RiskValidationRequest request ->
+                sentRequest = request
+                passedValidation()
+            }
+        and:
+            sentRequest.loansTakenToday() == 2L
+            sentRequest.requestedAt().toInstant() == requestedAt.toInstant()
+    }
+
+    void 'should use the business time zone to find the day the loan was requested'() {
+        given: '22:30 UTC is already after midnight in Vilnius (UTC+3 in summer)'
+            ZonedDateTime requestedAt = ZonedDateTime.parse('2022-07-14T22:30:00Z')
+            timeUtils.currentDateTime >> ZonedDateTime.parse('2022-07-15T08:00:00+03:00[Europe/Vilnius]')
+            Client owner = clientRepository.save(client)
+            saveLoan(owner, OPEN, ZonedDateTime.parse('2022-07-14T20:00:00Z'))
+            saveLoan(owner, OPEN, ZonedDateTime.parse('2022-07-14T21:30:00Z'))
+            Loan evaluatedLoan = saveLoan(owner, NOT_EVALUATED, requestedAt)
+        when:
+            loanService.validate(evaluatedLoan, VALID_CLIENT_ID)
+        then: 'only the loan taken after local midnight (21:00 UTC) counts'
+            1 * riskCheckerClient.validate(_ as RiskValidationRequest) >> { RiskValidationRequest request ->
+                sentRequest = request
+                passedValidation()
+            }
+        and:
+            sentRequest.loansTakenToday() == 1L
+            sentRequest.requestedAt().toInstant() == requestedAt.toInstant()
     }
 
     void 'should make parallel loan request of the same client wait until earlier one is committed'() {
@@ -189,14 +253,19 @@ class LoanServiceIntegrationSpec extends AbstractDatabaseSpec {
         RiskValidationResponse.passed()
     }
 
-    private Loan saveLoan(Client loanClient, Status loanStatus) {
-        loanRepository.save(new Loan().tap {
+    private Loan saveLoan(Client loanClient, Status loanStatus, ZonedDateTime createdAt = noon) {
+        Loan saved = loanRepository.save(new Loan().tap {
             amount = 10.00
             interestRate = 10.00
             termInMonths = 10
             client = loanClient
             status = loanStatus
         })
+        transactionTemplate.executeWithoutResult {
+            jdbcTemplate.update(
+                'update loan set created_at = ? where id = ?', Timestamp.from(createdAt.toInstant()), saved.id)
+        }
+        loanRepository.findById(saved.id).get()
     }
 
     private Client buildOtherClient() {

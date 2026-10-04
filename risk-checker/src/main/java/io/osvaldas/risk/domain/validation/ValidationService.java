@@ -21,7 +21,7 @@ public class ValidationService {
         long loanId = request.loanId();
         log.info("Validating client {} loan {}.", clientId, loanId);
         try {
-            validator.validate(new RiskValidationTarget(request.amount(), clientId, request.loansTakenToday()));
+            validator.validate(new RiskValidationTarget(request.amount(), clientId, request.loansTakenToday(), request.requestedAt()));
         } catch (ValidationRuleException e) {
             log.info("Risk validation rejected for client {} with loan {}: {}", clientId, loanId, e.getMessage());
             return RiskValidationResponse.rejected(e.getReason(), e.getMessage());

@@ -19,9 +19,4 @@ class TimeServiceSpec extends Specification {
             timeService.currentDateTime == ZonedDateTime.parse('2021-10-12T10:10:10Z[UTC]')
     }
 
-    void 'should return current hour of day from the clock'() {
-        expect:
-            timeService.hourOfDay == 10
-    }
-
 }
