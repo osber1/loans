@@ -30,7 +30,7 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
     static String deadLetterQueueName = 'notification.dlq'
 
     @ServiceConnection
-    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:3.13.1-management-alpine')
+    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer('rabbitmq:4.3.6-management-alpine')
 
     static GenericContainer mailhogContainer = new GenericContainer<>('mailhog/mailhog:v1.0.1')
         .withExposedPorts(MAILHOG_SMTP_PORT, MAILHOG_API_PORT)
@@ -40,16 +40,15 @@ abstract class AbstractIntegrationSpec extends AbstractEmailSpec {
         rabbitMQContainer.start()
 
         rabbitMQContainer.with {
-            execInContainer('rabbitmqadmin', 'declare', 'queue', "name=$queueName")
-            execInContainer('rabbitmqadmin', 'declare', 'exchange', "name=$exchangeName", 'type=direct')
+            execInContainer('rabbitmqadmin', 'declare', 'queue', '--name', queueName)
+            execInContainer('rabbitmqadmin', 'declare', 'exchange', '--name', exchangeName, '--type', 'direct')
             execInContainer('rabbitmqadmin', 'declare', 'binding',
-                "source=$exchangeName",
-                "destination=$queueName",
-                "routing_key=$routingKeys",
-                'destination_type=queue',
-                'arguments={}')
+                '--source', exchangeName,
+                '--destination', queueName,
+                '--destination-type', 'queue',
+                '--routing-key', routingKeys)
             // Mirrors the dead-letter queue and notification-dlx policy from loans-infra
-            execInContainer('rabbitmqadmin', 'declare', 'queue', "name=$deadLetterQueueName")
+            execInContainer('rabbitmqadmin', 'declare', 'queue', '--name', deadLetterQueueName)
             execInContainer('rabbitmqctl', 'set_policy', 'notification-dlx', '^notification\\.queue$',
                 '{"dead-letter-exchange":"","dead-letter-routing-key":"' + deadLetterQueueName + '"}',
                 '--apply-to', 'queues')

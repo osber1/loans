@@ -7,7 +7,7 @@ final class SharedPostgres {
 
     static final String CREDENTIAL = 'root'
 
-    static final PostgreSQLContainer INSTANCE = new PostgreSQLContainer('postgres:17.6-alpine')
+    static final PostgreSQLContainer INSTANCE = new PostgreSQLContainer('postgres:18.6-alpine')
         .withDatabaseName('loans')
         .withUsername(CREDENTIAL)
         .withPassword(CREDENTIAL)
