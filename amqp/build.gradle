@@ -3,4 +3,17 @@ dependencies {
         libs.spring.boot.starter.amqp,
         libs.spring.boot.starter.validation
     )
+
+    testImplementation(
+        libs.groovy,
+        libs.spock.core
+    )
+
+    testRuntimeOnly(
+        "org.junit.platform:junit-platform-launcher"
+    )
+}
+
+test {
+    useJUnitPlatform()
 }

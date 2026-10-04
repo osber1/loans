@@ -30,9 +30,17 @@ public class NotificationOutboxScheduler {
     @SchedulerLock(name = "relayNotificationOutbox", lockAtLeastFor = "PT1S", lockAtMostFor = "PT1M")
     public void relayNotificationOutbox() {
         int published = outboxService.relayPending();
+        if (published > 0) {
+            log.info("Notification outbox relayed {} messages", published);
+        }
+    }
+
+    @Scheduled(cron = "${scheduler.relayNotificationOutbox.purgeCron:0 0 * * * *}")
+    @SchedulerLock(name = "purgeNotificationOutbox", lockAtLeastFor = "PT1S", lockAtMostFor = "PT5M")
+    public void purgeNotificationOutbox() {
         int purged = outboxService.purgePublished(retention);
-        if (published > 0 || purged > 0) {
-            log.info("Notification outbox relayed {} and purged {} messages", published, purged);
+        if (purged > 0) {
+            log.info("Notification outbox purged {} published messages", purged);
         }
     }
 
