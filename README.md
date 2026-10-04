@@ -56,7 +56,7 @@ automatically if none is installed.
 Always use the Gradle wrapper:
 
 ```shell
-./gradlew build                      # compile, unit/integration tests, static analysis, boot images
+./gradlew build                      # compile, unit/integration tests, static analysis
 ./gradlew build -x test              # build without running tests
 ./gradlew check                      # tests + Checkstyle, CodeNarc, SpotBugs, JaCoCo coverage verification
 ./gradlew :back-office:test          # tests of a single module
@@ -64,7 +64,9 @@ Always use the Gradle wrapper:
 ```
 
 The `back-office` and `notification-service` tests use Testcontainers, so Docker has to be running.
-`build` also creates the application images with `bootBuildImage`, which needs Docker as well.
+`./gradlew bootBuildImage` builds the application images (`osvasldas97/<module>:1.0-SNAPSHOT`, the Docker Hub user can
+be changed with `DOCKERHUB_USERNAME`) and needs Docker as well; add `--publishImage` to push them, which uses the
+`DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` environment variables.
 
 ### Acceptance tests
 
@@ -91,14 +93,14 @@ the resulting diff after a build. CI fails when the build leaves a diff, so the 
 ## CI
 
 `.github/workflows/pipeline.yml` runs `./gradlew check sonar`, uploads coverage to Codecov, scans the repository
-with Trivy and, on `master`, logs in to DockerHub and builds the application images. Required repository secrets:
+with Trivy and, on `master`, builds and pushes the application images to DockerHub. Required repository secrets:
 
 | Secret               | Used by                       |
 |----------------------|-------------------------------|
 | `SONAR_TOKEN`        | SonarCloud analysis           |
 | `CODECOV_TOKEN`      | Codecov upload                |
-| `DOCKERHUB_USERNAME` | DockerHub login (master only) |
-| `DOCKERHUB_TOKEN`    | DockerHub login (master only) |
+| `DOCKERHUB_USERNAME` | DockerHub image push (master only) |
+| `DOCKERHUB_TOKEN`    | DockerHub image push (master only) |
 
 `GITHUB_TOKEN` is provided by GitHub Actions.
 

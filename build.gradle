@@ -26,6 +26,8 @@ sonar {
     }
 }
 
+String dockerHubUser = providers.environmentVariable('DOCKERHUB_USERNAME').getOrElse('osvasldas97')
+
 subprojects {
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'groovy'
@@ -84,6 +86,16 @@ subprojects {
             implementation(
                 libs.spring.boot.starter.bootstrap
             )
+        }
+
+        tasks.named('bootBuildImage') {
+            imageName = "${dockerHubUser}/${project.name}:${project.version}"
+            docker {
+                publishRegistry {
+                    username = providers.environmentVariable('DOCKERHUB_USERNAME')
+                    password = providers.environmentVariable('DOCKERHUB_TOKEN')
+                }
+            }
         }
     }
 
