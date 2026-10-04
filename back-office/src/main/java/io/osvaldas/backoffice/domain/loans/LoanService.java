@@ -60,11 +60,6 @@ public class LoanService {
 
     private final CacheManager cacheManager;
 
-    @Transactional
-    public Loan save(Loan loan) {
-        return loanRepository.save(loan);
-    }
-
     @Transactional(readOnly = true)
     public Loan getLoan(long id) {
         return loanRepository.findWithPostponesById(id)
@@ -117,16 +112,11 @@ public class LoanService {
     private RiskValidationResponse sendValidationRequest(Loan loan, String clientId) {
         ZonedDateTime requestedAt = requestedAt(loan);
         long loansTakenToday = getLoanTakenTodayCount(clientId, loan.getId(), requestedAt);
-        try {
-            log.info("Validating loan: {}", loan.getId());
-            RiskValidationResponse response = riskCheckerClient.validate(
-                new RiskValidationRequest(loan.getId(), clientId, loan.getAmount(), loansTakenToday, requestedAt));
-            log.info("Risk validation response: {}", response);
-            return response;
-        } catch (RuntimeException e) {
-            log.error("Error validating loan: {}", loan.getId());
-            throw e;
-        }
+        log.info("Validating loan: {}", loan.getId());
+        RiskValidationResponse response = riskCheckerClient.validate(
+            new RiskValidationRequest(loan.getId(), clientId, loan.getAmount(), loansTakenToday, requestedAt));
+        log.info("Risk validation response: {}", response);
+        return response;
     }
 
     private ZonedDateTime requestedAt(Loan loan) {

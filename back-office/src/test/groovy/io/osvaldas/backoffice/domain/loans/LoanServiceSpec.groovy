@@ -51,7 +51,6 @@ class LoanServiceSpec extends AbstractSpec {
 
     LoanRepository loanRepository = Mock {
         save(_ as Loan) >> loan
-        findById(LOAN_ID) >> { of(loan) }
     }
 
     @Subject
@@ -60,13 +59,6 @@ class LoanServiceSpec extends AbstractSpec {
 
     void setup() {
         loan.status = NOT_EVALUATED
-    }
-
-    void 'should save loan'() {
-        when:
-            loanService.save(loan)
-        then:
-            1 * loanRepository.save(loan) >> loan
     }
 
     void 'should return loans list with postpones fetched when there are loans'() {

@@ -14,36 +14,29 @@ import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
-
 @Component
 @Endpoint(id = "release-notes")
 public class ActuatorReleaseNotesEndpoint {
 
-    Map<String, List<String>> releaseNotesMap = new LinkedHashMap<>();
+    private final Map<String, List<String>> releaseNotesMap = new LinkedHashMap<>(Map.of("version-1.0", of("Risk evaluation added", "Using PostgreSQL for storage")));
 
-    @PostConstruct
-    public void initNotes() {
-        releaseNotesMap.put("version-1.0", of("Risk evaluation added", "Using PostgreSQL for storage"));
+    @ReadOperation
+    public synchronized Map<String, List<String>> getReleaseNotes() {
+        return new LinkedHashMap<>(releaseNotesMap);
     }
 
     @ReadOperation
-    public Map<String, List<String>> getReleaseNotes() {
-        return releaseNotesMap;
-    }
-
-    @ReadOperation
-    public List<String> getNotesByVersion(@Selector String version) {
+    public synchronized List<String> getNotesByVersion(@Selector String version) {
         return releaseNotesMap.get(version);
     }
 
     @WriteOperation
-    public void addReleaseNotes(@Selector String version, String releaseNotes) {
+    public synchronized void addReleaseNotes(@Selector String version, String releaseNotes) {
         releaseNotesMap.put(version, Arrays.asList(releaseNotes.split(",")));
     }
 
     @DeleteOperation
-    public void deleteNotes(@Selector String version) {
+    public synchronized void deleteNotes(@Selector String version) {
         releaseNotesMap.remove(version);
     }
 }

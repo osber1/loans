@@ -27,8 +27,6 @@ class PostponeServiceSpec extends AbstractSpec {
         when:
             LoanPostpone loanPostpone = postponeService.postponeLoan(LOAN_ID)
         then:
-            0 * loanService.save(_)
-        and:
             with(loanPostpone) {
                 returnDate == firstPostpone.returnDate
                 interestRate == firstPostpone.interestRate

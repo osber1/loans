@@ -15,13 +15,10 @@ import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.stereotype.Repository;
 
 import io.osvaldas.api.loans.Status;
-import io.osvaldas.backoffice.repositories.entities.Client;
 import io.osvaldas.backoffice.repositories.entities.Loan;
 
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificationExecutor<Loan>, RevisionRepository<Loan, Long, Long> {
-
-    Optional<Loan> findById(long id);
 
     @EntityGraph(attributePaths = "loanPostpones")
     Optional<Loan> findWithPostponesById(long id);
@@ -37,6 +34,4 @@ public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificat
 
     @Lock(PESSIMISTIC_WRITE)
     Optional<Loan> findForUpdateById(long id);
-
-    List<Loan> findAllByClient(Client client);
 }
