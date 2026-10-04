@@ -67,8 +67,7 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
             entityManager.clear()
         expect:
             findNotEvaluated(now().minusMinutes(1)).empty
-            repository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
-                REJECTED, now().plusMinutes(1), 0, Limit.of(10)).empty
+            repository.findBatchWithClient(REJECTED, now().plusMinutes(1), 0, Limit.of(10)).empty
             findNotEvaluated(now().plusMinutes(1)).size() == 1
     }
 
@@ -86,8 +85,7 @@ class LoanRepositorySpec extends AbstractDatabaseSpec {
     }
 
     private List<Loan> findNotEvaluated(ZonedDateTime createdBefore, long afterId = 0, int limit = 10) {
-        repository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
-            NOT_EVALUATED, createdBefore, afterId, Limit.of(limit))
+        repository.findBatchWithClient(NOT_EVALUATED, createdBefore, afterId, Limit.of(limit))
     }
 
     private Loan saveLoan(Client loanClient, io.osvaldas.api.loans.Status loanStatus) {

@@ -14,6 +14,7 @@ import org.springframework.cache.CacheManager
 import org.springframework.data.domain.Limit
 import org.springframework.data.jpa.domain.Specification
 
+import feign.FeignException
 import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.api.exceptions.ClientNotActiveException
 import io.osvaldas.api.exceptions.NotFoundException
@@ -266,10 +267,33 @@ class LoanServiceSpec extends AbstractSpec {
             sentRequest.requestedAt().toInstant() == requestedAt.toInstant()
     }
 
+    void 'should report an unavailable risk checker for status #status'() {
+        given:
+            FeignException failure = Stub { status() >> status }
+            riskCheckerClient.validate(_ as RiskValidationRequest) >> { throw failure }
+        when:
+            loanService.validate(loan, CLIENT_ID)
+        then:
+            RiskCheckerUnavailableException e = thrown()
+            e.cause.is(failure)
+        where:
+            status << [-1, 500, 503]
+    }
+
+    void 'should not treat a client error of the risk checker as unavailable'() {
+        given:
+            FeignException failure = Stub { status() >> 400 }
+            riskCheckerClient.validate(_ as RiskValidationRequest) >> { throw failure }
+        when:
+            loanService.validate(loan, CLIENT_ID)
+        then:
+            FeignException e = thrown()
+            e.is(failure)
+    }
+
     void 'should return #result.size() loans when status is #status'() {
         given:
-            1 * loanRepository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
-                status, DATE.minusMinutes(5), 7L, Limit.of(50)) >> result
+            1 * loanRepository.findBatchWithClient(status, DATE.minusMinutes(5), 7L, Limit.of(50)) >> result
         expect:
             loanService.getLoansByStatusOlderThan(status, Duration.ofMinutes(5), 7L, 50) == result
         where:

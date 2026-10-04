@@ -16,11 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import feign.FeignException;
 import io.osvaldas.api.loans.LoanRequest;
 import io.osvaldas.api.loans.LoanResponse;
 import io.osvaldas.backoffice.domain.loans.LoanService;
-import io.osvaldas.backoffice.domain.loans.RiskCheckerErrors;
+import io.osvaldas.backoffice.domain.loans.RiskCheckerUnavailableException;
 import io.osvaldas.backoffice.repositories.entities.Loan;
 import io.osvaldas.backoffice.repositories.mapper.LoanMapper;
 import jakarta.validation.Valid;
@@ -54,10 +53,7 @@ public class LoansController {
         Loan takenLoan = service.addLoan(loan, clientId);
         try {
             service.validate(takenLoan, clientId);
-        } catch (FeignException e) {
-            if (!RiskCheckerErrors.isUnavailable(e)) {
-                throw e;
-            }
+        } catch (RiskCheckerUnavailableException e) {
             log.warn("Risk checker is unavailable, loan {} will be evaluated later", takenLoan.getId(), e);
             return ResponseEntity.status(ACCEPTED).body(loanMapper.map(takenLoan));
         }

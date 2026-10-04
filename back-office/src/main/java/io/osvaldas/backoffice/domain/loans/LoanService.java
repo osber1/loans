@@ -28,6 +28,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import feign.FeignException;
 import io.osvaldas.api.exceptions.ClientNotActiveException;
 import io.osvaldas.api.exceptions.NotFoundException;
 import io.osvaldas.api.exceptions.ValidationRuleException;
@@ -47,6 +48,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class LoanService {
+
+    private static final int SERVER_ERROR_FROM = 500;
 
     private final ClientService clientService;
 
@@ -99,7 +102,7 @@ public class LoanService {
     }
 
     public List<Loan> getLoansByStatusOlderThan(Status status, Duration minAge, long afterId, int limit) {
-        return loanRepository.findAllWithClientByStatusAndCreatedAtBeforeAndIdGreaterThanOrderByIdAsc(
+        return loanRepository.findBatchWithClient(
             status, timeUtils.getCurrentDateTime().minus(minAge), afterId, Limit.of(limit));
     }
 
@@ -113,10 +116,21 @@ public class LoanService {
         ZonedDateTime requestedAt = requestedAt(loan);
         long loansTakenToday = getLoanTakenTodayCount(clientId, loan.getId(), requestedAt);
         log.info("Validating loan: {}", loan.getId());
-        RiskValidationResponse response = riskCheckerClient.validate(
+        RiskValidationResponse response = callRiskChecker(
             new RiskValidationRequest(loan.getId(), clientId, loan.getAmount(), loansTakenToday, requestedAt));
         log.info("Risk validation response: {}", response);
         return response;
+    }
+
+    private RiskValidationResponse callRiskChecker(RiskValidationRequest request) {
+        try {
+            return riskCheckerClient.validate(request);
+        } catch (FeignException e) {
+            if (e.status() <= 0 || e.status() >= SERVER_ERROR_FROM) {
+                throw new RiskCheckerUnavailableException(e);
+            }
+            throw e;
+        }
     }
 
     private ZonedDateTime requestedAt(Loan loan) {
