@@ -6,6 +6,10 @@ import static java.time.ZoneId.of
 
 import java.time.Clock
 
+import org.springframework.amqp.core.Binding
+import org.springframework.amqp.core.BindingBuilder
+import org.springframework.amqp.core.DirectExchange
+import org.springframework.amqp.core.Queue
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -42,7 +46,7 @@ import spock.lang.Shared
 @ActiveProfiles('test')
 @AutoConfigureMockMvc
 @EnableWireMock([@ConfigureWireMock(baseUrlProperties = 'risk.checker.url')])
-@ContextConfiguration(classes = TestClockConfig)
+@ContextConfiguration(classes = [TestClockConfig, TestRabbitTopologyConfig])
 @SpringBootTest(properties = 'spring.main.allow-bean-definition-overriding=true')
 abstract class AbstractControllerSpec extends AbstractSpec {
 
@@ -111,6 +115,32 @@ abstract class AbstractControllerSpec extends AbstractSpec {
         @Bean
         Clock clock() {
             fixed(parse('2021-10-12T10:10:10.00Z'), of('UTC'))
+        }
+
+    }
+
+    @TestConfiguration
+    static class TestRabbitTopologyConfig {
+
+        static final String EXCHANGE = 'internal.exchange'
+
+        static final String QUEUE = 'notification.queue'
+
+        static final String ROUTING_KEY = 'internal.notification.routing-key'
+
+        @Bean
+        DirectExchange internalExchange() {
+            new DirectExchange(EXCHANGE)
+        }
+
+        @Bean
+        Queue notificationQueue() {
+            new Queue(QUEUE)
+        }
+
+        @Bean
+        Binding notificationBinding(DirectExchange internalExchange, Queue notificationQueue) {
+            BindingBuilder.bind(notificationQueue).to(internalExchange).with(ROUTING_KEY)
         }
 
     }

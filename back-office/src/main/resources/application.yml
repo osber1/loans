@@ -39,6 +39,11 @@ spring:
 
   rabbitmq:
     host: localhost
+    connection-timeout: 2s
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
   web:
     error:
       include-message: always
@@ -85,6 +90,7 @@ scheduler:
     enabled: true
     delay: PT5S
     retention: P7D
+    purgeCron: "0 0 * * * *"
   evaluateNotEvaluatedLoans:
     enabled: true
     cron: "0 */10 * * * *"
