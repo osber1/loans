@@ -7,6 +7,7 @@ import static io.osvaldas.api.util.ExceptionMessages.ACTIVATION_LINK_INVALID
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
+import java.time.Clock
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -21,7 +22,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException
 import io.osvaldas.api.email.EmailMessage
 import io.osvaldas.api.exceptions.BadRequestException
 import io.osvaldas.api.exceptions.NotFoundException
-import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.domain.notifications.NotificationOutboxService
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig
@@ -39,16 +39,14 @@ class ClientServiceSpec extends AbstractSpec {
 
     NotificationOutboxService notificationOutbox = Mock()
 
-    TimeUtils timeUtils = Stub {
-        currentDateTime >> DATE
-    }
+    Clock clock = Clock.fixed(DATE.toInstant(), DATE.zone)
 
     PropertiesConfig config = Stub {
         activationTokenTtl >> Duration.ofDays(7)
     }
 
     @Subject
-    ClientService clientService = new ClientService(clientRepository, notificationOutbox, timeUtils, config)
+    ClientService clientService = new ClientService(clientRepository, notificationOutbox, clock, config)
 
     void 'should throw exception when registering client with existing personal code'() {
         when:

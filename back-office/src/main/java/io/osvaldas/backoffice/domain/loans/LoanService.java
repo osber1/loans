@@ -15,6 +15,7 @@ import static io.osvaldas.backoffice.repositories.specifications.LoanSpecificati
 import static java.time.temporal.ChronoUnit.DAYS;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -35,7 +36,6 @@ import io.osvaldas.api.exceptions.ValidationRuleException;
 import io.osvaldas.api.loans.Status;
 import io.osvaldas.api.risk.validation.RiskValidationRequest;
 import io.osvaldas.api.risk.validation.RiskValidationResponse;
-import io.osvaldas.api.util.TimeUtils;
 import io.osvaldas.backoffice.domain.clients.ClientService;
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig;
 import io.osvaldas.backoffice.repositories.LoanRepository;
@@ -57,7 +57,7 @@ public class LoanService {
 
     private final PropertiesConfig config;
 
-    private final TimeUtils timeUtils;
+    private final Clock clock;
 
     private final RiskCheckerClient riskCheckerClient;
 
@@ -103,7 +103,7 @@ public class LoanService {
 
     public List<Loan> getLoansByStatusOlderThan(Status status, Duration minAge, long afterId, int limit) {
         return loanRepository.findBatchWithClient(
-            status, timeUtils.getCurrentDateTime().minus(minAge), afterId, Limit.of(limit));
+            status, ZonedDateTime.now(clock).minus(minAge), afterId, Limit.of(limit));
     }
 
     private Client getActiveClient(String clientId) {
@@ -134,7 +134,7 @@ public class LoanService {
     }
 
     private ZonedDateTime requestedAt(Loan loan) {
-        ZonedDateTime now = timeUtils.getCurrentDateTime();
+        ZonedDateTime now = ZonedDateTime.now(clock);
         return Optional.ofNullable(loan.getCreatedAt())
             .map(createdAt -> createdAt.withZoneSameInstant(now.getZone()))
             .orElse(now);
@@ -151,7 +151,7 @@ public class LoanService {
     }
 
     private Loan addLoanToClient(Client client, Loan loan) {
-        loan.setInterestAndReturnDate(config.getInterestRate(), timeUtils.getCurrentDateTime());
+        loan.setInterestAndReturnDate(config.getInterestRate(), ZonedDateTime.now(clock));
         loan.setClient(client);
         return loanRepository.save(loan);
     }

@@ -6,6 +6,7 @@ import static io.osvaldas.api.loans.Status.REJECTED
 import static java.util.Optional.empty
 import static java.util.Optional.of
 
+import java.time.Clock
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -22,7 +23,6 @@ import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.api.risk.validation.RiskValidationRequest
 import io.osvaldas.api.risk.validation.RiskRejectionReason
 import io.osvaldas.api.risk.validation.RiskValidationResponse
-import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.domain.clients.ClientService
 import io.osvaldas.backoffice.infra.configuration.PropertiesConfig
@@ -34,9 +34,7 @@ class LoanServiceSpec extends AbstractSpec {
 
     ClientService clientService = Stub()
 
-    TimeUtils timeUtils = Stub {
-        currentDateTime >> DATE
-    }
+    Clock clock = Clock.fixed(DATE.toInstant(), DATE.zone)
 
     PropertiesConfig config = Stub()
 
@@ -55,7 +53,7 @@ class LoanServiceSpec extends AbstractSpec {
     }
 
     @Subject
-    LoanService loanService = new LoanService(clientService, loanRepository, config, timeUtils, riskCheckerClient,
+    LoanService loanService = new LoanService(clientService, loanRepository, config, clock, riskCheckerClient,
         cacheManager)
 
     void setup() {

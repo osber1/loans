@@ -5,6 +5,7 @@ import static io.osvaldas.api.risk.validation.RiskRejectionReason.FORBIDDEN_TIME
 import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import io.osvaldas.api.risk.validation.RiskValidationRequest;
 import io.osvaldas.api.util.ExceptionMessages;
-import io.osvaldas.api.util.TimeUtils;
 import io.osvaldas.risk.domain.validation.Rejection;
 import io.osvaldas.risk.domain.validation.ValidationRule;
 import io.osvaldas.risk.infra.configuration.PropertiesConfig;
@@ -28,7 +28,7 @@ public class TimeAndAmountValidator implements ValidationRule {
 
     private final PropertiesConfig config;
 
-    private final TimeUtils timeUtils;
+    private final Clock clock;
 
     @Override
     public Optional<Rejection> check(RiskValidationRequest request) {
@@ -36,7 +36,7 @@ public class TimeAndAmountValidator implements ValidationRule {
     }
 
     private int requestHour(RiskValidationRequest request) {
-        ZonedDateTime now = timeUtils.getCurrentDateTime();
+        ZonedDateTime now = ZonedDateTime.now(clock);
         return Optional.ofNullable(request.requestedAt())
             .map(requestedAt -> requestedAt.withZoneSameInstant(now.getZone()))
             .orElse(now)

@@ -1,11 +1,11 @@
 package io.osvaldas.backoffice.domain.notifications
 
+import java.time.Clock
 import java.time.Duration
 
 import org.springframework.context.ApplicationEventPublisher
 
 import io.osvaldas.api.email.EmailMessage
-import io.osvaldas.api.util.TimeUtils
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.repositories.NotificationOutboxRepository
 import io.osvaldas.backoffice.repositories.entities.NotificationOutbox
@@ -36,15 +36,13 @@ class NotificationOutboxServiceSpec extends AbstractSpec {
         }
     }
 
-    TimeUtils timeUtils = Stub {
-        currentDateTime >> DATE
-    }
+    Clock clock = Clock.fixed(DATE.toInstant(), DATE.zone)
 
     ApplicationEventPublisher eventPublisher = Mock()
 
     @Subject
     NotificationOutboxService service =
-        new NotificationOutboxService(repository, messageProducer, rabbitProperties, timeUtils, eventPublisher)
+        new NotificationOutboxService(repository, messageProducer, rabbitProperties, clock, eventPublisher)
 
     void 'should store the message and announce it when enqueuing'() {
         given:
