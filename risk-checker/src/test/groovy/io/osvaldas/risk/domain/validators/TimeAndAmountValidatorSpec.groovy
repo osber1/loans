@@ -3,6 +3,9 @@ package io.osvaldas.risk.domain.validators
 import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS
 import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH
 
+import java.time.ZoneId
+import java.time.ZonedDateTime
+
 import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException
 import io.osvaldas.api.exceptions.ValidationRuleException.TimeException
@@ -14,10 +17,14 @@ import spock.lang.Subject
 
 class TimeAndAmountValidatorSpec extends AbstractSpec {
 
+    static final ZoneId VILNIUS = ZoneId.of('Europe/Vilnius')
+
     BigDecimal maxAmount = 100.00
 
+    ZonedDateTime now = at(10)
+
     TimeUtils timeUtils = Stub {
-        hourOfDay >> 10
+        currentDateTime >> { now }
     }
 
     PropertiesConfig config = new PropertiesConfig(
@@ -38,11 +45,11 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
     }
 
     void 'should throw exception when max amount and forbidden time'() {
+        given:
+            now = at(3)
         when:
             timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: maxAmount))
         then:
-            timeUtils.hourOfDay >> 3
-        and:
             TimeException e = thrown()
             e.message == riskTooHigh
     }
@@ -56,11 +63,11 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
     }
 
     void 'should not throw time exception when amount is below max amount in forbidden time'() {
+        given:
+            now = at(3)
         when:
             timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: 99.99))
         then:
-            timeUtils.hourOfDay >> 3
-        and:
             notThrown(ValidationRuleException)
     }
 
@@ -68,11 +75,10 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
         given:
             config.forbiddenHourFrom = from
             config.forbiddenHourTo = to
+            now = at(hour)
         when:
             timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: maxAmount))
         then:
-            timeUtils.hourOfDay >> hour
-        and:
             TimeException e = thrown()
             e.message == RISK_TOO_HIGH.formatted(fromText, toText)
         where:
@@ -90,11 +96,10 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
         given:
             config.forbiddenHourFrom = from
             config.forbiddenHourTo = to
+            now = at(hour)
         when:
             timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: maxAmount))
         then:
-            timeUtils.hourOfDay >> hour
-        and:
             notThrown(ValidationRuleException)
         where:
             from | to | hour
@@ -104,6 +109,40 @@ class TimeAndAmountValidatorSpec extends AbstractSpec {
             22   | 6  | 6
             23   | 0  | 0
             6    | 6  | 6
+    }
+
+    void 'should check the hour the loan was requested instead of the current hour'() {
+        given: 'a loan requested in the forbidden hours and evaluated later during the day'
+            now = at(10)
+        when:
+            timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: maxAmount, requestedAt: at(2)))
+        then:
+            TimeException e = thrown()
+            e.message == riskTooHigh
+    }
+
+    void 'should accept a loan requested outside the forbidden hours when it is evaluated inside them'() {
+        given:
+            now = at(2)
+        when:
+            timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: maxAmount, requestedAt: at(23)))
+        then:
+            notThrown(ValidationRuleException)
+    }
+
+    void 'should convert the request time to the business time zone before checking the hour'() {
+        given: '22:30 UTC is 01:30 in Vilnius (summer time)'
+            now = ZonedDateTime.parse('2022-07-15T12:00:00+03:00[Europe/Vilnius]')
+            ZonedDateTime requestedAt = ZonedDateTime.parse('2022-07-14T22:30:00Z')
+        when:
+            timeAndAmountValidator.validate(new RiskValidationTarget(loanAmount: maxAmount, requestedAt: requestedAt))
+        then:
+            TimeException e = thrown()
+            e.message == riskTooHigh
+    }
+
+    private static ZonedDateTime at(int hour) {
+        ZonedDateTime.of(2022, 7, 14, hour, 0, 0, 0, VILNIUS)
     }
 
 }

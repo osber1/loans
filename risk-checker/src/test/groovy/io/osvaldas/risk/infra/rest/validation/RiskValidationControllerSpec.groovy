@@ -117,6 +117,35 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
             }
     }
 
+    void 'should apply the forbidden hours to the time the loan was requested, not to the evaluation time'() {
+        given: 'a loan requested at 04:10 and evaluated at 10:10'
+            Map body = [loanId: validLoanId, clientId: validClientId, amount: MAX_AMOUNT, loansTakenToday: BELOW_LIMIT,
+                        requestedAt: '2022-10-12T04:10:10Z']
+        when:
+            MockHttpServletResponse response = postValidationRequest(body)
+        then:
+            response.status == OK.value()
+        and:
+            with(readValidationResponse(response)) {
+                !success()
+                reason() == FORBIDDEN_TIME
+            }
+    }
+
+    void 'should accept a loan requested outside the forbidden hours even when it is evaluated inside them'() {
+        given:
+            testClockDelegate.changeDelegate(fixed(parse('2022-10-12T04:10:10.00Z'), of('UTC')))
+        and:
+            Map body = [loanId: validLoanId, clientId: validClientId, amount: MAX_AMOUNT, loansTakenToday: BELOW_LIMIT,
+                        requestedAt: '2022-10-11T21:10:10Z']
+        when:
+            MockHttpServletResponse response = postValidationRequest(body)
+        then:
+            response.status == OK.value()
+        and:
+            readValidationResponse(response).success()
+    }
+
     void 'should apply local validation rules in order'() {
         expect:
             rules*.class == [TimeAndAmountValidator, LoanLimitValidator]
@@ -166,7 +195,7 @@ class RiskValidationControllerSpec extends AbstractControllerSpec {
     }
 
     private RiskValidationRequest buildRequest(BigDecimal amount, long loansTakenToday) {
-        new RiskValidationRequest(validLoanId, validClientId, amount, loansTakenToday)
+        new RiskValidationRequest(validLoanId, validClientId, amount, loansTakenToday, null)
     }
 
 }

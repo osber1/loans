@@ -23,6 +23,10 @@ public final class LoanSpecifications {
         return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get(Loan_.CREATED_AT), date);
     }
 
+    public static Specification<Loan> loanCreatedBefore(ZonedDateTime date) {
+        return (root, query, cb) -> cb.lessThan(root.get(Loan_.CREATED_AT), date);
+    }
+
     public static Specification<Loan> loanStatusIn(Collection<Status> statuses) {
         return (root, query, cb) -> root.get(Loan_.STATUS).in(statuses);
     }

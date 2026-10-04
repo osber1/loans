@@ -4,6 +4,8 @@ import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS;
 import static io.osvaldas.api.util.ExceptionMessages.RISK_TOO_HIGH;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -29,14 +31,22 @@ public class TimeAndAmountValidator implements ValidationRule {
 
     @Override
     public void validate(RiskValidationTarget target) {
-        checkTimeAndAmount(target.getLoanAmount());
+        checkTimeAndAmount(target.getLoanAmount(), requestHour(target));
         checkIfAmountIsNotToHigh(target.getLoanAmount());
     }
 
-    private void checkTimeAndAmount(BigDecimal amount) {
+    private int requestHour(RiskValidationTarget target) {
+        ZonedDateTime now = timeUtils.getCurrentDateTime();
+        return Optional.ofNullable(target.getRequestedAt())
+            .map(requestedAt -> requestedAt.withZoneSameInstant(now.getZone()))
+            .orElse(now)
+            .getHour();
+    }
+
+    private void checkTimeAndAmount(BigDecimal amount, int hour) {
         int from = config.getForbiddenHourFrom();
         int to = config.getForbiddenHourTo();
-        if (isWithinWindow(timeUtils.getHourOfDay(), from, to) && amount.compareTo(config.getMaxAmount()) == 0) {
+        if (isWithinWindow(hour, from, to) && amount.compareTo(config.getMaxAmount()) == 0) {
             throw new TimeException(RISK_TOO_HIGH.formatted(formatHour(from), formatHour(to)));
         }
     }

@@ -3,6 +3,8 @@ package io.osvaldas.risk.domain.validation
 import static io.osvaldas.api.risk.validation.RiskRejectionReason.AMOUNT_EXCEEDS
 import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS as AMOUNT_EXCEEDS_MESSAGE
 
+import java.time.ZonedDateTime
+
 import io.osvaldas.api.exceptions.ValidationRuleException.AmountException
 import io.osvaldas.api.risk.validation.RiskValidationRequest
 import io.osvaldas.api.risk.validation.RiskValidationResponse
@@ -17,7 +19,10 @@ class ValidationServiceSpec extends AbstractSpec {
     BigDecimal amount = 55.5
 
     @Shared
-    RiskValidationRequest request = new RiskValidationRequest(1L, clientId, amount, 1L)
+    ZonedDateTime requestedAt = ZonedDateTime.parse('2022-10-11T23:30:00Z')
+
+    @Shared
+    RiskValidationRequest request = new RiskValidationRequest(1L, clientId, amount, 1L, requestedAt)
 
     Validator validator = Mock()
 
@@ -31,7 +36,7 @@ class ValidationServiceSpec extends AbstractSpec {
             response.success()
             response.reason() == null
         and:
-            1 * validator.validate(new RiskValidationTarget(amount, clientId, 1))
+            1 * validator.validate(new RiskValidationTarget(amount, clientId, 1, requestedAt))
     }
 
     void 'should return failed validation with reason when validation rule rejects loan'() {

@@ -50,6 +50,26 @@ class LoanSpecificationsSpec extends AbstractDatabaseSpec {
             FUTURE_DATE  || 0
     }
 
+    void 'should return list size of #listSize when loans are created before #description'() {
+        when:
+            List<Loan> loans = repository.findAll(LoanSpecifications.loanCreatedBefore(creationDate))
+        then:
+            loans.size() == listSize
+        where:
+            creationDate || listSize | description
+            DATE         || 0        | 'a past date'
+            FUTURE_DATE  || 1        | 'a future date'
+    }
+
+    void 'should exclude loan created exactly at the given date when created before it'() {
+        given:
+            entityManager.flush()
+            entityManager.clear()
+            ZonedDateTime createdAt = repository.findById(loan.id).get().createdAt
+        expect:
+            repository.count(LoanSpecifications.loanCreatedBefore(createdAt)) == 0
+    }
+
     void 'should include loan created exactly at the given date'() {
         given:
             entityManager.flush()

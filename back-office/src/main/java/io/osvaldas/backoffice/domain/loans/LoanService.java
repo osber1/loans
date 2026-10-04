@@ -10,6 +10,7 @@ import static io.osvaldas.api.util.ExceptionMessages.LOAN_NOT_FOUND;
 import static io.osvaldas.backoffice.infra.configuration.BeansConfig.LOAN_RESPONSE_CACHE;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.clientIdIs;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreatedAtOrAfter;
+import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanCreatedBefore;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanIdLessThan;
 import static io.osvaldas.backoffice.repositories.specifications.LoanSpecifications.loanStatusIn;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -114,10 +115,12 @@ public class LoanService {
     }
 
     private RiskValidationResponse sendValidationRequest(Loan loan, String clientId) {
-        long loansTakenToday = getLoanTakenTodayCount(clientId, loan.getId(), timeUtils.getCurrentDateTime().truncatedTo(DAYS));
+        ZonedDateTime requestedAt = requestedAt(loan);
+        long loansTakenToday = getLoanTakenTodayCount(clientId, loan.getId(), requestedAt);
         try {
             log.info("Validating loan: {}", loan.getId());
-            RiskValidationResponse response = riskCheckerClient.validate(new RiskValidationRequest(loan.getId(), clientId, loan.getAmount(), loansTakenToday));
+            RiskValidationResponse response = riskCheckerClient.validate(
+                new RiskValidationRequest(loan.getId(), clientId, loan.getAmount(), loansTakenToday, requestedAt));
             log.info("Risk validation response: {}", response);
             return response;
         } catch (RuntimeException e) {
@@ -126,9 +129,18 @@ public class LoanService {
         }
     }
 
-    private long getLoanTakenTodayCount(String clientId, long loanId, ZonedDateTime startOfDay) {
+    private ZonedDateTime requestedAt(Loan loan) {
+        ZonedDateTime now = timeUtils.getCurrentDateTime();
+        return Optional.ofNullable(loan.getCreatedAt())
+            .map(createdAt -> createdAt.withZoneSameInstant(now.getZone()))
+            .orElse(now);
+    }
+
+    private long getLoanTakenTodayCount(String clientId, long loanId, ZonedDateTime requestedAt) {
+        ZonedDateTime startOfDay = requestedAt.truncatedTo(DAYS);
         Specification<Loan> specification = clientIdIs(clientId)
             .and(loanCreatedAtOrAfter(startOfDay))
+            .and(loanCreatedBefore(startOfDay.plusDays(1)))
             .and(loanStatusIn(EnumSet.of(PENDING, NOT_EVALUATED, OPEN)))
             .and(loanIdLessThan(loanId));
         return loanRepository.count(specification);
