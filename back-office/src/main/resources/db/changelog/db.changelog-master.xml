@@ -57,6 +57,7 @@
             <column name="return_date" type="timestamp with time zone"/>
             <column name="created_at" type="timestamp with time zone"/>
             <column name="client_id" type="varchar(255)"/>
+            <column name="version" type="BIGINT"/>
         </createTable>
 
         <createTable tableName="loan_aud">
@@ -182,29 +183,6 @@
             <dropTable tableName="notification_outbox"/>
             <dropSequence sequenceName="notification_outbox_seq"/>
         </rollback>
-    </changeSet>
-
-    <changeSet id="loan-version" author="osvaldas">
-        <addColumn tableName="loan">
-            <column name="version" type="BIGINT" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
-        <rollback>
-            <dropColumn tableName="loan" columnName="version"/>
-        </rollback>
-    </changeSet>
-
-    <changeSet id="loan-pending-to-not-evaluated" author="osvaldas">
-        <update tableName="loan">
-            <column name="status" value="NOT_EVALUATED"/>
-            <where>status = 'PENDING'</where>
-        </update>
-        <update tableName="loan_aud">
-            <column name="status" value="NOT_EVALUATED"/>
-            <where>status = 'PENDING'</where>
-        </update>
-        <rollback/>
     </changeSet>
 
 </databaseChangeLog>

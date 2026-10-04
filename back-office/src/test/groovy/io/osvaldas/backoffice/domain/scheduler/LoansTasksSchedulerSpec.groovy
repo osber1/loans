@@ -5,11 +5,11 @@ import static io.osvaldas.api.loans.Status.NOT_EVALUATED
 
 import java.time.Duration
 
-import feign.FeignException
 import io.osvaldas.api.exceptions.ValidationRuleException
 import io.osvaldas.api.risk.validation.RiskRejectionReason
 import io.osvaldas.backoffice.AbstractSpec
 import io.osvaldas.backoffice.domain.loans.LoanService
+import io.osvaldas.backoffice.domain.loans.RiskCheckerUnavailableException
 import io.osvaldas.backoffice.repositories.entities.Loan
 import spock.lang.Shared
 import spock.lang.Subject
@@ -33,6 +33,7 @@ class LoansTasksSchedulerSpec extends AbstractSpec {
     void 'should evaluate #invocations times when there are #result.size() loans'() {
         given:
             loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 0, BATCH_SIZE) >> result
+            loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, loan.id, BATCH_SIZE) >> []
         when:
             scheduler.evaluateNotEvaluatedLoans()
         then:
@@ -50,6 +51,7 @@ class LoansTasksSchedulerSpec extends AbstractSpec {
             Loan thirdLoan = buildLoanWithClient(3)
             loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 0, BATCH_SIZE) >> [failingLoan, secondLoan]
             loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 2, BATCH_SIZE) >> [thirdLoan]
+            loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 3, BATCH_SIZE) >> []
         when:
             scheduler.evaluateNotEvaluatedLoans()
         then:
@@ -65,7 +67,7 @@ class LoansTasksSchedulerSpec extends AbstractSpec {
             ]
     }
 
-    void 'should fetch loans in batches until a batch is not full'() {
+    void 'should fetch loans in batches after the last evaluated loan until there are no more'() {
         given:
             List<Loan> loans = (1..5).collect { buildLoanWithClient(it) }
         when:
@@ -74,39 +76,24 @@ class LoansTasksSchedulerSpec extends AbstractSpec {
             1 * loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 0, BATCH_SIZE) >> loans[0..1]
             1 * loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 2, BATCH_SIZE) >> loans[2..3]
             1 * loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 4, BATCH_SIZE) >> [loans[4]]
-            0 * loanService.getLoansByStatusOlderThan(*_)
+            1 * loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 5, BATCH_SIZE) >> []
         and:
             5 * loanService.validate(_ as Loan, CLIENT_ID)
     }
 
-    void 'should stop the run when the risk checker is unavailable with status #status'() {
+    void 'should stop the run when the risk checker is unavailable'() {
         given:
             Loan firstLoan = buildLoanWithClient(1)
             Loan secondLoan = buildLoanWithClient(2)
             loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 0, BATCH_SIZE) >> [firstLoan, secondLoan]
-            FeignException failure = Stub { status() >> status }
         when:
             scheduler.evaluateNotEvaluatedLoans()
         then:
-            1 * loanService.validate(firstLoan, CLIENT_ID) >> { throw failure }
+            1 * loanService.validate(firstLoan, CLIENT_ID) >> { throw new RiskCheckerUnavailableException(null) }
             0 * loanService.validate(secondLoan, CLIENT_ID)
             0 * loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 2, _)
-        where:
-            status << [-1, 500, 503]
-    }
-
-    void 'should keep evaluating other loans when the risk checker rejects the request with status 400'() {
-        given:
-            Loan firstLoan = buildLoanWithClient(1)
-            Loan secondLoan = buildLoanWithClient(2)
-            loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 0, BATCH_SIZE) >> [firstLoan, secondLoan]
-            loanService.getLoansByStatusOlderThan(NOT_EVALUATED, MIN_AGE, 2, BATCH_SIZE) >> []
-            FeignException failure = Stub { status() >> 400 }
-        when:
-            scheduler.evaluateNotEvaluatedLoans()
-        then:
-            1 * loanService.validate(firstLoan, CLIENT_ID) >> { throw failure }
-            1 * loanService.validate(secondLoan, CLIENT_ID)
+        and:
+            noExceptionThrown()
     }
 
     private Loan buildLoanWithClient(long loanId) {
