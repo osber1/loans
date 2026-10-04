@@ -163,7 +163,7 @@ public class LoanService {
 
     private void rejectLoanAndThrow(Loan loan, RiskValidationResponse response) {
         setStatusAndSave(loan, REJECTED);
-        throw ValidationRuleException.of(response.reason(), response.message());
+        throw new ValidationRuleException(response.reason(), response.message());
     }
 
     private void setStatusAndSave(Loan loan, Status status) {

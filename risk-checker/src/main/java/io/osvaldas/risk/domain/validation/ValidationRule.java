@@ -1,8 +1,10 @@
 package io.osvaldas.risk.domain.validation;
 
-import io.osvaldas.risk.repositories.risk.RiskValidationTarget;
+import java.util.Optional;
+
+import io.osvaldas.api.risk.validation.RiskValidationRequest;
 
 public interface ValidationRule {
 
-    void validate(RiskValidationTarget target);
+    Optional<Rejection> check(RiskValidationRequest request);
 }

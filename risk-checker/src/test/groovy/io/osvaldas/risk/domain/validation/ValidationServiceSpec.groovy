@@ -5,11 +5,9 @@ import static io.osvaldas.api.util.ExceptionMessages.AMOUNT_EXCEEDS as AMOUNT_EX
 
 import java.time.ZonedDateTime
 
-import io.osvaldas.api.exceptions.ValidationRuleException.AmountException
 import io.osvaldas.api.risk.validation.RiskValidationRequest
 import io.osvaldas.api.risk.validation.RiskValidationResponse
 import io.osvaldas.risk.AbstractSpec
-import io.osvaldas.risk.repositories.risk.RiskValidationTarget
 import spock.lang.Shared
 import spock.lang.Subject
 
@@ -24,26 +22,31 @@ class ValidationServiceSpec extends AbstractSpec {
     @Shared
     RiskValidationRequest request = new RiskValidationRequest(1L, clientId, amount, 1L, requestedAt)
 
-    Validator validator = Mock()
+    ValidationRule firstRule = Mock()
+
+    ValidationRule secondRule = Mock()
 
     @Subject
-    ValidationService validationService = new ValidationService(validator)
+    ValidationService validationService = new ValidationService([firstRule, secondRule])
 
-    void 'should return successful validation when checking risk'() {
+    void 'should return successful validation when no rule rejects the request'() {
         when:
             RiskValidationResponse response = validationService.validate(request)
         then:
+            1 * firstRule.check(request) >> Optional.empty()
+        then:
+            1 * secondRule.check(request) >> Optional.empty()
+        and:
             response.success()
             response.reason() == null
-        and:
-            1 * validator.validate(new RiskValidationTarget(amount, clientId, 1, requestedAt))
     }
 
-    void 'should return failed validation with reason when validation rule rejects loan'() {
+    void 'should return failed validation with reason and skip the remaining rules when a rule rejects the request'() {
         when:
             RiskValidationResponse response = validationService.validate(request)
         then:
-            1 * validator.validate(_ as RiskValidationTarget) >> { throw new AmountException(AMOUNT_EXCEEDS_MESSAGE) }
+            1 * firstRule.check(request) >> Optional.of(new Rejection(AMOUNT_EXCEEDS, AMOUNT_EXCEEDS_MESSAGE))
+            0 * secondRule.check(_)
         and:
             !response.success()
             response.reason() == AMOUNT_EXCEEDS
@@ -56,7 +59,7 @@ class ValidationServiceSpec extends AbstractSpec {
         when:
             validationService.validate(request)
         then:
-            1 * validator.validate(_ as RiskValidationTarget) >> { throw failure }
+            1 * firstRule.check(request) >> { throw failure }
         and:
             IllegalStateException e = thrown()
             e.is(failure)

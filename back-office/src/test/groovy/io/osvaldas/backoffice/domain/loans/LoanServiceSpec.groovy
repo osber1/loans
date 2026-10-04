@@ -153,7 +153,6 @@ class LoanServiceSpec extends AbstractSpec {
             loanService.validate(addedLoan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
-            e instanceof ValidationRuleException.AmountException
             e.reason == RiskRejectionReason.AMOUNT_EXCEEDS
             e.message == AMOUNT_EXCEEDS
         and:
@@ -172,7 +171,6 @@ class LoanServiceSpec extends AbstractSpec {
             loanService.validate(addedLoan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
-            e instanceof ValidationRuleException.TimeException
             e.reason == RiskRejectionReason.FORBIDDEN_TIME
             e.message == RISK_TOO_HIGH
     }
@@ -187,7 +185,6 @@ class LoanServiceSpec extends AbstractSpec {
             loanService.validate(loan, CLIENT_ID)
         then:
             ValidationRuleException e = thrown()
-            e instanceof ValidationRuleException.LoanLimitException
             e.reason == RiskRejectionReason.LOAN_LIMIT_EXCEEDS
             e.message == LOAN_LIMIT_EXCEEDS
     }
