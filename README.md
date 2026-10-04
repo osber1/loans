@@ -3,7 +3,7 @@
 ## Status
 
 ![loans workflow](https://github.com/osber1/loans/actions/workflows/pipeline.yml/badge.svg)
-[![codecov](https://codecov.io/gh/osber1/loans/branch/master/graph/badge.svg?token=2KOECLUD4M)](https://codecov.io/gh/osber1/loans)
+[![codecov](https://codecov.io/gh/osber1/loans/branch/main/graph/badge.svg?token=2KOECLUD4M)](https://codecov.io/gh/osber1/loans)
 [![sonarcloud](https://sonarcloud.io/api/project_badges/measure?project=osber1_loans&metric=sqale_rating)](https://sonarcloud.io/project/overview?id=osber1_loans)
 ## [Infra Repository](https://github.com/osber1/loans-infra)
 
@@ -93,14 +93,14 @@ the resulting diff after a build. CI fails when the build leaves a diff, so the 
 ## CI
 
 `.github/workflows/pipeline.yml` runs `./gradlew check sonar`, uploads coverage to Codecov, scans the repository
-with Trivy and, on `master`, builds and pushes the application images to DockerHub. Required repository secrets:
+with Trivy and, on `main`, builds and pushes the application images to DockerHub. Required repository secrets:
 
 | Secret               | Used by                       |
 |----------------------|-------------------------------|
 | `SONAR_TOKEN`        | SonarCloud analysis           |
 | `CODECOV_TOKEN`      | Codecov upload                |
-| `DOCKERHUB_USERNAME` | DockerHub image push (master only) |
-| `DOCKERHUB_TOKEN`    | DockerHub image push (master only) |
+| `DOCKERHUB_USERNAME` | DockerHub image push (main only) |
+| `DOCKERHUB_TOKEN`    | DockerHub image push (main only) |
 
 `GITHUB_TOKEN` is provided by GitHub Actions.
 
