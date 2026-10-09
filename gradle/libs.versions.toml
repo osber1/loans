@@ -3,7 +3,7 @@ spring_boot = "4.1.1"
 spring_cloud_release = "2025.1.3"
 mapstruct = "1.6.3"
 spock = "2.4-groovy-5.0"
-cucumber = "8.0.3"
+cucumber = "8.0.4"
 shedlock = "7.10.1"
 error_prone_picnic = "0.30.0"
 groovy = "5.1.3"
@@ -38,7 +38,7 @@ groovy_json = { module = "org.apache.groovy:groovy-json", version.ref = "groovy"
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock" }
 spock_spring = { module = "org.spockframework:spock-spring", version.ref = "spock" }
 
-wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.4.2" }
+wiremock = { module = "org.wiremock.integrations:wiremock-spring-boot", version = "4.4.3" }
 
 feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
 
